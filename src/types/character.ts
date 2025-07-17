@@ -69,6 +69,7 @@ export interface ActivityReward {
   type: 'experience' | 'currency' | 'item' | 'resource';
   amount: number;
   itemId?: string;
+  description?: string;
 }
 
 export interface Character {

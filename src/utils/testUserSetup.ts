@@ -4,8 +4,8 @@
  */
 
 export const setupTestUsers = () => {
-  // Only run in development mode
-  if (process.env.NODE_ENV !== 'development') {
+  // Only run in development mode and if localStorage is available
+  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined' || !window.localStorage) {
     return;
   }
 

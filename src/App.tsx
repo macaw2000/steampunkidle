@@ -5,28 +5,58 @@ import { store } from './store/store';
 import AuthProvider from './components/auth/AuthProvider';
 import GameDashboard from './components/GameDashboard';
 import AuthCallback from './components/auth/AuthCallback';
-import './utils/testUserSetup'; // Initialize test users in development
+import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
+import ErrorBoundary from './components/common/ErrorBoundary';
 import './App.css';
 
+// Conditionally import test user setup only in development
+if (process.env.NODE_ENV === 'development') {
+  try {
+    require('./utils/testUserSetup');
+  } catch (error) {
+    console.warn('Failed to load test user setup:', error);
+  }
+}
+
 function App() {
+  console.log('App component rendering...');
+  
   return (
-    <Provider store={store}>
-      <AuthProvider>
-        <Router>
-          <div className="App">
-            <header className="App-header">
-              <h1>Steampunk Idle Game</h1>
-            </header>
-            <main>
-              <Routes>
-                <Route path="/" element={<GameDashboard />} />
-                <Route path="/auth/callback" element={<AuthCallback />} />
-              </Routes>
-            </main>
-          </div>
-        </Router>
-      </AuthProvider>
-    </Provider>
+    <GlobalErrorBoundary>
+      <Provider store={store}>
+        <ErrorBoundary fallback={<div>Authentication system failed to load</div>}>
+          <AuthProvider>
+            <Router>
+              <div className="App">
+                <header className="App-header">
+                  <h1>Steampunk Idle Game</h1>
+                </header>
+                <main>
+                  <Routes>
+                    <Route 
+                      path="/" 
+                      element={
+                        <ErrorBoundary fallback={<div>Game dashboard failed to load</div>}>
+                          <GameDashboard />
+                        </ErrorBoundary>
+                      } 
+                    />
+                    <Route 
+                      path="/auth/callback" 
+                      element={
+                        <ErrorBoundary fallback={<div>Authentication callback failed</div>}>
+                          <AuthCallback />
+                        </ErrorBoundary>
+                      } 
+                    />
+                  </Routes>
+                </main>
+              </div>
+            </Router>
+          </AuthProvider>
+        </ErrorBoundary>
+      </Provider>
+    </GlobalErrorBoundary>
   );
 }
 

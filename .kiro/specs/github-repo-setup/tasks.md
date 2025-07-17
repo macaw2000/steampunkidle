@@ -2,7 +2,9 @@
 
 ## Task List
 
-- [-] 1. Create GitHub repository via web interface
+- [x] 1. Create GitHub repository via web interface
+
+
 
 
 

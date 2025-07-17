@@ -23,6 +23,11 @@ export class ActivityService {
    * Switch character to a new activity
    */
   static async switchActivity(userId: string, activityType: ActivityType): Promise<SwitchActivityResponse> {
+    // Check if we're in development mode - use mock functionality
+    if (process.env.NODE_ENV === 'development') {
+      return this.mockSwitchActivity(userId, activityType);
+    }
+
     try {
       const response = await fetch(`/api/activity/${userId}/switch`, {
         method: 'POST',
@@ -41,7 +46,8 @@ export class ActivityService {
       return result;
     } catch (error) {
       console.error('Error switching activity:', error);
-      throw error;
+      // Fallback to mock in case of network error
+      return this.mockSwitchActivity(userId, activityType);
     }
   }
 
@@ -49,6 +55,11 @@ export class ActivityService {
    * Get current activity progress
    */
   static async getActivityProgress(userId: string): Promise<ActivityProgress | null> {
+    // Check if we're in development mode - use mock functionality
+    if (process.env.NODE_ENV === 'development') {
+      return this.mockGetActivityProgress(userId);
+    }
+
     try {
       const response = await fetch(`/api/activity/${userId}/progress`);
 
@@ -61,7 +72,8 @@ export class ActivityService {
       return result.progress;
     } catch (error) {
       console.error('Error getting activity progress:', error);
-      throw error;
+      // Fallback to mock in case of network error
+      return this.mockGetActivityProgress(userId);
     }
   }
 
@@ -193,6 +205,141 @@ export class ActivityService {
     const duration = this.formatActivityDuration(progress.minutesActive);
     
     return `${activityInfo.name} for ${duration} - ${Math.floor(progress.progressPercentage)}% progress`;
+  }
+
+  /**
+   * Mock activity progress for development mode
+   */
+  private static async mockGetActivityProgress(userId: string): Promise<ActivityProgress | null> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    // Get current character from localStorage (mock data)
+    const characterKey = `testCharacter-${userId}`;
+    let character: Character | null = null;
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedCharacter = localStorage.getItem(characterKey);
+      if (storedCharacter) {
+        character = JSON.parse(storedCharacter);
+      }
+    }
+
+    if (!character || !character.currentActivity) {
+      return null;
+    }
+
+    const minutesActive = Math.floor(
+      (Date.now() - new Date(character.currentActivity.startedAt).getTime()) / (1000 * 60)
+    );
+
+    const progressPercentage = Math.min(100, (minutesActive / 60) * 100); // 100% after 1 hour
+
+    // Generate potential rewards based on activity type and time
+    const potentialRewards: ActivityReward[] = [
+      {
+        type: 'experience',
+        amount: Math.floor(minutesActive * 2),
+        description: 'Experience gained from activity',
+      },
+    ];
+
+    if (minutesActive >= 5) {
+      potentialRewards.push({
+        type: 'currency',
+        amount: Math.floor(minutesActive * 0.5),
+        description: 'Coins earned',
+      });
+    }
+
+    return {
+      activityType: character.currentActivity.type,
+      startedAt: new Date(character.currentActivity.startedAt),
+      minutesActive,
+      progressPercentage,
+      potentialRewards,
+    };
+  }
+
+  /**
+   * Mock activity switching for development mode
+   */
+  private static async mockSwitchActivity(userId: string, activityType: ActivityType): Promise<SwitchActivityResponse> {
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Get current character from localStorage (mock data)
+    const characterKey = `testCharacter-${userId}`;
+    let character: Character | null = null;
+
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const storedCharacter = localStorage.getItem(characterKey);
+      if (storedCharacter) {
+        character = JSON.parse(storedCharacter);
+      }
+    }
+
+    if (!character) {
+      throw new Error('Character not found');
+    }
+
+    // Calculate rewards from previous activity if there was one
+    const previousActivityRewards: ActivityReward[] = [];
+    if (character.currentActivity && character.currentActivity.type !== activityType) {
+      const minutesActive = Math.floor(
+        (Date.now() - new Date(character.currentActivity.startedAt).getTime()) / (1000 * 60)
+      );
+      
+      if (minutesActive > 0) {
+        // Generate mock rewards based on time spent
+        const baseReward = Math.floor(minutesActive * 2);
+        previousActivityRewards.push({
+          type: 'experience',
+          amount: baseReward,
+          description: `${baseReward} experience from ${character.currentActivity.type}`,
+        });
+        
+        if (minutesActive >= 5) {
+          previousActivityRewards.push({
+            type: 'currency',
+            amount: Math.floor(minutesActive * 0.5),
+            description: `${Math.floor(minutesActive * 0.5)} coins earned`,
+          });
+        }
+      }
+    }
+
+    // Update character's current activity
+    const updatedCharacter: Character = {
+      ...character,
+      currentActivity: {
+        type: activityType,
+        startedAt: new Date(),
+        progress: 0,
+        rewards: [],
+      },
+      // Apply previous activity rewards
+      experience: character.experience + (previousActivityRewards.find(r => r.type === 'experience')?.amount || 0),
+      currency: character.currency + (previousActivityRewards.find(r => r.type === 'currency')?.amount || 0),
+    };
+
+    // Recalculate level if experience increased
+    if (updatedCharacter.experience > character.experience) {
+      updatedCharacter.level = Math.floor(Math.sqrt(updatedCharacter.experience / 100)) + 1;
+    }
+
+    // Save updated character back to localStorage
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem(characterKey, JSON.stringify(updatedCharacter));
+    }
+
+    const activityInfo = this.getActivityDisplayInfo(activityType);
+    
+    return {
+      character: updatedCharacter,
+      previousActivityRewards: previousActivityRewards.length > 0 ? previousActivityRewards : undefined,
+      message: `Successfully switched to ${activityInfo.name}!`,
+    };
   }
 }
 

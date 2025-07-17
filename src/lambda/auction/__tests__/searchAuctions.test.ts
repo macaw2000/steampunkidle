@@ -19,7 +19,7 @@ const mockDocClient = {
 // Mock environment variables
 process.env.AUCTION_LISTINGS_TABLE = 'test-auction-listings';
 
-describe.skip('searchAuctions Lambda', () => {
+describe.skip('searchAuctions Lambda - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

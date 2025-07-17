@@ -15,7 +15,7 @@ process.env.LEADERBOARDS_TABLE = 'test-leaderboards';
 process.env.GUILD_MEMBERS_TABLE = 'test-guild-members';
 process.env.GUILDS_TABLE = 'test-guilds';
 
-describe.skip('calculateLeaderboards Lambda', () => {
+describe.skip('calculateLeaderboards Lambda - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     ddbMock.reset();
     jest.clearAllMocks();

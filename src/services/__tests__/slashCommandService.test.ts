@@ -7,7 +7,7 @@ import SlashCommandService, { SlashCommandContext, SlashCommandResult } from '..
 // Mock fetch globally
 global.fetch = jest.fn();
 
-describe.skip('SlashCommandService', () => {
+describe('SlashCommandService', () => {
   let service: SlashCommandService;
   let mockContext: SlashCommandContext;
 
@@ -125,7 +125,7 @@ describe.skip('SlashCommandService', () => {
   });
 
   describe('whisper command', () => {
-    beforeEach(() => {
+    it('should process whisper command successfully', async () => {
       (fetch as jest.Mock)
         .mockResolvedValueOnce({
           ok: true,
@@ -135,9 +135,7 @@ describe.skip('SlashCommandService', () => {
           ok: true,
           json: () => Promise.resolve({ messageId: 'msg123' }),
         });
-    });
 
-    it('should process whisper command successfully', async () => {
       const result = await service.processCommand('w', ['targetPlayer', 'hello', 'there'], mockContext);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Whisper sent to targetPlayer');
@@ -165,14 +163,12 @@ describe.skip('SlashCommandService', () => {
       lastActiveAt: '2023-01-01T00:00:00Z',
     };
 
-    beforeEach(() => {
+    it('should display player profile', async () => {
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve(mockProfile),
       });
-    });
 
-    it('should display player profile', async () => {
       const result = await service.processCommand('profile', ['TestPlayer'], mockContext);
       expect(result.success).toBe(true);
       expect(result.message).toContain('TestPlayer');
@@ -285,7 +281,7 @@ describe.skip('SlashCommandService', () => {
       expect(result.success).toBe(true);
       expect(result.message).toContain('TestGuild');
       expect(result.message).toContain('15/50');
-      expect(result.message).toContain('Level 5');
+      expect(result.message).toContain('Level: 5');
       expect(result.systemMessage).toBe(true);
     });
 
@@ -328,14 +324,12 @@ describe.skip('SlashCommandService', () => {
       { name: 'Player2', level: 25 },
     ];
 
-    beforeEach(() => {
+    it('should list online players', async () => {
       (fetch as jest.Mock).mockResolvedValueOnce({
         ok: true,
         json: () => Promise.resolve({ players: mockPlayers }),
       });
-    });
 
-    it('should list online players', async () => {
       const result = await service.processCommand('who', [], mockContext);
       expect(result.success).toBe(true);
       expect(result.message).toContain('Online Players (2)');
@@ -359,19 +353,19 @@ describe.skip('SlashCommandService', () => {
 
   describe('command aliases', () => {
     it('should handle whisper aliases', async () => {
-      (fetch as jest.Mock)
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ userId: 'target123' }),
-        })
-        .mockResolvedValueOnce({
-          ok: true,
-          json: () => Promise.resolve({ messageId: 'msg123' }),
-        });
-
       const aliases = ['whisper', 'tell', 'msg'];
       
       for (const alias of aliases) {
+        (fetch as jest.Mock)
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ userId: 'target123' }),
+          })
+          .mockResolvedValueOnce({
+            ok: true,
+            json: () => Promise.resolve({ messageId: 'msg123' }),
+          });
+
         const result = await service.processCommand(alias, ['player', 'hello'], mockContext);
         expect(result.success).toBe(true);
         expect(result.message).toContain('Whisper sent');

@@ -12,7 +12,7 @@ const ddbMock = mockClient(DynamoDBDocumentClient);
 // Mock environment variables
 process.env.LEADERBOARDS_TABLE = 'test-leaderboards';
 
-describe.skip('getLeaderboard Lambda', () => {
+describe.skip('getLeaderboard Lambda - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     ddbMock.reset();
     jest.clearAllMocks();

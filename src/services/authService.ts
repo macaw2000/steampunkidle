@@ -73,6 +73,11 @@ class AuthService {
   // Initialize authentication on app start
   async initializeAuth(): Promise<{ user: User; tokens: AuthTokens } | null> {
     if (isDevelopmentMode()) {
+      // Check if localStorage is available
+      if (typeof window === 'undefined' || !window.localStorage) {
+        return null;
+      }
+      
       // Check for mock session in localStorage
       const mockSession = localStorage.getItem('mockAuthSession');
       if (mockSession) {
@@ -324,7 +329,9 @@ class AuthService {
   async logout(accessToken: string): Promise<void> {
     if (isDevelopmentMode()) {
       // Clear mock session
-      localStorage.removeItem('mockAuthSession');
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.removeItem('mockAuthSession');
+      }
       return;
     }
 
@@ -398,6 +405,11 @@ class AuthService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      throw new Error('Authentication not available');
+    }
+
     // Get stored users from localStorage
     const storedUsers = JSON.parse(localStorage.getItem('mockUsers') || '{}');
     
@@ -442,6 +454,11 @@ class AuthService {
   private async mockEmailRegister(email: string, password: string): Promise<{ requiresConfirmation: boolean }> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      throw new Error('Registration not available');
+    }
 
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -490,6 +507,11 @@ class AuthService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      throw new Error('Email confirmation not available');
+    }
+
     // Get stored users from localStorage
     const storedUsers = JSON.parse(localStorage.getItem('mockUsers') || '{}');
     
@@ -514,6 +536,11 @@ class AuthService {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
 
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      throw new Error('Password reset not available');
+    }
+
     // Get stored users from localStorage
     const storedUsers = JSON.parse(localStorage.getItem('mockUsers') || '{}');
     
@@ -535,6 +562,11 @@ class AuthService {
   private async mockConfirmPasswordReset(email: string, confirmationCode: string, newPassword: string): Promise<void> {
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // Check if localStorage is available
+    if (typeof window === 'undefined' || !window.localStorage) {
+      throw new Error('Password reset not available');
+    }
 
     // Validate password strength
     if (newPassword.length < 8) {

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store/store';
 import { setOnlineStatus } from '../store/slices/gameSlice';
+import ErrorBoundary from './common/ErrorBoundary';
 import LoginComponent from './auth/LoginComponent';
 import UserProfile from './auth/UserProfile';
 import CharacterCreation from './character/CharacterCreation';
@@ -27,7 +28,11 @@ const GameDashboard: React.FC = () => {
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
-    return <LoginComponent />;
+    return (
+      <ErrorBoundary fallback={<div>Login component failed to load</div>}>
+        <LoginComponent />
+      </ErrorBoundary>
+    );
   }
 
   // Show loading screen while checking for character
@@ -46,12 +51,14 @@ const GameDashboard: React.FC = () => {
   if (hasCharacter === false) {
     return (
       <div className="game-dashboard">
-        <CharacterCreation 
-          onCharacterCreated={() => {
-            // Character creation will update the Redux state automatically
-            // The component will re-render and show the main game interface
-          }}
-        />
+        <ErrorBoundary fallback={<div>Character creation failed to load</div>}>
+          <CharacterCreation 
+            onCharacterCreated={() => {
+              // Character creation will update the Redux state automatically
+              // The component will re-render and show the main game interface
+            }}
+          />
+        </ErrorBoundary>
       </div>
     );
   }
@@ -59,7 +66,9 @@ const GameDashboard: React.FC = () => {
   // Show main game interface if user has a character
   return (
     <div className="game-dashboard">
-      <UserProfile />
+      <ErrorBoundary fallback={<div>User profile failed to load</div>}>
+        <UserProfile />
+      </ErrorBoundary>
       
       <div className="status-bar">
         <span className={`online-indicator ${isOnline ? 'online' : 'offline'}`}>
@@ -101,10 +110,14 @@ const GameDashboard: React.FC = () => {
             </div>
 
             {/* Activity Selection */}
-            <ActivitySelector />
+            <ErrorBoundary fallback={<div>Activity selector failed to load</div>}>
+              <ActivitySelector />
+            </ErrorBoundary>
 
             {/* Real-time Progress Display */}
-            <RealTimeProgressTracker />
+            <ErrorBoundary fallback={<div>Progress tracker failed to load</div>}>
+              <RealTimeProgressTracker />
+            </ErrorBoundary>
 
             <div className="game-info">
               <h3>Game Features</h3>
@@ -121,7 +134,11 @@ const GameDashboard: React.FC = () => {
           </>
         )}
 
-        {activeTab === 'marketplace' && <MarketplaceHub />}
+        {activeTab === 'marketplace' && (
+          <ErrorBoundary fallback={<div>Marketplace failed to load</div>}>
+            <MarketplaceHub />
+          </ErrorBoundary>
+        )}
       </div>
     </div>
   );

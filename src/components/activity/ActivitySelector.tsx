@@ -11,43 +11,34 @@ import { setCharacter } from '../../store/slices/gameSlice';
 import './ActivitySelector.css';
 
 const ActivitySelector: React.FC = () => {
-  const dispatch = useDispatch();
   const { character } = useSelector((state: RootState) => state.game);
-  const { user } = useSelector((state: RootState) => state.auth);
-  const [switching, setSwitching] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleActivitySwitch = async (activityType: ActivityType) => {
-    if (!user?.userId || !character || switching) return;
-
-    setSwitching(true);
-    setError(null);
-
+  // Simple error handling wrapper for ActivityService calls
+  const safeGetActivityInfo = (activityType: ActivityType) => {
     try {
-      const result = await ActivityService.switchActivity(user.userId, activityType);
-      
-      // Update character in Redux store
-      dispatch(setCharacter(result.character));
-      
-      // Show success message if there were previous rewards
-      if (result.previousActivityRewards && result.previousActivityRewards.length > 0) {
-        console.log('Previous activity rewards:', result.previousActivityRewards);
-        // TODO: Show rewards notification
-      }
+      return ActivityService.getActivityDisplayInfo(activityType);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to switch activity');
-    } finally {
-      setSwitching(false);
+      console.error('Error getting activity info:', err);
+      return {
+        name: 'Unknown Activity',
+        description: 'Activity information unavailable',
+        icon: '❓',
+        primaryStat: 'Unknown',
+        rewards: ['Unknown'],
+        steampunkFlavor: 'Activity details unavailable',
+      };
     }
   };
 
-  const getActivityInfo = (activityType: ActivityType) => {
-    return ActivityService.getActivityDisplayInfo(activityType);
-  };
-
-  const getActivityEfficiency = (activityType: ActivityType) => {
-    if (!character) return 1;
-    return ActivityService.calculateActivityEfficiency(character, activityType);
+  const safeGetActivityEfficiency = (activityType: ActivityType) => {
+    try {
+      if (!character) return 1;
+      return ActivityService.calculateActivityEfficiency(character, activityType);
+    } catch (err) {
+      console.error('Error calculating efficiency:', err);
+      return 1;
+    }
   };
 
   const isCurrentActivity = (activityType: ActivityType) => {
@@ -72,15 +63,14 @@ const ActivitySelector: React.FC = () => {
 
       <div className="activities-grid">
         {activities.map((activityType) => {
-          const info = getActivityInfo(activityType);
-          const efficiency = getActivityEfficiency(activityType);
+          const info = safeGetActivityInfo(activityType);
+          const efficiency = safeGetActivityEfficiency(activityType);
           const isCurrent = isCurrentActivity(activityType);
           
           return (
             <div
               key={activityType}
-              className={`activity-card ${isCurrent ? 'active' : ''} ${switching ? 'disabled' : ''}`}
-              onClick={() => !switching && !isCurrent && handleActivitySwitch(activityType)}
+              className={`activity-card ${isCurrent ? 'active' : ''}`}
             >
               <div className="activity-icon">{info.icon}</div>
               <div className="activity-name">{info.name}</div>
@@ -113,12 +103,6 @@ const ActivitySelector: React.FC = () => {
                   ⚡ Active
                 </div>
               )}
-
-              {switching && (
-                <div className="switching-overlay">
-                  <div className="loading-spinner">⚙️</div>
-                </div>
-              )}
             </div>
           );
         })}
@@ -127,17 +111,7 @@ const ActivitySelector: React.FC = () => {
       {character.currentActivity && (
         <div className="current-activity-status">
           <h4>Current Activity Status</h4>
-          <p>
-            {ActivityService.getActivityStatusMessage({
-              activityType: character.currentActivity.type,
-              startedAt: new Date(character.currentActivity.startedAt),
-              minutesActive: Math.floor(
-                (Date.now() - new Date(character.currentActivity.startedAt).getTime()) / (1000 * 60)
-              ),
-              progressPercentage: character.currentActivity.progress,
-              potentialRewards: character.currentActivity.rewards,
-            })}
-          </p>
+          <p>Current Activity: {character.currentActivity.type}</p>
         </div>
       )}
     </div>

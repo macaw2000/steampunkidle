@@ -57,25 +57,37 @@
 
 
 
+
 - [ ] 5. Fix activity Lambda function tests
   - [ ] 5.1 Fix calculateOfflineProgress test setup
     - Update mock setup to return proper success responses
     - Fix character update expectations in tests
     - _Requirements: 1.4_
 
+
+
 - [ ] 6. Fix character validation schema tests
   - [ ] 6.1 Update CharacterSchema to include missing fields
     - Add missing harvesting skill fields (mining, foraging, salvaging, crystal_extraction)
 
 
+
+
     - Add missing combat skill fields (melee, ranged, defense, tactics)
+
+
     - _Requirements: 2.1, 2.2_
   
   - [x] 6.2 Update character validation test data
 
 
+
+
     - Ensure test character objects include all required skill fields
     - Update mock character data to match schema requirements
+
+
+
     - _Requirements: 2.1, 2.3_
 
 
