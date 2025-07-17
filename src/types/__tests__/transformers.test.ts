@@ -135,13 +135,15 @@ describe('DataTransformers', () => {
           intelligence: 10,
           vitality: 25,
           craftingSkills: { clockmaking: 5, engineering: 3, alchemy: 2, steamcraft: 4, level: 3, experience: 150 },
-          harvestingSkills: { clockmaking: 2, engineering: 1, alchemy: 3, steamcraft: 2, level: 2, experience: 80 },
-          combatSkills: { clockmaking: 1, engineering: 2, alchemy: 1, steamcraft: 3, level: 2, experience: 90 },
+          harvestingSkills: { mining: 2, foraging: 1, salvaging: 3, crystal_extraction: 2, level: 2, experience: 80 },
+          combatSkills: { melee: 1, ranged: 2, defense: 1, tactics: 3, level: 2, experience: 90 },
         },
         specialization: {
           tankProgress: 0,
           healerProgress: 0,
           dpsProgress: 0,
+          primaryRole: null,
+          secondaryRole: null,
           bonuses: [],
         },
         currentActivity: {
@@ -152,6 +154,7 @@ describe('DataTransformers', () => {
         },
         lastActiveAt: new Date(),
         createdAt: new Date(),
+        updatedAt: new Date(),
       };
 
       const progress = DataTransformers.calculateSpecializationProgress(character);

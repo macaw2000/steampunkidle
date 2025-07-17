@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ChatMessage, ChatChannel, ChatChannelType } from '../../types/chat';
+import { ChatMessage, ChatChannel } from '../../types/chat';
 
 interface ChatState {
   channels: ChatChannel[];

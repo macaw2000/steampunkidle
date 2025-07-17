@@ -61,6 +61,7 @@ describe('inviteToGuild Lambda function', () => {
 
   const mockInviterMembership: GuildMember = {
     userId: 'user-123',
+    guildId: 'guild-123',
     characterName: 'Inviter',
     role: 'leader',
     joinedAt: new Date(),
@@ -80,6 +81,7 @@ describe('inviteToGuild Lambda function', () => {
     currentActivity: {} as any,
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date()
   };
 
   it('should send invitation successfully', async () => {

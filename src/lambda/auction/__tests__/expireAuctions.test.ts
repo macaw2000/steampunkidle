@@ -22,7 +22,7 @@ process.env.CHARACTERS_TABLE = 'test-characters';
 process.env.INVENTORY_TABLE = 'test-inventory';
 process.env.CURRENCY_TRANSACTIONS_TABLE = 'test-currency-transactions';
 
-describe.skip('expireAuctions Lambda', () => {
+describe.skip('expireAuctions Lambda - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });

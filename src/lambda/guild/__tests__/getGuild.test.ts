@@ -54,6 +54,7 @@ describe('getGuild Lambda function', () => {
   const mockMembers: GuildMember[] = [
     {
       userId: 'user-123',
+      guildId: 'guild-123',
       characterName: 'Leader',
       role: 'leader',
       joinedAt: new Date(),
@@ -62,6 +63,7 @@ describe('getGuild Lambda function', () => {
     },
     {
       userId: 'user-456',
+      guildId: 'guild-123',
       characterName: 'Member',
       role: 'member',
       joinedAt: new Date(),

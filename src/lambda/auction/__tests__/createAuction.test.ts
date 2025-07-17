@@ -10,18 +10,19 @@ import { DynamoDBDocumentClient } from '@aws-sdk/lib-dynamodb';
 jest.mock('@aws-sdk/client-dynamodb');
 jest.mock('@aws-sdk/lib-dynamodb');
 
+const mockSend = jest.fn();
 const mockDocClient = {
-  send: jest.fn(),
+  send: mockSend,
 };
 
-(DynamoDBDocumentClient.from as jest.Mock) = jest.fn().mockReturnValue(mockDocClient);
+jest.mocked(DynamoDBDocumentClient.from).mockReturnValue(mockDocClient as any);
 
 // Mock environment variables
 process.env.AUCTION_LISTINGS_TABLE = 'test-auction-listings';
 process.env.INVENTORY_TABLE = 'test-inventory';
 process.env.CHARACTERS_TABLE = 'test-characters';
 
-describe.skip('createAuction Lambda', () => {
+describe.skip('createAuction Lambda - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -70,7 +71,7 @@ describe.skip('createAuction Lambda', () => {
   };
 
   it('should create auction successfully', async () => {
-    mockDocClient.send
+    mockSend
       .mockResolvedValueOnce(mockInventoryItem) // GetCommand for inventory
       .mockResolvedValueOnce(mockCharacter) // GetCommand for character
       .mockResolvedValueOnce({}) // PutCommand for auction
@@ -135,7 +136,7 @@ describe.skip('createAuction Lambda', () => {
       },
     };
 
-    mockDocClient.send.mockResolvedValueOnce(insufficientInventory);
+    mockSend.mockResolvedValueOnce(insufficientInventory);
 
     const result = await handler(mockEvent(validCreateRequest));
 
@@ -154,7 +155,7 @@ describe.skip('createAuction Lambda', () => {
       },
     };
 
-    mockDocClient.send
+    mockSend
       .mockResolvedValueOnce(mockInventoryItem)
       .mockResolvedValueOnce(poorCharacter);
 
@@ -210,7 +211,7 @@ describe.skip('createAuction Lambda', () => {
   });
 
   it('should handle database errors gracefully', async () => {
-    mockDocClient.send.mockRejectedValueOnce(new Error('Database error'));
+    mockSend.mockRejectedValueOnce(new Error('Database error'));
 
     const result = await handler(mockEvent(validCreateRequest));
 
@@ -221,7 +222,7 @@ describe.skip('createAuction Lambda', () => {
   });
 
   it('should handle transaction failures with cleanup', async () => {
-    mockDocClient.send
+    mockSend
       .mockResolvedValueOnce(mockInventoryItem) // GetCommand for inventory
       .mockResolvedValueOnce(mockCharacter) // GetCommand for character
       .mockRejectedValueOnce(new Error('Transaction failed')); // PutCommand fails

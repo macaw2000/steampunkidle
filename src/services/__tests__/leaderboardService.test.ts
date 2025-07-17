@@ -137,6 +137,18 @@ describe('leaderboardService', () => {
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 500,
+        statusText: 'Internal Server Error',
+        headers: new Headers(),
+        redirected: false,
+        type: 'basic',
+        url: '',
+        clone: () => ({} as Response),
+        body: null,
+        bodyUsed: false,
+        arrayBuffer: async () => new ArrayBuffer(0),
+        blob: async () => new Blob(),
+        formData: async () => new FormData(),
+        text: async () => '',
         json: async () => { throw new Error('Network error'); },
       } as Response);
 

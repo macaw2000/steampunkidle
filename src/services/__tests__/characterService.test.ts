@@ -263,6 +263,8 @@ describe.skip('CharacterService', () => {
         tankProgress: 0,
         healerProgress: 0,
         dpsProgress: 0,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       },
       currentActivity: {
@@ -273,6 +275,7 @@ describe.skip('CharacterService', () => {
       },
       lastActiveAt: new Date(),
       createdAt: new Date(),
+      updatedAt: new Date(),
     };
 
     it('should add experience and update level', async () => {
@@ -334,6 +337,8 @@ describe.skip('CharacterService', () => {
         tankProgress: 0,
         healerProgress: 0,
         dpsProgress: 0,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       },
       currentActivity: {
@@ -344,6 +349,7 @@ describe.skip('CharacterService', () => {
       },
       lastActiveAt: new Date(),
       createdAt: new Date(),
+      updatedAt: new Date()
     };
 
     it('should add skill experience successfully', async () => {

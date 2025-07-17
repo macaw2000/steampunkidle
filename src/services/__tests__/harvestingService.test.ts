@@ -53,6 +53,7 @@ describe('HarvestingService', () => {
       healerProgress: 10,
       dpsProgress: 15,
       primaryRole: 'tank',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -63,6 +64,7 @@ describe('HarvestingService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {

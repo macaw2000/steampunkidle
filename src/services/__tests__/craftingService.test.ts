@@ -32,18 +32,18 @@ describe('CraftingService', () => {
         experience: 2000,
       },
       harvestingSkills: {
-        clockmaking: 2,
-        engineering: 1,
-        alchemy: 0,
-        steamcraft: 1,
+        mining: 2,
+        foraging: 1,
+        salvaging: 0,
+        crystal_extraction: 1,
         level: 1,
         experience: 50,
       },
       combatSkills: {
-        clockmaking: 1,
-        engineering: 0,
-        alchemy: 0,
-        steamcraft: 2,
+        melee: 1,
+        ranged: 0,
+        defense: 0,
+        tactics: 2,
         level: 1,
         experience: 100,
       },
@@ -53,6 +53,7 @@ describe('CraftingService', () => {
       healerProgress: 10,
       dpsProgress: 15,
       primaryRole: 'tank',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -63,6 +64,7 @@ describe('CraftingService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {

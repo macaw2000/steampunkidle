@@ -195,7 +195,7 @@ describe.skip('Zone System Integration', () => {
         maxHealth: 100,
         stats: { attack: 15, defense: 15, speed: 12 },
         lootTable: [],
-        steampunkTheme: { type: 'mechanical', description: 'Test' }
+        steampunkTheme: { type: 'mechanical' as const, description: 'Test' }
       };
 
       const weakDamage = ZoneService.calculateDamage(

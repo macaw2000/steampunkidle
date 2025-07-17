@@ -12,7 +12,7 @@ const mockDocClient = {
 
 (DynamoDBDocumentClient.from as jest.Mock).mockReturnValue(mockDocClient);
 
-describe.skip('calculateOfflineProgress', () => {
+describe.skip('calculateOfflineProgress - Complex AWS SDK mocking issues', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     process.env.CHARACTERS_TABLE = 'test-characters-table';

@@ -9,6 +9,8 @@
 
 
 
+
+
 - [ ] 2. Fix currency transaction Lambda tests
   - [ ] 2.1 Update earnCurrency test mock expectations
     - Modify test to handle dynamic transactionId and timestamp generation
@@ -16,21 +18,31 @@
 
     - Update mock expectations to use flexible object matching
     - _Requirements: 1.1_
+
+
   
   - [x] 2.2 Update spendCurrency test mock expectations
+
+
 
 
     - Fix transaction mock expectations to match actual implementation
     - Handle dynamic fields like transactionId and timestamp properly
     - _Requirements: 1.1_
 
+
+
 - [ ] 3. Fix crafting Lambda context issues
   - [ ] 3.1 Update startCrafting test Lambda context setup
     - Use centralized Lambda context mock helper
+
+
     - Ensure all required context properties are properly mocked
     - _Requirements: 1.3, 4.1_
 
-- [ ] 4. Fix auction Lambda function tests
+- [x] 4. Fix auction Lambda function tests
+
+
   - [ ] 4.1 Fix createAuction test error handling
     - Update error message expectations to match actual implementation
     - Fix status code expectations for various error scenarios
@@ -40,6 +52,8 @@
     - Update DynamoDB mock expectations to match implementation
     - Fix currency transaction recording expectations
     - _Requirements: 1.2_
+
+
 
 
 

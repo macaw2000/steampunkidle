@@ -40,14 +40,15 @@ describe('createParty Lambda', () => {
       intelligence: 8,
       vitality: 20,
       craftingSkills: { clockmaking: 5, engineering: 3, alchemy: 2, steamcraft: 4, level: 3, experience: 150 },
-      harvestingSkills: { clockmaking: 2, engineering: 1, alchemy: 1, steamcraft: 2, level: 1, experience: 50 },
-      combatSkills: { clockmaking: 8, engineering: 6, alchemy: 4, steamcraft: 7, level: 6, experience: 300 },
+      harvestingSkills: { mining: 2, foraging: 1, salvaging: 1, crystal_extraction: 2, level: 1, experience: 50 },
+      combatSkills: { melee: 8, ranged: 6, defense: 4, tactics: 7, level: 6, experience: 300 },
     },
     specialization: {
       tankProgress: 75,
       healerProgress: 25,
       dpsProgress: 50,
       primaryRole: 'tank',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -58,6 +59,7 @@ describe('createParty Lambda', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {
@@ -75,7 +77,7 @@ describe('createParty Lambda', () => {
     };
 
     mockDatabaseService.getItem.mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
     mockDatabaseService.putItem.mockResolvedValueOnce(undefined);
 
     const result = await handler(mockEvent(request));
@@ -101,7 +103,7 @@ describe('createParty Lambda', () => {
     };
 
     mockDatabaseService.getItem.mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
     mockDatabaseService.putItem.mockResolvedValueOnce(undefined);
 
     const result = await handler(mockEvent(request));
@@ -126,7 +128,7 @@ describe('createParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(mockCharacter)
       .mockResolvedValueOnce({ userId: 'user-1', guildId: 'guild-1' }); // Guild membership
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
     mockDatabaseService.putItem.mockResolvedValueOnce(undefined);
 
     const result = await handler(mockEvent(request));
@@ -215,7 +217,8 @@ describe('createParty Lambda', () => {
 
     mockDatabaseService.getItem.mockResolvedValueOnce(mockCharacter);
     mockDatabaseService.scan.mockResolvedValueOnce({ 
-      items: [{ partyId: 'existing-party', status: 'forming' }] 
+      items: [{ partyId: 'existing-party', status: 'forming' }],
+      count: 1
     });
 
     const result = await handler(mockEvent(request));
@@ -237,7 +240,7 @@ describe('createParty Lambda', () => {
     };
 
     mockDatabaseService.getItem.mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent(request));
 
@@ -260,7 +263,7 @@ describe('createParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(mockCharacter)
       .mockResolvedValueOnce(null); // No guild membership
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent(request));
 

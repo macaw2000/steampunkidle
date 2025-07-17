@@ -35,18 +35,18 @@ describe('CurrencyService', () => {
         experience: 2000,
       },
       harvestingSkills: {
-        clockmaking: 6,
-        engineering: 4,
-        alchemy: 3,
-        steamcraft: 2,
+        mining: 6,
+        foraging: 4,
+        salvaging: 3,
+        crystal_extraction: 2,
         level: 6,
         experience: 1200,
       },
       combatSkills: {
-        clockmaking: 10,
-        engineering: 8,
-        alchemy: 6,
-        steamcraft: 7,
+        melee: 10,
+        ranged: 8,
+        defense: 6,
+        tactics: 7,
         level: 10,
         experience: 3000,
       },
@@ -56,6 +56,7 @@ describe('CurrencyService', () => {
       healerProgress: 15,
       dpsProgress: 35,
       primaryRole: 'dps',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -66,6 +67,7 @@ describe('CurrencyService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   describe('calculateActivityCurrencyReward', () => {

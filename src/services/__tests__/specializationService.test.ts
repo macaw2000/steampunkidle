@@ -56,6 +56,8 @@ describe('SpecializationService', () => {
       tankProgress: 0,
       healerProgress: 0,
       dpsProgress: 0,
+      primaryRole: null,
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -66,6 +68,7 @@ describe('SpecializationService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   });
 
   describe('calculateSpecializationProgress', () => {
@@ -248,6 +251,7 @@ describe('SpecializationService', () => {
         healerProgress: 150,
         dpsProgress: 50,
         primaryRole: 'healer' as const,
+        secondaryRole: null,
         bonuses: [],
       };
 
@@ -268,6 +272,8 @@ describe('SpecializationService', () => {
         tankProgress: 0,
         healerProgress: 0,
         dpsProgress: 0,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       };
 
@@ -343,6 +349,8 @@ describe('SpecializationService', () => {
         tankProgress: 150,
         healerProgress: 80,
         dpsProgress: 60,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       };
 
@@ -360,6 +368,8 @@ describe('SpecializationService', () => {
         tankProgress: 1500,
         healerProgress: 800,
         dpsProgress: 600,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       };
 
@@ -373,6 +383,8 @@ describe('SpecializationService', () => {
         tankProgress: 50,
         healerProgress: 250,
         dpsProgress: 100,
+        primaryRole: null,
+        secondaryRole: null,
         bonuses: [],
       };
 

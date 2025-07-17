@@ -49,6 +49,7 @@ describe('createGuild Lambda function', () => {
     currentActivity: {} as any,
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date()
   };
 
   it('should create a guild successfully', async () => {

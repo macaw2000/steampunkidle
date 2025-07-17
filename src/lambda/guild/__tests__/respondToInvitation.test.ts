@@ -76,6 +76,7 @@ describe('respondToInvitation Lambda function', () => {
     currentActivity: {} as any,
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date()
   };
 
   it('should accept invitation successfully', async () => {

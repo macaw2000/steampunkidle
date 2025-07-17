@@ -63,14 +63,15 @@ describe('joinParty Lambda', () => {
       intelligence: 12,
       vitality: 13,
       craftingSkills: { clockmaking: 3, engineering: 4, alchemy: 2, steamcraft: 3, level: 3, experience: 120 },
-      harvestingSkills: { clockmaking: 2, engineering: 1, alchemy: 1, steamcraft: 2, level: 1, experience: 40 },
-      combatSkills: { clockmaking: 6, engineering: 7, alchemy: 5, steamcraft: 6, level: 5, experience: 250 },
+      harvestingSkills: { mining: 2, foraging: 1, salvaging: 1, crystal_extraction: 2, level: 1, experience: 40 },
+      combatSkills: { melee: 6, ranged: 7, defense: 5, tactics: 6, level: 5, experience: 250 },
     },
     specialization: {
       tankProgress: 30,
       healerProgress: 20,
       dpsProgress: 80,
       primaryRole: 'dps',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -81,6 +82,7 @@ describe('joinParty Lambda', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {
@@ -96,7 +98,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(mockParty)
       .mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
     mockDatabaseService.updateItem.mockResolvedValueOnce(undefined);
 
     const result = await handler(mockEvent('party-1', request));
@@ -197,7 +199,8 @@ describe('joinParty Lambda', () => {
       .mockResolvedValueOnce(mockParty)
       .mockResolvedValueOnce(mockCharacter);
     mockDatabaseService.scan.mockResolvedValueOnce({ 
-      items: [{ partyId: 'other-party', status: 'forming' }] 
+      items: [{ partyId: 'other-party', status: 'forming' }],
+      count: 1
     });
 
     const result = await handler(mockEvent('party-1', request));
@@ -217,7 +220,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(activeParty)
       .mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 
@@ -244,7 +247,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(fullParty)
       .mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 
@@ -263,7 +266,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(mockParty)
       .mockResolvedValueOnce(lowLevelCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 
@@ -284,7 +287,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(highLevelParty)
       .mockResolvedValueOnce(highLevelCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 
@@ -304,7 +307,7 @@ describe('joinParty Lambda', () => {
       .mockResolvedValueOnce(guildParty)
       .mockResolvedValueOnce(mockCharacter)
       .mockResolvedValueOnce(null); // No guild membership
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 
@@ -323,7 +326,7 @@ describe('joinParty Lambda', () => {
     mockDatabaseService.getItem
       .mockResolvedValueOnce(privateParty)
       .mockResolvedValueOnce(mockCharacter);
-    mockDatabaseService.scan.mockResolvedValueOnce({ items: [] });
+    mockDatabaseService.scan.mockResolvedValueOnce({ items: [], count: 0 });
 
     const result = await handler(mockEvent('party-1', request));
 

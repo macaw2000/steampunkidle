@@ -3,10 +3,7 @@
  */
 
 import { Character, CharacterStats, CraftingSkillSet, HarvestingSkillSet, CombatSkillSet, CreateCharacterRequest, UpdateCharacterRequest } from '../types/character';
-import { DatabaseService, TABLE_NAMES } from './databaseService';
 import { SpecializationService } from './specializationService';
-import { GameDataOptimized } from '../utils/dynamodb-optimized';
-import { CacheKeys } from '../utils/cache';
 import { v4 as uuidv4 } from 'uuid';
 
 export class CharacterService {

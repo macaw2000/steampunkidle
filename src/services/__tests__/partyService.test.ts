@@ -54,14 +54,15 @@ describe('PartyService', () => {
       intelligence: 8,
       vitality: 20,
       craftingSkills: { clockmaking: 5, engineering: 3, alchemy: 2, steamcraft: 4, level: 3, experience: 150 },
-      harvestingSkills: { clockmaking: 2, engineering: 1, alchemy: 1, steamcraft: 2, level: 1, experience: 50 },
-      combatSkills: { clockmaking: 8, engineering: 6, alchemy: 4, steamcraft: 7, level: 6, experience: 300 },
+      harvestingSkills: { mining: 2, foraging: 1, salvaging: 1, crystal_extraction: 2, level: 1, experience: 50 },
+      combatSkills: { melee: 8, ranged: 6, defense: 4, tactics: 7, level: 6, experience: 300 },
     },
     specialization: {
       tankProgress: 75,
       healerProgress: 25,
       dpsProgress: 50,
       primaryRole: 'tank',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -72,6 +73,7 @@ describe('PartyService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {
@@ -297,6 +299,7 @@ describe('PartyService', () => {
           healerProgress: 80,
           dpsProgress: 30,
           primaryRole: 'healer' as const,
+          secondaryRole: null,
           bonuses: [],
         },
       };
@@ -313,6 +316,7 @@ describe('PartyService', () => {
           healerProgress: 25,
           dpsProgress: 85,
           primaryRole: 'dps' as const,
+          secondaryRole: null,
           bonuses: [],
         },
       };
@@ -328,6 +332,8 @@ describe('PartyService', () => {
           tankProgress: 50,
           healerProgress: 50,
           dpsProgress: 50,
+          primaryRole: null,
+          secondaryRole: null,
           bonuses: [],
         },
       };

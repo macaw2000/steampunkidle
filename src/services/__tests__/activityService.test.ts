@@ -31,18 +31,18 @@ describe('ActivityService', () => {
         experience: 450,
       },
       harvestingSkills: {
-        clockmaking: 2,
-        engineering: 1,
-        alchemy: 0,
-        steamcraft: 1,
+        mining: 2,
+        foraging: 1,
+        salvaging: 0,
+        crystal_extraction: 1,
         level: 2,
         experience: 200,
       },
       combatSkills: {
-        clockmaking: 1,
-        engineering: 0,
-        alchemy: 0,
-        steamcraft: 2,
+        melee: 1,
+        ranged: 0,
+        defense: 0,
+        tactics: 2,
         level: 1,
         experience: 100,
       },
@@ -52,6 +52,7 @@ describe('ActivityService', () => {
       healerProgress: 10,
       dpsProgress: 15,
       primaryRole: 'tank',
+      secondaryRole: null,
       bonuses: [],
     },
     currentActivity: {
@@ -62,6 +63,7 @@ describe('ActivityService', () => {
     },
     lastActiveAt: new Date(),
     createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   beforeEach(() => {
@@ -209,7 +211,7 @@ describe('ActivityService', () => {
     });
 
     it('should default to crafting for no specialization', () => {
-      const noSpecCharacter = { ...mockCharacter, specialization: { ...mockCharacter.specialization, primaryRole: undefined } };
+      const noSpecCharacter = { ...mockCharacter, specialization: { ...mockCharacter.specialization, primaryRole: null } };
       const recommended = ActivityService.getRecommendedActivity(noSpecCharacter);
       expect(recommended).toBe('crafting');
     });
