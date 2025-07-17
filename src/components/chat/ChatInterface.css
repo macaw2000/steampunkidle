@@ -1,0 +1,254 @@
+/* Chat Interface Styles */
+.chat-interface {
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Courier New', monospace;
+  color: #f4e4bc;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-interface.minimized {
+  height: auto !important;
+}
+
+/* Chat Header */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border-bottom: 1px solid #654321;
+  min-height: 40px;
+}
+
+.chat-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.chat-icon {
+  font-size: 16px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #dc3545;
+  animation: pulse 2s infinite;
+}
+
+.connection-status.connected .status-dot {
+  background: #28a745;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+
+.chat-controls {
+  display: flex;
+  gap: 4px;
+}
+
+.private-message-button,
+.minimize-button {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #654321;
+  border-radius: 4px;
+  padding: 4px 8px;
+  color: #f4e4bc;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.private-message-button:hover,
+.minimize-button:hover {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: #8b4513;
+}
+
+/* Chat Content */
+.chat-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Loading State */
+.chat-interface.loading {
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  color: #f4e4bc;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(244, 228, 188, 0.3);
+  border-top: 3px solid #f4e4bc;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error State */
+.chat-interface.error {
+  justify-content: center;
+  align-items: center;
+}
+
+.chat-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  color: #f4e4bc;
+}
+
+.error-icon {
+  font-size: 32px;
+}
+
+.error-message {
+  font-size: 14px;
+  max-width: 250px;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border: 1px solid #654321;
+  border-radius: 4px;
+  padding: 8px 16px;
+  color: #f4e4bc;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+}
+
+.retry-button:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+  transform: translateY(-1px);
+}
+
+/* No Channel Selected */
+.no-channel-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  gap: 12px;
+  color: rgba(244, 228, 188, 0.6);
+  text-align: center;
+}
+
+.no-channel-icon {
+  font-size: 48px;
+  opacity: 0.5;
+}
+
+.no-channel-message {
+  font-size: 14px;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chat-interface {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+  }
+  
+  .chat-header {
+    padding: 6px 8px;
+  }
+  
+  .chat-title {
+    font-size: 12px;
+  }
+  
+  .connection-status {
+    font-size: 10px;
+  }
+  
+  .private-message-button,
+  .minimize-button {
+    padding: 3px 6px;
+    font-size: 11px;
+  }
+}
+
+/* Steampunk Theme Enhancements */
+.chat-interface::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 20%, rgba(139, 69, 19, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(160, 82, 45, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.chat-interface > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Scrollbar Styling */
+.chat-interface ::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-interface ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.chat-interface ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border-radius: 4px;
+}
+
+.chat-interface ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+}

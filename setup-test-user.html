@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Setup Test User</title>
+</head>
+<body>
+    <h1>Setting up test user...</h1>
+    <p id="status">Initializing...</p>
+    
+    <script>
+        // Create a pre-verified test user
+        const testUser = {
+            userId: 'test-user-123',
+            email: 'test@example.com',
+            password: 'TestPass123',
+            name: 'Test User',
+            emailConfirmed: true,
+            createdAt: new Date().toISOString()
+        };
+
+        // Store the user in localStorage
+        const mockUsers = {
+            'test@example.com': testUser
+        };
+        
+        localStorage.setItem('mockUsers', JSON.stringify(mockUsers));
+        
+        document.getElementById('status').innerHTML = `
+            <p style="color: green;">✅ Test user created successfully!</p>
+            <p><strong>Email:</strong> test@example.com</p>
+            <p><strong>Password:</strong> TestPass123</p>
+            <p>You can now close this tab and log in to the game.</p>
+            <button onclick="window.close()">Close</button>
+        `;
+        
+        console.log('Test user created:', testUser);
+    </script>
+</body>
+</html>

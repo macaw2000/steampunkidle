@@ -1,0 +1,165 @@
+/**
+ * Styles for Guild Manager component
+ */
+
+.guild-manager {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  color: #e8d5b7;
+  font-family: 'Cinzel', serif;
+}
+
+.guild-manager.loading,
+.guild-manager.error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.loading-spinner {
+  text-align: center;
+  font-size: 18px;
+  color: #d4af37;
+}
+
+.error-message {
+  text-align: center;
+  background: rgba(139, 69, 19, 0.2);
+  padding: 30px;
+  border-radius: 8px;
+  border: 2px solid #8b4513;
+}
+
+.error-message h3 {
+  color: #ff6b6b;
+  margin-bottom: 15px;
+  font-size: 24px;
+}
+
+.error-message p {
+  margin-bottom: 20px;
+  font-size: 16px;
+}
+
+.retry-button {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2c1810;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+}
+
+.retry-button:hover {
+  background: linear-gradient(135deg, #b8941f 0%, #d4af37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.guild-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #8b4513;
+  padding-bottom: 0;
+}
+
+.tab-button {
+  background: rgba(139, 69, 19, 0.3);
+  color: #e8d5b7;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px 8px 0 0;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  position: relative;
+}
+
+.tab-button:hover {
+  background: rgba(139, 69, 19, 0.5);
+  color: #d4af37;
+}
+
+.tab-button.active {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2c1810;
+  font-weight: bold;
+}
+
+.tab-button.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+}
+
+.guild-content {
+  background: rgba(44, 24, 16, 0.6);
+  border-radius: 8px;
+  padding: 24px;
+  border: 1px solid #8b4513;
+}
+
+/* No Guild State */
+.guild-manager.no-guild .guild-content {
+  min-height: 500px;
+}
+
+/* Has Guild State */
+.guild-manager.has-guild .guild-content {
+  min-height: 600px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .guild-manager {
+    margin: 10px;
+    padding: 15px;
+  }
+
+  .guild-tabs {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .tab-button {
+    flex: 1;
+    min-width: 120px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  .guild-content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .guild-manager {
+    margin: 5px;
+    padding: 10px;
+  }
+
+  .tab-button {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .guild-content {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,306 @@
+.party-card {
+  background: linear-gradient(135deg, #3d2817 0%, #4a3728 100%);
+  border: 2px solid #8b4513;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.party-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.party-card.zone {
+  border-color: #d4af37;
+}
+
+.party-card.zone:hover {
+  border-color: #e6c547;
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.2);
+}
+
+.party-card.dungeon {
+  border-color: #dc143c;
+}
+
+.party-card.dungeon:hover {
+  border-color: #ff1744;
+  box-shadow: 0 6px 20px rgba(220, 20, 60, 0.2);
+}
+
+.party-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.party-title h4 {
+  color: #d4af37;
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  margin: 0 0 8px 0;
+}
+
+.party-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.visibility, .created-time {
+  font-size: 0.8rem;
+  color: #cdaa3d;
+}
+
+.visibility {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.party-type-badge {
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #2c1810;
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.party-card.dungeon .party-type-badge {
+  background: linear-gradient(135deg, #dc143c 0%, #8b0000 100%);
+  color: #fff;
+}
+
+.party-info {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.level-range, .member-count, .guild-info {
+  font-size: 0.9rem;
+  color: #cdaa3d;
+}
+
+.level-range strong, .member-count strong {
+  color: #d4af37;
+}
+
+.ready-count {
+  color: #90ee90;
+  font-weight: bold;
+  margin-left: 5px;
+}
+
+.guild-info {
+  color: #ffa500;
+  font-weight: bold;
+}
+
+.party-composition {
+  margin-bottom: 15px;
+  padding: 12px;
+  background: rgba(139, 69, 19, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.composition-header {
+  margin-bottom: 10px;
+}
+
+.composition-header strong {
+  color: #d4af37;
+  font-size: 0.9rem;
+}
+
+.detailed-composition .role-breakdown {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.role-count {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.85rem;
+  color: #cdaa3d;
+}
+
+.role-icon {
+  font-size: 1rem;
+}
+
+.composition-warnings {
+  margin-top: 10px;
+}
+
+.warning {
+  font-size: 0.8rem;
+  color: #ffa500;
+  margin-bottom: 4px;
+}
+
+.simple-composition .role-icons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.member-role {
+  font-size: 1.2rem;
+  padding: 4px;
+  background: rgba(212, 175, 55, 0.1);
+  border-radius: 4px;
+  cursor: help;
+}
+
+.empty-slot {
+  font-size: 1.2rem;
+  opacity: 0.3;
+  padding: 4px;
+}
+
+.party-members {
+  margin-bottom: 20px;
+}
+
+.members-header {
+  margin-bottom: 10px;
+}
+
+.members-header strong {
+  color: #d4af37;
+  font-size: 0.9rem;
+}
+
+.members-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(139, 69, 19, 0.1);
+  border-radius: 6px;
+  border: 1px solid rgba(139, 69, 19, 0.2);
+  transition: all 0.2s ease;
+}
+
+.member.ready {
+  border-color: rgba(144, 238, 144, 0.3);
+  background: rgba(144, 238, 144, 0.05);
+}
+
+.member-role-icon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.member-name {
+  color: #d4af37;
+  font-weight: bold;
+  flex-grow: 1;
+}
+
+.member-level {
+  color: #cdaa3d;
+  font-size: 0.9rem;
+}
+
+.leader-badge {
+  font-size: 0.9rem;
+}
+
+.ready-indicator {
+  font-size: 0.8rem;
+}
+
+.party-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.join-button {
+  padding: 12px 20px;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #d4af37 0%, #b8860b 100%);
+  color: #2c1810;
+  font-weight: bold;
+  font-family: 'Cinzel', serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.join-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #e6c547 0%, #cdaa3d 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.join-button:disabled, .join-button.disabled {
+  background: #666;
+  color: #999;
+  border-color: #666;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.cannot-join {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.join-reason {
+  font-size: 0.85rem;
+  color: #ffa500;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .party-card {
+    padding: 15px;
+  }
+
+  .party-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .party-type-badge {
+    align-self: flex-start;
+  }
+
+  .detailed-composition .role-breakdown {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .simple-composition .role-icons {
+    justify-content: center;
+  }
+
+  .member {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

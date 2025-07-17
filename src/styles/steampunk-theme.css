@@ -1,0 +1,441 @@
+/* Steampunk Theme System */
+
+/* Color Palette */
+:root {
+  /* Primary Steampunk Colors */
+  --steampunk-primary: #8b4513; /* Saddle Brown */
+  --steampunk-primary-light: #cd853f; /* Peru */
+  --steampunk-primary-dark: #654321; /* Dark Brown */
+  
+  /* Secondary Colors */
+  --steampunk-secondary: #daa520; /* Goldenrod */
+  --steampunk-secondary-light: #ffd700; /* Gold */
+  --steampunk-secondary-dark: #b8860b; /* Dark Goldenrod */
+  
+  /* Background Colors */
+  --steampunk-bg-primary: #2c1810; /* Very Dark Brown */
+  --steampunk-bg-secondary: #4a3728; /* Dark Brown */
+  --steampunk-bg-tertiary: #6b4e37; /* Medium Brown */
+  
+  /* Text Colors */
+  --steampunk-text-primary: #f4e4bc; /* Cream */
+  --steampunk-text-secondary: #deb887; /* Burlywood */
+  --steampunk-text-muted: #d4c4a8; /* Light Tan */
+  
+  /* Accent Colors */
+  --steampunk-copper: #b87333; /* Copper */
+  --steampunk-brass: #b5a642; /* Brass */
+  --steampunk-bronze: #cd7f32; /* Bronze */
+  --steampunk-rust: #b7410e; /* Rust */
+  
+  /* Status Colors */
+  --steampunk-success: #228b22; /* Forest Green */
+  --steampunk-warning: #ff8c00; /* Dark Orange */
+  --steampunk-error: #dc143c; /* Crimson */
+  --steampunk-info: #4682b4; /* Steel Blue */
+  
+  /* Specialization Colors */
+  --steampunk-tank: #4169e1; /* Royal Blue */
+  --steampunk-healer: #32cd32; /* Lime Green */
+  --steampunk-dps: #dc143c; /* Crimson */
+  
+  /* Gradients */
+  --steampunk-gradient-primary: linear-gradient(135deg, var(--steampunk-bg-primary) 0%, var(--steampunk-bg-secondary) 50%, var(--steampunk-bg-tertiary) 100%);
+  --steampunk-gradient-secondary: linear-gradient(90deg, var(--steampunk-primary) 0%, var(--steampunk-primary-light) 50%, var(--steampunk-primary) 100%);
+  --steampunk-gradient-gold: linear-gradient(90deg, var(--steampunk-secondary-dark) 0%, var(--steampunk-secondary) 50%, var(--steampunk-secondary-light) 100%);
+  
+  /* Shadows */
+  --steampunk-shadow-small: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --steampunk-shadow-medium: 0 4px 8px rgba(0, 0, 0, 0.3);
+  --steampunk-shadow-large: 0 8px 16px rgba(0, 0, 0, 0.4);
+  --steampunk-shadow-glow: 0 0 20px rgba(255, 140, 0, 0.3);
+  --steampunk-shadow-inset: inset 0 0 20px rgba(255, 140, 0, 0.1);
+  
+  /* Border Radius */
+  --steampunk-radius-small: 4px;
+  --steampunk-radius-medium: 8px;
+  --steampunk-radius-large: 12px;
+  --steampunk-radius-xl: 16px;
+  
+  /* Spacing */
+  --steampunk-spacing-xs: 4px;
+  --steampunk-spacing-sm: 8px;
+  --steampunk-spacing-md: 16px;
+  --steampunk-spacing-lg: 24px;
+  --steampunk-spacing-xl: 32px;
+  
+  /* Typography */
+  --steampunk-font-primary: 'Georgia', serif;
+  --steampunk-font-secondary: 'Times New Roman', serif;
+  --steampunk-font-mono: 'Courier New', monospace;
+}
+
+/* Base Component Classes */
+
+/* Cards and Containers */
+.steampunk-card {
+  background: rgba(139, 69, 19, 0.9);
+  border: 2px solid var(--steampunk-primary);
+  border-radius: var(--steampunk-radius-large);
+  padding: var(--steampunk-spacing-lg);
+  color: var(--steampunk-text-primary);
+  box-shadow: var(--steampunk-shadow-medium);
+  backdrop-filter: blur(10px);
+}
+
+.steampunk-card-elevated {
+  box-shadow: var(--steampunk-shadow-large), var(--steampunk-shadow-glow);
+}
+
+.steampunk-panel {
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--steampunk-primary-light);
+  border-radius: var(--steampunk-radius-medium);
+  padding: var(--steampunk-spacing-md);
+  color: var(--steampunk-text-primary);
+  box-shadow: var(--steampunk-shadow-small);
+}
+
+.steampunk-section {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--steampunk-primary-dark);
+  border-radius: var(--steampunk-radius-medium);
+  padding: var(--steampunk-spacing-md);
+  margin-bottom: var(--steampunk-spacing-md);
+}
+
+/* Buttons */
+.steampunk-btn {
+  padding: 12px 24px;
+  border: 2px solid var(--steampunk-primary-light);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--steampunk-text-primary);
+  border-radius: var(--steampunk-radius-medium);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  font-family: var(--steampunk-font-primary);
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.steampunk-btn:hover {
+  background: rgba(205, 133, 63, 0.2);
+  transform: translateY(-2px);
+  box-shadow: var(--steampunk-shadow-medium);
+}
+
+.steampunk-btn:active {
+  transform: translateY(0);
+}
+
+.steampunk-btn.primary {
+  background: var(--steampunk-primary);
+  color: var(--steampunk-text-primary);
+}
+
+.steampunk-btn.primary:hover {
+  background: var(--steampunk-primary-light);
+}
+
+.steampunk-btn.secondary {
+  background: var(--steampunk-secondary);
+  color: var(--steampunk-bg-primary);
+  border-color: var(--steampunk-secondary-dark);
+}
+
+.steampunk-btn.secondary:hover {
+  background: var(--steampunk-secondary-light);
+}
+
+.steampunk-btn.success {
+  background: var(--steampunk-success);
+  border-color: var(--steampunk-success);
+}
+
+.steampunk-btn.warning {
+  background: var(--steampunk-warning);
+  border-color: var(--steampunk-warning);
+}
+
+.steampunk-btn.error {
+  background: var(--steampunk-error);
+  border-color: var(--steampunk-error);
+}
+
+.steampunk-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Form Elements */
+.steampunk-input {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--steampunk-primary-dark);
+  border-radius: var(--steampunk-radius-medium);
+  padding: var(--steampunk-spacing-sm) var(--steampunk-spacing-md);
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.steampunk-input:focus {
+  outline: none;
+  border-color: var(--steampunk-primary-light);
+  box-shadow: 0 0 0 2px rgba(205, 133, 63, 0.2);
+}
+
+.steampunk-input::placeholder {
+  color: var(--steampunk-text-muted);
+}
+
+.steampunk-select {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--steampunk-primary-dark);
+  border-radius: var(--steampunk-radius-medium);
+  padding: var(--steampunk-spacing-sm) var(--steampunk-spacing-md);
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Progress Bars */
+.steampunk-progress {
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: var(--steampunk-radius-large);
+  overflow: hidden;
+  border: 1px solid var(--steampunk-primary-dark);
+  height: 20px;
+}
+
+.steampunk-progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  background: var(--steampunk-gradient-gold);
+}
+
+.steampunk-progress-fill.tank {
+  background: linear-gradient(90deg, var(--steampunk-tank) 0%, #1e90ff 100%);
+}
+
+.steampunk-progress-fill.healer {
+  background: linear-gradient(90deg, var(--steampunk-healer) 0%, var(--steampunk-success) 100%);
+}
+
+.steampunk-progress-fill.dps {
+  background: linear-gradient(90deg, var(--steampunk-dps) 0%, #b22222 100%);
+}
+
+/* Typography */
+.steampunk-heading {
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  margin-bottom: var(--steampunk-spacing-md);
+}
+
+.steampunk-heading.primary {
+  color: var(--steampunk-secondary-light);
+}
+
+.steampunk-heading.secondary {
+  color: var(--steampunk-primary-light);
+}
+
+.steampunk-text {
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+}
+
+.steampunk-text.muted {
+  color: var(--steampunk-text-muted);
+}
+
+.steampunk-text.secondary {
+  color: var(--steampunk-text-secondary);
+}
+
+.steampunk-text.accent {
+  color: var(--steampunk-secondary);
+  font-weight: bold;
+}
+
+/* Status Indicators */
+.steampunk-badge {
+  padding: 4px 8px;
+  border-radius: var(--steampunk-radius-xl);
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.steampunk-badge.success {
+  background: var(--steampunk-success);
+  color: white;
+}
+
+.steampunk-badge.warning {
+  background: var(--steampunk-warning);
+  color: white;
+}
+
+.steampunk-badge.error {
+  background: var(--steampunk-error);
+  color: white;
+}
+
+.steampunk-badge.info {
+  background: var(--steampunk-info);
+  color: white;
+}
+
+.steampunk-badge.primary {
+  background: var(--steampunk-primary);
+  color: var(--steampunk-text-primary);
+}
+
+.steampunk-badge.secondary {
+  background: var(--steampunk-secondary);
+  color: var(--steampunk-bg-primary);
+}
+
+/* Rarity Colors for Items */
+.rarity-common {
+  color: #9d9d9d;
+}
+
+.rarity-uncommon {
+  color: #1eff00;
+}
+
+.rarity-rare {
+  color: #0070dd;
+}
+
+.rarity-epic {
+  color: #a335ee;
+}
+
+.rarity-legendary {
+  color: #ff8000;
+}
+
+/* Steampunk-specific decorative elements */
+.steampunk-divider {
+  height: 2px;
+  background: var(--steampunk-gradient-secondary);
+  border: none;
+  margin: var(--steampunk-spacing-lg) 0;
+  border-radius: 1px;
+}
+
+.steampunk-glow {
+  box-shadow: var(--steampunk-shadow-glow), var(--steampunk-shadow-inset);
+}
+
+/* Animation Classes */
+.steampunk-pulse {
+  animation: steampunk-pulse 2s infinite;
+}
+
+@keyframes steampunk-pulse {
+  0% { 
+    box-shadow: 0 0 0 0 rgba(205, 133, 63, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(205, 133, 63, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(205, 133, 63, 0);
+  }
+}
+
+.steampunk-fade-in {
+  animation: steampunk-fade-in 0.5s ease-in;
+}
+
+@keyframes steampunk-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover Effects */
+.steampunk-hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.steampunk-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--steampunk-shadow-large);
+}
+
+/* Grid and Layout Utilities */
+.steampunk-grid {
+  display: grid;
+  gap: var(--steampunk-spacing-md);
+}
+
+.steampunk-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.steampunk-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+
+.steampunk-flex {
+  display: flex;
+  gap: var(--steampunk-spacing-md);
+}
+
+.steampunk-flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.steampunk-flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .steampunk-card {
+    padding: var(--steampunk-spacing-md);
+  }
+  
+  .steampunk-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .steampunk-grid-2,
+  .steampunk-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .steampunk-card {
+    padding: var(--steampunk-spacing-sm);
+    margin: var(--steampunk-spacing-sm);
+  }
+  
+  .steampunk-btn {
+    padding: 8px 16px;
+    font-size: 0.8rem;
+  }
+}

@@ -1,0 +1,268 @@
+/* Chat Message Item Styles */
+.chat-message-item {
+  margin-bottom: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+  position: relative;
+}
+
+.chat-message-item:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Message types */
+.text-message {
+  /* Default styling */
+}
+
+.system-message {
+  background: rgba(212, 175, 55, 0.1);
+  border-left: 3px solid #d4af37;
+  font-style: italic;
+  color: rgba(244, 228, 188, 0.8);
+}
+
+.command-message {
+  background: rgba(23, 162, 184, 0.1);
+  border-left: 3px solid #17a2b8;
+  font-family: 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.emote-message {
+  background: rgba(111, 66, 193, 0.1);
+  border-left: 3px solid #6f42c1;
+  font-style: italic;
+}
+
+/* Own vs other messages */
+.own-message {
+  /* Subtle highlighting for own messages */
+}
+
+.own-message:hover {
+  background: rgba(139, 69, 19, 0.1);
+}
+
+.other-message {
+  /* Default styling for other messages */
+}
+
+/* Message header */
+.message-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+.sender-name {
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.sender-name:hover {
+  color: #d4af37;
+}
+
+.own-sender {
+  color: #28a745;
+}
+
+.other-sender {
+  color: #17a2b8;
+}
+
+.whisper-indicator {
+  color: #ffc107;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+.message-timestamp {
+  color: rgba(244, 228, 188, 0.5);
+  font-size: 10px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+  user-select: none;
+}
+
+.message-timestamp:hover {
+  color: rgba(244, 228, 188, 0.8);
+}
+
+/* Message content */
+.message-content {
+  font-size: 13px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.text-content {
+  color: #f4e4bc;
+}
+
+.system-content {
+  color: rgba(244, 228, 188, 0.8);
+  font-weight: 500;
+}
+
+.command-content {
+  color: #17a2b8;
+  font-family: 'Courier New', monospace;
+}
+
+.emote-content {
+  color: #6f42c1;
+}
+
+/* Inline timestamp */
+.inline-timestamp {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(244, 228, 188, 0.3);
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  opacity: 0;
+  user-select: none;
+}
+
+.chat-message-item:hover .inline-timestamp {
+  opacity: 1;
+}
+
+.inline-timestamp:hover {
+  color: rgba(244, 228, 188, 0.6);
+}
+
+/* Special message styling */
+.system-message .message-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.system-message::before {
+  content: '⚙️';
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.command-message::before {
+  content: '>';
+  color: #17a2b8;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+.emote-message::before {
+  content: '*';
+  color: #6f42c1;
+  font-weight: bold;
+  margin-right: 4px;
+}
+
+/* Link styling (if content contains URLs) */
+.message-content a {
+  color: #d4af37;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.message-content a:hover {
+  color: #f4e4bc;
+}
+
+/* Code blocks and inline code */
+.message-content code {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(244, 228, 188, 0.2);
+  border-radius: 3px;
+  padding: 2px 4px;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #d4af37;
+}
+
+.message-content pre {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(244, 228, 188, 0.2);
+  border-radius: 4px;
+  padding: 8px;
+  margin: 4px 0;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #d4af37;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .chat-message-item {
+    padding: 3px 6px;
+    margin-bottom: 3px;
+  }
+  
+  .message-header {
+    gap: 6px;
+    font-size: 10px;
+  }
+  
+  .message-content {
+    font-size: 12px;
+  }
+  
+  .message-timestamp {
+    font-size: 9px;
+  }
+  
+  .inline-timestamp {
+    font-size: 8px;
+    right: 6px;
+  }
+  
+  /* Always show inline timestamp on mobile */
+  .inline-timestamp {
+    opacity: 0.5;
+  }
+}
+
+/* Animation for new messages */
+@keyframes message-appear {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.chat-message-item.new-message {
+  animation: message-appear 0.3s ease-out;
+}
+
+/* Highlight effect for mentions (future enhancement) */
+.message-content .mention {
+  background: rgba(212, 175, 55, 0.2);
+  color: #d4af37;
+  padding: 1px 3px;
+  border-radius: 3px;
+  font-weight: bold;
+}
+
+/* Selection styling */
+.chat-message-item::selection,
+.chat-message-item *::selection {
+  background: rgba(212, 175, 55, 0.3);
+  color: #f4e4bc;
+}

@@ -1,0 +1,284 @@
+/* Real-time Progress Tracker Styles */
+
+.real-time-progress-tracker {
+  position: relative;
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  border: 2px solid #8b4513;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 16px 0;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Connection Status */
+.connection-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.connection-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.connection-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+}
+
+.connection-status--connecting .connection-dot {
+  background: #ffa500;
+  animation: pulse 1.5s infinite;
+}
+
+.connection-status--connected .connection-dot {
+  background: #00ff00;
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.5);
+}
+
+.connection-status--disconnected .connection-dot {
+  background: #ff4444;
+}
+
+.connection-text {
+  color: #e6d5c3;
+  font-weight: 500;
+}
+
+.last-update {
+  color: #a0a0a0;
+  font-size: 0.75rem;
+}
+
+/* Notification Container */
+.notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.notification-container > * {
+  pointer-events: auto;
+}
+
+/* Achievement Container */
+.achievement-container {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1001;
+  pointer-events: none;
+}
+
+.achievement-celebration {
+  background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+  border: 3px solid #b8860b;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 
+    0 8px 32px rgba(255, 215, 0, 0.4),
+    0 0 0 4px rgba(255, 255, 255, 0.2);
+  animation: achievementCelebration 3s ease-out forwards;
+  pointer-events: auto;
+}
+
+.achievement-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  color: #2c1810;
+}
+
+.achievement-icon {
+  font-size: 3rem;
+  animation: bounce 0.6s ease-out;
+}
+
+.achievement-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.achievement-description {
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+  opacity: 0.8;
+}
+
+.achievement-rewards {
+  display: flex;
+  gap: 12px;
+}
+
+.achievement-reward {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Real-time Stats */
+.real-time-stats {
+  margin-top: 16px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.stat-label {
+  color: #a0a0a0;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  color: #e6d5c3;
+  font-size: 1.25rem;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+/* Animations */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.2);
+  }
+}
+
+@keyframes achievementCelebration {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.5) rotate(-10deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1) rotate(2deg);
+  }
+  40% {
+    transform: translate(-50%, -50%) scale(0.95) rotate(-1deg);
+  }
+  60% {
+    transform: translate(-50%, -50%) scale(1.02) rotate(0.5deg);
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1) rotate(0deg);
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8) rotate(0deg);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    transform: translate3d(0, 0, 0);
+  }
+  40%, 43% {
+    transform: translate3d(0, -8px, 0);
+  }
+  70% {
+    transform: translate3d(0, -4px, 0);
+  }
+  90% {
+    transform: translate3d(0, -2px, 0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .real-time-progress-tracker {
+    padding: 16px;
+    margin: 12px 0;
+  }
+
+  .connection-status {
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 12px;
+  }
+
+  .notification-container {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+  }
+
+  .achievement-celebration {
+    padding: 16px;
+    margin: 0 16px;
+  }
+
+  .achievement-content {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .achievement-icon {
+    font-size: 2.5rem;
+  }
+
+  .achievement-title {
+    font-size: 1.25rem;
+  }
+}
+
+/* Dark mode adjustments */
+@media (prefers-color-scheme: dark) {
+  .real-time-progress-tracker {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    border-color: #555;
+  }
+
+  .connection-text {
+    color: #e0e0e0;
+  }
+
+  .stat-value {
+    color: #f0f0f0;
+  }
+}

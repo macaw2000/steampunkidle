@@ -1,0 +1,275 @@
+/**
+ * Styles for the leaderboard table component
+ * Steampunk-themed table with rank highlighting
+ */
+
+.leaderboard-table-container {
+  background: rgba(139, 69, 19, 0.1);
+  border-radius: 8px;
+  border: 1px solid #8b4513;
+  overflow: hidden;
+}
+
+.leaderboard-table {
+  width: 100%;
+}
+
+/* Table header */
+.table-header {
+  display: grid;
+  grid-template-columns: 80px 1fr 200px 150px;
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border-bottom: 2px solid #d4af37;
+  font-weight: 600;
+  color: #f4e4bc;
+}
+
+.header-cell {
+  padding: 15px 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-right: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.header-cell:last-child {
+  border-right: none;
+}
+
+.player-header {
+  text-align: left;
+}
+
+/* Table body */
+.table-body {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 80px 1fr 200px 150px;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+  transition: all 0.3s ease;
+  background: rgba(244, 228, 188, 0.05);
+}
+
+.table-row:hover {
+  background: rgba(212, 175, 55, 0.1);
+  transform: translateX(2px);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+/* Rank-specific styling */
+.table-row.rank-gold {
+  background: linear-gradient(90deg, rgba(255, 215, 0, 0.15) 0%, rgba(244, 228, 188, 0.05) 100%);
+  border-left: 4px solid #ffd700;
+}
+
+.table-row.rank-silver {
+  background: linear-gradient(90deg, rgba(192, 192, 192, 0.15) 0%, rgba(244, 228, 188, 0.05) 100%);
+  border-left: 4px solid #c0c0c0;
+}
+
+.table-row.rank-bronze {
+  background: linear-gradient(90deg, rgba(205, 127, 50, 0.15) 0%, rgba(244, 228, 188, 0.05) 100%);
+  border-left: 4px solid #cd7f32;
+}
+
+.table-row.rank-top-10 {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.1) 0%, rgba(244, 228, 188, 0.05) 100%);
+  border-left: 2px solid #d4af37;
+}
+
+.table-row.rank-top-100 {
+  border-left: 1px solid #8b4513;
+}
+
+/* Current user highlighting */
+.table-row.current-user {
+  background: linear-gradient(90deg, rgba(100, 149, 237, 0.2) 0%, rgba(244, 228, 188, 0.1) 100%);
+  border: 2px solid #6495ed;
+  border-radius: 4px;
+  margin: 2px 0;
+}
+
+.table-row.current-user:hover {
+  background: linear-gradient(90deg, rgba(100, 149, 237, 0.3) 0%, rgba(244, 228, 188, 0.15) 100%);
+}
+
+/* Table cells */
+.table-cell {
+  padding: 12px 10px;
+  display: flex;
+  align-items: center;
+  color: #f4e4bc;
+  border-right: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.table-cell:last-child {
+  border-right: none;
+}
+
+/* Rank cell */
+.rank-cell {
+  justify-content: center;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rank-display {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.rank-number {
+  font-size: 0.8rem;
+  color: #c9a876;
+}
+
+/* Player cell */
+.player-cell {
+  justify-content: flex-start;
+}
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.player-name {
+  font-weight: 600;
+  color: #f4e4bc;
+}
+
+.you-indicator {
+  font-size: 0.8rem;
+  color: #6495ed;
+  font-weight: 500;
+  margin-left: 8px;
+}
+
+/* Guild cell */
+.guild-cell {
+  justify-content: center;
+}
+
+.guild-name {
+  color: #d4af37;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.no-guild {
+  color: #8b7355;
+  font-style: italic;
+}
+
+/* Stat cell */
+.stat-cell {
+  justify-content: center;
+}
+
+.stat-value {
+  font-weight: 600;
+  color: #d4af37;
+  font-size: 1rem;
+}
+
+/* Empty table */
+.empty-table {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #c9a876;
+  gap: 10px;
+}
+
+.empty-icon {
+  font-size: 2rem;
+}
+
+.empty-message {
+  font-size: 1.1rem;
+  font-style: italic;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 60px 1fr 120px 100px;
+  }
+
+  .header-cell,
+  .table-cell {
+    padding: 10px 8px;
+    font-size: 0.85rem;
+  }
+
+  .guild-name {
+    font-size: 0.8rem;
+  }
+
+  .stat-value {
+    font-size: 0.9rem;
+  }
+
+  .rank-display {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .table-header,
+  .table-row {
+    grid-template-columns: 50px 1fr 80px 80px;
+  }
+
+  .header-cell,
+  .table-cell {
+    padding: 8px 5px;
+    font-size: 0.8rem;
+  }
+
+  .guild-cell {
+    display: none; /* Hide guild column on very small screens */
+  }
+
+  .table-header,
+  .table-row {
+    grid-template-columns: 50px 1fr 100px;
+  }
+
+  .you-indicator {
+    display: block;
+    margin-left: 0;
+    margin-top: 2px;
+  }
+}
+
+/* Scrollbar styling */
+.table-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.table-body::-webkit-scrollbar-track {
+  background: rgba(139, 69, 19, 0.2);
+  border-radius: 4px;
+}
+
+.table-body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border-radius: 4px;
+}
+
+.table-body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+}

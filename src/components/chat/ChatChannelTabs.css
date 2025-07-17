@@ -1,0 +1,212 @@
+/* Chat Channel Tabs Styles */
+.chat-channel-tabs {
+  position: relative;
+  background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
+  border-bottom: 1px solid #4a2c17;
+  overflow: hidden;
+}
+
+.tabs-container {
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.tabs-container::-webkit-scrollbar {
+  display: none;
+}
+
+.channel-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: rgba(244, 228, 188, 0.7);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  position: relative;
+  min-width: fit-content;
+}
+
+.channel-tab:hover {
+  background: rgba(0, 0, 0, 0.2);
+  color: #f4e4bc;
+}
+
+.channel-tab.active {
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom-color: #d4af37;
+  color: #f4e4bc;
+  font-weight: bold;
+}
+
+.channel-tab.has-unread {
+  color: #f4e4bc;
+}
+
+.channel-tab.has-unread:not(.active) {
+  animation: pulse-tab 2s infinite;
+}
+
+@keyframes pulse-tab {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.channel-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.channel-name {
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unread-badge {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 16px;
+  text-align: center;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  animation: bounce-in 0.3s ease-out;
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Tab Scroll Buttons */
+.tab-scroll-buttons {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  display: none;
+  background: linear-gradient(90deg, transparent 0%, rgba(101, 67, 33, 0.8) 20%, rgba(101, 67, 33, 1) 100%);
+  pointer-events: none;
+}
+
+.scroll-button {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid #8b4513;
+  border-radius: 3px;
+  color: #f4e4bc;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  height: 24px;
+  width: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+  pointer-events: all;
+  transition: all 0.2s ease;
+}
+
+.scroll-button:hover {
+  background: rgba(0, 0, 0, 0.5);
+  border-color: #d4af37;
+}
+
+.scroll-button:active {
+  transform: scale(0.95);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+  .tab-scroll-buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 30px;
+  }
+  
+  .tabs-container {
+    padding-right: 30px;
+  }
+  
+  .channel-tab {
+    padding: 6px 8px;
+    font-size: 11px;
+  }
+  
+  .channel-name {
+    max-width: 60px;
+  }
+  
+  .unread-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+    min-width: 14px;
+  }
+}
+
+/* Steampunk Theme Enhancements */
+.channel-tab::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(212, 175, 55, 0.1) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.channel-tab.active::before {
+  opacity: 1;
+}
+
+.channel-tab:hover::before {
+  opacity: 0.5;
+}
+
+/* Special styling for different channel types */
+.channel-tab[title*="general"] .channel-icon {
+  color: #28a745;
+}
+
+.channel-tab[title*="guild"] .channel-icon {
+  color: #6f42c1;
+}
+
+.channel-tab[title*="party"] .channel-icon {
+  color: #17a2b8;
+}
+
+.channel-tab[title*="whisper"] .channel-icon {
+  color: #ffc107;
+}
+
+.channel-tab[title*="zone"] .channel-icon {
+  color: #dc3545;
+}

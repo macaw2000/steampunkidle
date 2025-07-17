@@ -1,0 +1,451 @@
+/* Steampunk Icons and Graphics System */
+
+/* Icon Base Classes */
+.steampunk-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  vertical-align: middle;
+}
+
+.steampunk-icon.small {
+  width: 16px;
+  height: 16px;
+}
+
+.steampunk-icon.medium {
+  width: 32px;
+  height: 32px;
+}
+
+.steampunk-icon.large {
+  width: 48px;
+  height: 48px;
+}
+
+.steampunk-icon.xl {
+  width: 64px;
+  height: 64px;
+}
+
+/* Character Class Icons (CSS-based placeholders) */
+.icon-tank {
+  background: radial-gradient(circle, #4169e1 30%, #1e90ff 70%);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-tank::before {
+  content: "🛡️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-healer {
+  background: radial-gradient(circle, #32cd32 30%, #228b22 70%);
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-healer::before {
+  content: "✚";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.icon-dps {
+  background: radial-gradient(circle, #dc143c 30%, #b22222 70%);
+  border-radius: 0;
+  transform: rotate(45deg);
+  position: relative;
+}
+
+.icon-dps::before {
+  content: "⚔️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-45deg);
+  font-size: 0.8em;
+}
+
+/* Activity Icons */
+.icon-crafting {
+  background: linear-gradient(45deg, #cd853f, #8b4513);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-crafting::before {
+  content: "🔧";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-harvesting {
+  background: linear-gradient(45deg, #228b22, #006400);
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-harvesting::before {
+  content: "⛏️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-combat {
+  background: linear-gradient(45deg, #dc143c, #8b0000);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-combat::before {
+  content: "⚔️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+/* Currency Icons */
+.icon-currency {
+  background: radial-gradient(circle, #ffd700 30%, #daa520 70%);
+  border-radius: 50%;
+  position: relative;
+  border: 2px solid #b8860b;
+}
+
+.icon-currency::before {
+  content: "⚙️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.7em;
+}
+
+/* Item Rarity Icons */
+.icon-item {
+  border-radius: 4px;
+  position: relative;
+  border: 2px solid;
+}
+
+.icon-item.common {
+  background: linear-gradient(45deg, #9d9d9d, #7d7d7d);
+  border-color: #6d6d6d;
+}
+
+.icon-item.uncommon {
+  background: linear-gradient(45deg, #1eff00, #00cc00);
+  border-color: #00aa00;
+}
+
+.icon-item.rare {
+  background: linear-gradient(45deg, #0070dd, #0056bb);
+  border-color: #003d99;
+}
+
+.icon-item.epic {
+  background: linear-gradient(45deg, #a335ee, #8b2bcc);
+  border-color: #7321aa;
+}
+
+.icon-item.legendary {
+  background: linear-gradient(45deg, #ff8000, #cc6600);
+  border-color: #aa5500;
+}
+
+/* Weapon Type Icons */
+.icon-weapon::before {
+  content: "⚔️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-armor::before {
+  content: "🛡️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-trinket::before {
+  content: "💍";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-material::before {
+  content: "🔩";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-consumable::before {
+  content: "🧪";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+/* Guild Icons */
+.icon-guild {
+  background: linear-gradient(45deg, #8b4513, #654321);
+  border-radius: 4px;
+  position: relative;
+  border: 2px solid #4a3728;
+}
+
+.icon-guild::before {
+  content: "🏛️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+/* Status Icons */
+.icon-online {
+  background: radial-gradient(circle, #32cd32, #228b22);
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-online::before {
+  content: "●";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.6em;
+}
+
+.icon-offline {
+  background: radial-gradient(circle, #dc143c, #b22222);
+  border-radius: 50%;
+  position: relative;
+}
+
+.icon-offline::before {
+  content: "●";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.6em;
+}
+
+/* Navigation Icons */
+.icon-chat {
+  background: linear-gradient(45deg, #4682b4, #2f4f4f);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-chat::before {
+  content: "💬";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-marketplace {
+  background: linear-gradient(45deg, #daa520, #b8860b);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-marketplace::before {
+  content: "🏪";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-leaderboard {
+  background: linear-gradient(45deg, #ffd700, #daa520);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-leaderboard::before {
+  content: "🏆";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.icon-group {
+  background: linear-gradient(45deg, #8b4513, #654321);
+  border-radius: 4px;
+  position: relative;
+}
+
+.icon-group::before {
+  content: "👥";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+/* Steampunk Decorative Elements */
+.steampunk-gear {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  background: radial-gradient(circle, #cd853f 30%, #8b4513 70%);
+  border-radius: 50%;
+  position: relative;
+  animation: rotate 10s linear infinite;
+}
+
+.steampunk-gear::before {
+  content: "⚙️";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.8em;
+}
+
+.steampunk-gear.fast {
+  animation-duration: 3s;
+}
+
+.steampunk-gear.slow {
+  animation-duration: 20s;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Avatar Placeholders */
+.steampunk-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #cd853f 0%, #8b4513 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #f4e4bc;
+  border: 3px solid #654321;
+  position: relative;
+}
+
+.steampunk-avatar.large {
+  width: 80px;
+  height: 80px;
+  font-size: 2rem;
+}
+
+.steampunk-avatar.small {
+  width: 40px;
+  height: 40px;
+  font-size: 1rem;
+  border-width: 2px;
+}
+
+/* Loading Spinner */
+.steampunk-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(205, 133, 63, 0.3);
+  border-top: 4px solid #cd853f;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Icon Adjustments */
+@media (max-width: 768px) {
+  .steampunk-icon.large {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .steampunk-icon.xl {
+    width: 56px;
+    height: 56px;
+  }
+  
+  .steampunk-avatar.large {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .steampunk-icon.medium {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .steampunk-icon.large {
+    width: 36px;
+    height: 36px;
+  }
+  
+  .steampunk-avatar {
+    width: 50px;
+    height: 50px;
+    font-size: 1.3rem;
+  }
+}

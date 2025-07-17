@@ -1,0 +1,25 @@
+/* Import Steampunk Theme System */
+@import './styles/steampunk-theme.css';
+@import './styles/icons.css';
+@import './styles/placeholders.css';
+
+body {
+  margin: 0;
+  font-family: var(--steampunk-font-primary), -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--steampunk-gradient-primary);
+  color: var(--steampunk-text-primary);
+  min-height: 100vh;
+}
+
+code {
+  font-family: var(--steampunk-font-mono), source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+* {
+  box-sizing: border-box;
+}

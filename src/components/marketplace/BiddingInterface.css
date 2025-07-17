@@ -1,0 +1,281 @@
+.bidding-interface-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.bidding-interface {
+  background: white;
+  border-radius: 10px;
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.bidding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 20px 0 20px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
+}
+
+.bidding-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 5px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.3s ease;
+}
+
+.close-button:hover {
+  background: #f5f5f5;
+}
+
+.auction-summary {
+  padding: 0 20px;
+  margin-bottom: 20px;
+}
+
+.item-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 5px;
+}
+
+.item-name {
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.item-rarity {
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.price-summary {
+  margin-bottom: 15px;
+}
+
+.current-price,
+.buyout-price,
+.user-currency {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.user-currency {
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  font-size: 1.1rem;
+}
+
+.error-message,
+.success-message {
+  margin: 0 20px 20px 20px;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.error-message {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.success-message {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.bidding-actions {
+  padding: 0 20px;
+}
+
+.bid-section,
+.buyout-section {
+  margin-bottom: 25px;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.bid-section h4,
+.buyout-section h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.bid-input-group {
+  margin-bottom: 15px;
+}
+
+.bid-input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  color: #555;
+}
+
+.bid-input-group input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.bid-input-group input:focus {
+  outline: none;
+  border-color: #8B4513;
+  box-shadow: 0 0 0 2px rgba(139, 69, 19, 0.2);
+}
+
+.place-bid-button,
+.buyout-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.place-bid-button {
+  background: #8B4513;
+  color: white;
+}
+
+.place-bid-button:hover:not(:disabled) {
+  background: #A0522D;
+}
+
+.place-bid-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.buyout-button {
+  background: #28a745;
+  color: white;
+}
+
+.buyout-button:hover:not(:disabled) {
+  background: #218838;
+}
+
+.buyout-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.buyout-section p {
+  margin: 0 0 15px 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.insufficient-funds-warning {
+  margin-top: 10px;
+  padding: 8px;
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.bidding-footer {
+  padding: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.cancel-button {
+  padding: 10px 20px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+.cancel-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+  .bidding-interface-overlay {
+    padding: 10px;
+  }
+
+  .bidding-interface {
+    max-height: 95vh;
+  }
+
+  .bidding-header {
+    padding: 15px 15px 0 15px;
+  }
+
+  .auction-summary,
+  .bidding-actions {
+    padding: 0 15px;
+  }
+
+  .bidding-footer {
+    padding: 15px;
+  }
+
+  .item-info {
+    flex-direction: column;
+    gap: 5px;
+    text-align: center;
+  }
+}

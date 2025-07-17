@@ -1,0 +1,95 @@
+{
+  "name": "steampunk-idle-game",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.7",
+    "@types/node": "^16.18.68",
+    "@types/react": "^18.2.42",
+    "@types/react-dom": "^18.2.17",
+    "@types/uuid": "^10.0.0",
+    "aws-amplify": "^6.0.7",
+    "aws-sdk": "^2.1498.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.3",
+    "react-router-dom": "^6.20.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "uuid": "^11.1.0",
+    "web-vitals": "^2.1.4",
+    "ws": "^8.14.2",
+    "zod": "^3.25.76"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --watchAll=false",
+    "test:watch": "react-scripts test",
+    "test:lambda": "jest --config jest.lambda.config.js --watchAll=false",
+    "test:lambda:watch": "jest --config jest.lambda.config.js",
+    "eject": "react-scripts eject",
+    "cdk": "cdk",
+    "cdk:deploy": "cdk deploy",
+    "cdk:destroy": "cdk destroy",
+    "cdk:synth": "cdk synth",
+    "localstack:start": "localstack start -d",
+    "localstack:stop": "localstack stop",
+    "dev:local": "npm run localstack:start && npm start",
+    "deploy:staging": "npm run build && cdk deploy --context environment=staging",
+    "deploy:production": "npm run build && cdk deploy --context environment=production --context deploymentStrategy=blue-green",
+    "health-check": "node -e \"console.log('Health check would run here')\"",
+    "health-check:staging": "bash scripts/health-check.sh staging https://api-staging.steampunk-idle-game.com",
+    "health-check:production": "bash scripts/health-check.sh production https://api.steampunk-idle-game.com",
+    "rollback:staging": "powershell -ExecutionPolicy Bypass -File scripts/rollback.ps1 -Environment staging",
+    "rollback:production": "powershell -ExecutionPolicy Bypass -File scripts/rollback.ps1 -Environment production",
+    "lint": "eslint src --ext .ts,.tsx --max-warnings 0",
+    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "test:coverage": "npm run test -- --coverage --watchAll=false",
+    "test:lambda:coverage": "npm run test:lambda -- --coverage",
+    "load-test": "node scripts/load-test.js",
+    "load-test:staging": "API_BASE_URL=https://api-staging.steampunk-idle-game.com WS_URL=wss://ws-staging.steampunk-idle-game.com node scripts/load-test.js",
+    "load-test:production": "API_BASE_URL=https://api.steampunk-idle-game.com WS_URL=wss://ws.steampunk-idle-game.com CONCURRENT_USERS=50 TEST_DURATION=300 node scripts/load-test.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@aws-sdk/client-apigatewaymanagementapi": "^3.450.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.450.0",
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0",
+    "@cypress/react": "^9.0.1",
+    "@cypress/webpack-dev-server": "^4.1.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/aws-lambda": "^8.10.126",
+    "@types/jest": "^29.5.8",
+    "@types/ws": "^8.5.8",
+    "aws-cdk": "^2.108.0",
+    "aws-cdk-lib": "^2.108.0",
+    "aws-sdk-client-mock": "^3.0.0",
+    "aws-sdk-client-mock-jest": "^3.0.0",
+    "constructs": "^10.3.0",
+    "cypress": "^14.5.2",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "ts-node": "^10.9.1"
+  }
+}

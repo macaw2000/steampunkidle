@@ -1,0 +1,104 @@
+name: Monitoring and Health Checks
+
+on:
+  schedule:
+    # Run health checks every 15 minutes
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to check'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+
+env:
+  AWS_REGION: 'us-east-1'
+
+jobs:
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_MONITORING }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_MONITORING }}
+        aws-region: ${{ env.AWS_REGION }}
+        
+    - name: Check API Gateway health
+      run: |
+        echo "Checking API Gateway endpoints..."
+        # Add API health check commands
+        curl -f https://api.steampunk-idle-game.com/health || exit 1
+        
+    - name: Check Lambda function health
+      run: |
+        echo "Checking Lambda function metrics..."
+        aws cloudwatch get-metric-statistics \
+          --namespace AWS/Lambda \
+          --metric-name Errors \
+          --dimensions Name=FunctionName,Value=steampunk-idle-game-auth \
+          --start-time $(date -u -d '15 minutes ago' +%Y-%m-%dT%H:%M:%S) \
+          --end-time $(date -u +%Y-%m-%dT%H:%M:%S) \
+          --period 300 \
+          --statistics Sum
+          
+    - name: Check DynamoDB health
+      run: |
+        echo "Checking DynamoDB table health..."
+        aws dynamodb describe-table --table-name steampunk-idle-game-users
+        aws dynamodb describe-table --table-name steampunk-idle-game-characters
+        
+    - name: Check WebSocket API health
+      run: |
+        echo "Checking WebSocket API health..."
+        # Add WebSocket health check
+        
+    - name: Alert on failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#alerts'
+        webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        text: '🚨 Health check failed for ${{ github.event.inputs.environment || "production" }} environment'
+
+  performance-check:
+    name: Performance Check
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install Lighthouse CI
+      run: npm install -g @lhci/cli
+      
+    - name: Run Lighthouse performance audit
+      run: |
+        lhci autorun --upload.target=temporary-public-storage || echo "Lighthouse audit completed"
+        
+    - name: Check API response times
+      run: |
+        echo "Checking API response times..."
+        time curl -s https://api.steampunk-idle-game.com/health
+        
+    - name: Generate performance report
+      run: |
+        echo "Performance metrics collected at $(date)"
+        echo "API response time: $(time curl -s https://api.steampunk-idle-game.com/health 2>&1 | grep real)"

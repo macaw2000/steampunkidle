@@ -1,0 +1,8 @@
+/* Steampunk Idle Game Styles */
+
+/* Import theme system */
+@import './steampunk-theme.css';
+
+/* Import component-specific styles */
+@import './icons.css';
+@import './placeholders.css';

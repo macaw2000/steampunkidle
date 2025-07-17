@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  localstack:
+    container_name: steampunk-idle-game-localstack
+    image: localstack/localstack:latest
+    ports:
+      - "4566:4566"            # LocalStack Gateway
+      - "4510-4559:4510-4559"  # External services port range
+    environment:
+      - DEBUG=${DEBUG-}
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - LAMBDA_EXECUTOR=${LAMBDA_EXECUTOR-}
+      - LOCALSTACK_API_KEY=${LOCALSTACK_API_KEY-}  # only required for Pro features
+      - SERVICES=s3,dynamodb,lambda,apigateway,cognito-idp,cognito-identity,cloudformation,sts,iam
+      - DATA_DIR=/tmp/localstack/data
+      - PERSISTENCE=${PERSISTENCE-}
+    volumes:
+      - "${LOCALSTACK_VOLUME_DIR:-./tmp/localstack}:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - localstack-network
+
+networks:
+  localstack-network:
+    driver: bridge

@@ -1,0 +1,443 @@
+/* Steampunk Placeholder Graphics and Visual Elements */
+
+/* Background Patterns */
+.steampunk-bg-pattern {
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(205, 133, 63, 0.1) 2px, transparent 2px),
+    radial-gradient(circle at 75% 75%, rgba(139, 69, 19, 0.1) 2px, transparent 2px);
+  background-size: 50px 50px;
+}
+
+.steampunk-bg-gears {
+  background-image: 
+    radial-gradient(circle at 20% 20%, rgba(205, 133, 63, 0.05) 10px, transparent 10px),
+    radial-gradient(circle at 80% 80%, rgba(139, 69, 19, 0.05) 8px, transparent 8px),
+    radial-gradient(circle at 40% 60%, rgba(218, 165, 32, 0.03) 6px, transparent 6px);
+  background-size: 100px 100px, 80px 80px, 60px 60px;
+}
+
+/* Item Placeholder Cards */
+.item-placeholder {
+  width: 60px;
+  height: 60px;
+  border-radius: var(--steampunk-radius-medium);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  border: 2px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.item-placeholder::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.1) 50%, transparent 70%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Weapon Placeholders */
+.weapon-placeholder {
+  background: linear-gradient(135deg, #8b4513 0%, #654321 100%);
+  border-color: #4a3728;
+}
+
+.weapon-placeholder.sword::after {
+  content: "⚔️";
+  font-size: 1.2em;
+}
+
+.weapon-placeholder.axe::after {
+  content: "🪓";
+  font-size: 1.2em;
+}
+
+.weapon-placeholder.bow::after {
+  content: "🏹";
+  font-size: 1.2em;
+}
+
+.weapon-placeholder.staff::after {
+  content: "🪄";
+  font-size: 1.2em;
+}
+
+/* Armor Placeholders */
+.armor-placeholder {
+  background: linear-gradient(135deg, #4682b4 0%, #2f4f4f 100%);
+  border-color: #1e3a3a;
+}
+
+.armor-placeholder.helmet::after {
+  content: "⛑️";
+  font-size: 1.2em;
+}
+
+.armor-placeholder.chestplate::after {
+  content: "🦺";
+  font-size: 1.2em;
+}
+
+.armor-placeholder.boots::after {
+  content: "🥾";
+  font-size: 1.2em;
+}
+
+.armor-placeholder.gloves::after {
+  content: "🧤";
+  font-size: 1.2em;
+}
+
+/* Trinket Placeholders */
+.trinket-placeholder {
+  background: linear-gradient(135deg, #daa520 0%, #b8860b 100%);
+  border-color: #996f00;
+  border-radius: 50%;
+}
+
+.trinket-placeholder.ring::after {
+  content: "💍";
+  font-size: 1.2em;
+}
+
+.trinket-placeholder.amulet::after {
+  content: "🔮";
+  font-size: 1.2em;
+}
+
+.trinket-placeholder.clockwork::after {
+  content: "⚙️";
+  font-size: 1.2em;
+}
+
+/* Material Placeholders */
+.material-placeholder {
+  background: linear-gradient(135deg, #cd853f 0%, #8b4513 100%);
+  border-color: #654321;
+}
+
+.material-placeholder.metal::after {
+  content: "🔩";
+  font-size: 1.2em;
+}
+
+.material-placeholder.wood::after {
+  content: "🪵";
+  font-size: 1.2em;
+}
+
+.material-placeholder.crystal::after {
+  content: "💎";
+  font-size: 1.2em;
+}
+
+.material-placeholder.oil::after {
+  content: "🛢️";
+  font-size: 1.2em;
+}
+
+/* Character Class Visual Representations */
+.class-representation {
+  width: 120px;
+  height: 120px;
+  border-radius: var(--steampunk-radius-large);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid;
+  position: relative;
+  overflow: hidden;
+}
+
+.class-representation::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+}
+
+.class-tank {
+  background: linear-gradient(135deg, #4169e1 0%, #1e90ff 100%);
+  border-color: #0056cc;
+}
+
+.class-tank::after {
+  content: "🛡️\A GUARDIAN";
+  white-space: pre;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+.class-healer {
+  background: linear-gradient(135deg, #32cd32 0%, #228b22 100%);
+  border-color: #1a6b1a;
+}
+
+.class-healer::after {
+  content: "✚\A MEDIC";
+  white-space: pre;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+.class-dps {
+  background: linear-gradient(135deg, #dc143c 0%, #b22222 100%);
+  border-color: #8b1a1a;
+}
+
+.class-dps::after {
+  content: "⚔️\A STRIKER";
+  white-space: pre;
+  text-align: center;
+  font-size: 2rem;
+  line-height: 1.2;
+  color: white;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+/* Zone and Dungeon Placeholders */
+.zone-placeholder {
+  width: 200px;
+  height: 120px;
+  border-radius: var(--steampunk-radius-large);
+  background: linear-gradient(135deg, #2c1810 0%, #4a3728 50%, #6b4e37 100%);
+  border: 2px solid var(--steampunk-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.zone-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(255, 140, 0, 0.1) 20px, transparent 20px),
+    radial-gradient(circle at 80% 70%, rgba(205, 133, 63, 0.1) 15px, transparent 15px);
+}
+
+.zone-placeholder::after {
+  content: "🏭\A ZONE";
+  white-space: pre;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: var(--steampunk-text-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+.dungeon-placeholder {
+  width: 200px;
+  height: 120px;
+  border-radius: var(--steampunk-radius-large);
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border: 2px solid #4682b4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.dungeon-placeholder::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 30% 20%, rgba(70, 130, 180, 0.2) 15px, transparent 15px),
+    radial-gradient(circle at 70% 80%, rgba(100, 149, 237, 0.1) 20px, transparent 20px);
+}
+
+.dungeon-placeholder::after {
+  content: "🏰\A DUNGEON";
+  white-space: pre;
+  text-align: center;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  color: #e6f3ff;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  font-weight: bold;
+  z-index: 1;
+  position: relative;
+}
+
+/* Guild Emblem Placeholders */
+.guild-emblem {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--steampunk-radius-medium);
+  background: linear-gradient(135deg, var(--steampunk-primary) 0%, var(--steampunk-primary-dark) 100%);
+  border: 3px solid var(--steampunk-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.guild-emblem::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at center, rgba(255, 215, 0, 0.2) 0%, transparent 70%);
+}
+
+.guild-emblem::after {
+  content: "🏛️";
+  z-index: 1;
+  position: relative;
+}
+
+/* Loading Placeholders */
+.loading-placeholder {
+  background: linear-gradient(90deg, rgba(205, 133, 63, 0.1) 25%, rgba(205, 133, 63, 0.2) 50%, rgba(205, 133, 63, 0.1) 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+  border-radius: var(--steampunk-radius-medium);
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.text-placeholder {
+  height: 1em;
+  margin: 0.5em 0;
+}
+
+.text-placeholder.short {
+  width: 60%;
+}
+
+.text-placeholder.medium {
+  width: 80%;
+}
+
+.text-placeholder.long {
+  width: 100%;
+}
+
+/* Steampunk Decorative Borders */
+.steampunk-border {
+  border: 2px solid var(--steampunk-primary);
+  position: relative;
+}
+
+.steampunk-border::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 1px solid var(--steampunk-secondary);
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.steampunk-border.ornate::after {
+  content: '⚙️';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: var(--steampunk-secondary);
+  color: var(--steampunk-bg-primary);
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .class-representation {
+    width: 100px;
+    height: 100px;
+  }
+  
+  .class-representation::after {
+    font-size: 1.5rem;
+  }
+  
+  .zone-placeholder,
+  .dungeon-placeholder {
+    width: 160px;
+    height: 100px;
+  }
+  
+  .zone-placeholder::after,
+  .dungeon-placeholder::after {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .item-placeholder {
+    width: 50px;
+    height: 50px;
+    font-size: 1.2rem;
+  }
+  
+  .class-representation {
+    width: 80px;
+    height: 80px;
+  }
+  
+  .class-representation::after {
+    font-size: 1.2rem;
+  }
+  
+  .guild-emblem {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+  }
+}

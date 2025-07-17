@@ -1,0 +1,246 @@
+/**
+ * Styles for Guild Invitations component
+ */
+
+.guild-invitations {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.invitations-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.invitations-header h2 {
+  color: #d4af37;
+  font-size: 28px;
+  margin-bottom: 8px;
+  font-family: 'Cinzel', serif;
+}
+
+.invitations-header p {
+  color: #e8d5b7;
+  font-size: 16px;
+}
+
+.invite-section {
+  background: rgba(139, 69, 19, 0.2);
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid #8b4513;
+  margin-bottom: 32px;
+}
+
+.invite-section h3 {
+  color: #d4af37;
+  font-size: 20px;
+  margin-bottom: 20px;
+  font-family: 'Cinzel', serif;
+}
+
+.invite-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  color: #d4af37;
+  font-weight: 600;
+  font-size: 16px;
+  font-family: 'Cinzel', serif;
+}
+
+.form-input {
+  padding: 12px 16px;
+  background: rgba(44, 24, 16, 0.8);
+  border: 2px solid #8b4513;
+  border-radius: 6px;
+  color: #e8d5b7;
+  font-size: 16px;
+  font-family: inherit;
+  transition: all 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-message {
+  background: rgba(255, 107, 107, 0.2);
+  color: #ff6b6b;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid #ff6b6b;
+  font-weight: 500;
+}
+
+.success-message {
+  background: rgba(76, 175, 80, 0.2);
+  color: #4caf50;
+  padding: 12px 16px;
+  border-radius: 6px;
+  border: 1px solid #4caf50;
+  font-weight: 500;
+}
+
+.invite-button {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%);
+  color: #2c1810;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Cinzel', serif;
+  align-self: flex-start;
+}
+
+.invite-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #b8941f 0%, #d4af37 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+.invite-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.no-permission {
+  background: rgba(139, 69, 19, 0.1);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #8b4513;
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.no-permission p {
+  color: #e8d5b7;
+  margin-bottom: 8px;
+  line-height: 1.6;
+}
+
+.invitation-info,
+.guild-settings-info {
+  background: rgba(139, 69, 19, 0.1);
+  padding: 24px;
+  border-radius: 8px;
+  border: 1px solid #8b4513;
+  margin-bottom: 24px;
+}
+
+.invitation-info h3,
+.guild-settings-info h3 {
+  color: #d4af37;
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-family: 'Cinzel', serif;
+}
+
+.invitation-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.invitation-info li {
+  color: #e8d5b7;
+  padding: 8px 0;
+  padding-left: 24px;
+  position: relative;
+  line-height: 1.5;
+}
+
+.invitation-info li::before {
+  content: '⚙';
+  position: absolute;
+  left: 0;
+  color: #d4af37;
+  font-size: 16px;
+}
+
+.settings-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.setting-item:last-child {
+  border-bottom: none;
+}
+
+.setting-label {
+  color: #d4af37;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.setting-value {
+  color: #e8d5b7;
+  font-size: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .invite-section {
+    padding: 20px;
+  }
+
+  .invitation-info,
+  .guild-settings-info {
+    padding: 20px;
+  }
+
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .guild-invitations {
+    padding: 0 10px;
+  }
+
+  .invite-section {
+    padding: 16px;
+  }
+
+  .invitation-info,
+  .guild-settings-info {
+    padding: 16px;
+  }
+
+  .invite-button {
+    align-self: stretch;
+    text-align: center;
+  }
+}

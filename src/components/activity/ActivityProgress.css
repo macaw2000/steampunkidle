@@ -1,0 +1,294 @@
+/* Activity Progress Styles - Steampunk Theme */
+
+.activity-progress {
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  border: 2px solid #8b6914;
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: #f4e4bc;
+  font-family: 'Georgia', serif;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.activity-progress__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.activity-progress__icon {
+  font-size: 3rem;
+  filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.activity-progress__info {
+  flex: 1;
+}
+
+.activity-progress__title {
+  font-size: 1.5rem;
+  color: #d4af37;
+  margin: 0 0 0.5rem 0;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.activity-progress__status {
+  font-size: 1rem;
+  color: #c9a876;
+  margin: 0;
+  font-style: italic;
+}
+
+.activity-progress__bar-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.activity-progress__bar {
+  flex: 1;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid #6b5b3f;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.activity-progress__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #8b6914 0%, #d4af37 50%, #f4e4bc 100%);
+  border-radius: 8px;
+  transition: width 0.3s ease;
+  box-shadow: 
+    0 0 10px rgba(212, 175, 55, 0.5),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+  position: relative;
+}
+
+.activity-progress__bar-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.3) 50%, transparent 100%);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.activity-progress__percentage {
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #d4af37;
+  min-width: 50px;
+  text-align: right;
+}
+
+.activity-progress__stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.activity-progress__stat {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(139, 105, 20, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.activity-progress__stat-label {
+  display: block;
+  font-size: 0.85rem;
+  color: #a08660;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.5rem;
+}
+
+.activity-progress__stat-value {
+  display: block;
+  font-size: 1.3rem;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+.activity-progress__rewards {
+  margin-bottom: 1.5rem;
+}
+
+.activity-progress__rewards-title {
+  font-size: 1.2rem;
+  color: #d4af37;
+  margin: 0 0 1rem 0;
+  font-weight: bold;
+}
+
+.activity-progress__rewards-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.activity-progress__reward {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(139, 105, 20, 0.2);
+  border: 1px solid rgba(139, 105, 20, 0.4);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.activity-progress__reward-icon {
+  font-size: 1.2rem;
+}
+
+.activity-progress__reward-amount {
+  font-weight: bold;
+  color: #d4af37;
+}
+
+.activity-progress__reward-type {
+  font-size: 0.85rem;
+  color: #c9a876;
+}
+
+.activity-progress__milestone {
+  background: rgba(143, 188, 143, 0.1);
+  border: 1px solid rgba(143, 188, 143, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.activity-progress__milestone-title {
+  font-size: 1.1rem;
+  color: #8fbc8f;
+  margin: 0 0 0.75rem 0;
+  font-weight: bold;
+}
+
+.activity-progress__milestone-rewards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.activity-progress__milestone-reward {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(143, 188, 143, 0.2);
+  border: 1px solid rgba(143, 188, 143, 0.4);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.85rem;
+}
+
+.activity-progress__efficiency {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(139, 105, 20, 0.3);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.activity-progress__efficiency-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.activity-progress__efficiency-label {
+  font-size: 1rem;
+  color: #c9a876;
+  font-weight: bold;
+}
+
+.activity-progress__efficiency-value {
+  font-size: 1.2rem;
+  color: #d4af37;
+  font-weight: bold;
+}
+
+.activity-progress__efficiency-tip {
+  font-size: 0.85rem;
+  color: #a08660;
+  margin: 0;
+  font-style: italic;
+}
+
+.activity-progress__empty {
+  text-align: center;
+  padding: 2rem;
+}
+
+.activity-progress__empty-icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.6;
+}
+
+.activity-progress__empty h3 {
+  color: #d4af37;
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.activity-progress__empty p {
+  color: #c9a876;
+  margin: 0;
+  font-style: italic;
+}
+
+.activity-progress__loading {
+  text-align: center;
+  padding: 2rem;
+  color: #c9a876;
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .activity-progress {
+    padding: 1rem;
+  }
+  
+  .activity-progress__header {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  
+  .activity-progress__stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .activity-progress__rewards-list {
+    justify-content: center;
+  }
+  
+  .activity-progress__milestone-rewards {
+    justify-content: center;
+  }
+  
+  .activity-progress__efficiency-info {
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+  }
+}
