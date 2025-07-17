@@ -83,36 +83,82 @@ const RealTimeProgressTracker: React.FC<RealTimeProgressTrackerProps> = ({ class
     dispatch(setOnlineStatus(connected));
   }, [dispatch]);
 
-  // Initialize WebSocket connection
+  // Initialize progress tracking (mock for development)
   useEffect(() => {
-    if (!character) return;
+    if (!character || !character.currentActivity) {
+      setConnectionStatus('disconnected');
+      return;
+    }
 
-    setConnectionStatus('connecting');
-
-    const connectWebSocket = async () => {
-      try {
-        await wsService.connect(character.userId);
+    // In development mode, simulate connection and progress
+    if (process.env.NODE_ENV === 'development') {
+      setConnectionStatus('connecting');
+      
+      // Simulate connection delay
+      const connectTimer = setTimeout(() => {
+        setConnectionStatus('connected');
+        dispatch(setOnlineStatus(true));
         
-        // Subscribe to messages
-        const unsubscribeMessages = wsService.subscribe('*', handleWebSocketMessage);
-        const unsubscribeStatus = wsService.onConnectionStatusChange(handleConnectionStatus);
-
-        return () => {
-          if (unsubscribeMessages) unsubscribeMessages();
-          if (unsubscribeStatus) unsubscribeStatus();
+        // Create initial activity progress
+        const startTime = new Date(character.currentActivity.startedAt);
+        const minutesActive = Math.floor((Date.now() - startTime.getTime()) / (1000 * 60));
+        
+        const initialProgress = {
+          activityType: character.currentActivity.type,
+          startedAt: startTime,
+          minutesActive,
+          progressPercentage: Math.min((minutesActive / 60) * 100, 100),
+          potentialRewards: [
+            {
+              type: 'experience' as const,
+              amount: Math.floor(minutesActive * 2),
+              description: 'Experience gained from activity',
+            },
+            ...(minutesActive >= 5 ? [{
+              type: 'currency' as const,
+              amount: Math.floor(minutesActive * 0.5),
+              description: 'Coins earned',
+            }] : [])
+          ],
         };
-      } catch (error) {
-        console.error('Failed to connect to WebSocket:', error);
+        
+        dispatch(setActivityProgress(initialProgress));
+      }, 1000);
+
+      return () => {
+        clearTimeout(connectTimer);
         setConnectionStatus('disconnected');
-      }
-    };
+        dispatch(setOnlineStatus(false));
+      };
+    } else {
+      // Production WebSocket connection
+      setConnectionStatus('connecting');
 
-    const cleanup = connectWebSocket();
+      const connectWebSocket = async () => {
+        try {
+          await wsService.connect(character.userId);
+          
+          // Subscribe to messages
+          const unsubscribeMessages = wsService.subscribe('*', handleWebSocketMessage);
+          const unsubscribeStatus = wsService.onConnectionStatusChange(handleConnectionStatus);
 
-    return () => {
-      cleanup.then(fn => fn?.());
-    };
-  }, [character, handleWebSocketMessage, handleConnectionStatus, wsService]);
+          return () => {
+            if (unsubscribeMessages) unsubscribeMessages();
+            if (unsubscribeStatus) unsubscribeStatus();
+          };
+        } catch (error) {
+          console.error('Failed to connect to WebSocket:', error);
+          setConnectionStatus('disconnected');
+        }
+      };
+
+      const cleanup = connectWebSocket();
+
+      return () => {
+        cleanup.then(fn => fn?.());
+      };
+    }
+  }, [character, handleWebSocketMessage, handleConnectionStatus, wsService, dispatch]);
 
   // Clean up notifications after they're shown
   const removeNotification = useCallback((notificationId: string) => {

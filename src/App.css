@@ -251,4 +251,227 @@
   .game-info ul {
     grid-template-columns: 1fr;
   }
+}/* Game Fea
+tures List Styling */
+.game-features-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--steampunk-spacing-sm);
+}
+
+.game-feature-item {
+  background: rgba(139, 69, 19, 0.3);
+  padding: var(--steampunk-spacing-md);
+  border-radius: var(--steampunk-radius-medium);
+  border: 2px solid var(--steampunk-primary);
+  font-size: 1.1rem;
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: bold;
+  text-align: center;
+}
+
+.game-feature-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.game-feature-item:hover {
+  background: rgba(205, 133, 63, 0.4);
+  border-color: var(--steampunk-secondary);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+  color: var(--steampunk-primary-light);
+}
+
+.game-feature-item:hover::before {
+  left: 100%;
+}
+
+.game-feature-item:active {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(139, 69, 19, 0.3);
+}
+
+/* Feature content styling for modals */
+.feature-content {
+  text-align: left;
+}
+
+.feature-content p {
+  margin-bottom: var(--steampunk-spacing-md);
+  line-height: 1.6;
+}
+
+.feature-content h4 {
+  color: var(--steampunk-primary-light);
+  margin: var(--steampunk-spacing-lg) 0 var(--steampunk-spacing-sm) 0;
+  font-family: var(--steampunk-font-primary);
+}
+
+.feature-content ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.feature-content li {
+  background: rgba(139, 69, 19, 0.2);
+  padding: var(--steampunk-spacing-sm);
+  margin: var(--steampunk-spacing-xs) 0;
+  border-radius: var(--steampunk-radius-small);
+  border-left: 3px solid var(--steampunk-primary-light);
+}
+
+.feature-placeholder {
+  background: rgba(0, 0, 0, 0.3);
+  padding: var(--steampunk-spacing-lg);
+  border-radius: var(--steampunk-radius-medium);
+  border: 1px dashed var(--steampunk-primary);
+  margin-top: var(--steampunk-spacing-md);
+}
+
+.feature-placeholder em {
+  color: var(--steampunk-text-secondary);
+  font-style: italic;
+}/* Das
+hboard Layout with Sidebar */
+.dashboard-layout {
+  display: flex;
+  gap: var(--steampunk-spacing-lg);
+  margin-bottom: 320px; /* Space for chat interface */
+  min-height: 600px;
+}
+
+.game-features-sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid var(--steampunk-primary-light);
+  border-radius: var(--steampunk-radius-large);
+  padding: var(--steampunk-spacing-lg);
+  box-shadow: var(--steampunk-shadow-medium);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+
+
+.game-features-list-sidebar {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--steampunk-spacing-sm);
+}
+
+.game-feature-item-sidebar {
+  background: rgba(139, 69, 19, 0.3);
+  padding: var(--steampunk-spacing-md);
+  border-radius: var(--steampunk-radius-medium);
+  border: 2px solid var(--steampunk-primary);
+  font-size: 1rem;
+  color: var(--steampunk-text-primary);
+  font-family: var(--steampunk-font-primary);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  font-weight: bold;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: var(--steampunk-spacing-sm);
+}
+
+.game-feature-item-sidebar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transition: left 0.5s ease;
+}
+
+.game-feature-item-sidebar:hover {
+  background: rgba(205, 133, 63, 0.4);
+  border-color: var(--steampunk-secondary);
+  transform: translateX(5px);
+  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+  color: var(--steampunk-primary-light);
+}
+
+.game-feature-item-sidebar:hover::before {
+  left: 100%;
+}
+
+.game-feature-item-sidebar:active {
+  transform: translateX(2px);
+  box-shadow: 0 2px 8px rgba(139, 69, 19, 0.3);
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0; /* Prevents flex item from overflowing */
+}
+
+/* Responsive Design for Sidebar Layout */
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    flex-direction: column;
+    margin-bottom: 270px; /* Adjust for mobile chat */
+  }
+  
+  .game-features-sidebar {
+    width: 100%;
+    position: static;
+    order: 2; /* Move sidebar below main content on mobile */
+  }
+  
+  .game-features-list-sidebar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--steampunk-spacing-sm);
+  }
+  
+  .game-feature-item-sidebar {
+    text-align: center;
+  }
+  
+  .game-feature-item-sidebar:hover {
+    transform: translateY(-3px);
+  }
+  
+  .main-content {
+    order: 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-layout {
+    margin-bottom: 250px; /* Smaller chat on mobile */
+  }
+  
+  .game-features-list-sidebar {
+    grid-template-columns: 1fr;
+  }
+  
+  .game-features-sidebar {
+    padding: var(--steampunk-spacing-md);
+  }
 }

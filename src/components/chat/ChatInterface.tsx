@@ -1,202 +1,229 @@
-/**
- * Main chat interface component with tabbed channels
- */
-
-import React, { useState, useEffect } from 'react';
-import { useChat } from '../../hooks/useChat';
-import ChatChannelTabs from './ChatChannelTabs';
-import ChatMessageList from './ChatMessageList';
-import ChatInput from './ChatInput';
-import PrivateMessageModal from './PrivateMessageModal';
+import React, { useState, useEffect, useRef } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../store/store';
 import './ChatInterface.css';
 
-interface ChatInterfaceProps {
-  className?: string;
-  height?: string;
-  showChannelTabs?: boolean;
-  enablePrivateMessages?: boolean;
+interface ChatMessage {
+  id: string;
+  sender: string;
+  content: string;
+  timestamp: Date;
+  channel: string;
+  type: 'user' | 'system' | 'achievement';
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({
-  className = '',
-  height = '400px',
-  showChannelTabs = true,
-  enablePrivateMessages = true,
-}) => {
-  const {
-    channels,
-    activeChannel,
-    activeMessages,
-    unreadCounts,
-    isConnected,
-    loading,
-    error,
-    typingUsers,
-    sendMessage,
-    switchChannel,
-    sendTypingIndicator,
-    createPrivateConversation,
-  } = useChat();
+type ChatChannel = 'global' | 'guild' | 'trade' | 'help';
 
-  const [showPrivateModal, setShowPrivateModal] = useState(false);
-  const [isMinimized, setIsMinimized] = useState(false);
+const ChatInterface: React.FC = () => {
+  const { character } = useSelector((state: RootState) => state.game);
+  const [activeChannel, setActiveChannel] = useState<ChatChannel>('global');
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Handle sending messages
-  const handleSendMessage = async (content: string) => {
-    if (!activeChannel) return;
-    
-    await sendMessage(content);
+  // Mock messages for development
+  const generateMockMessages = (): ChatMessage[] => {
+    const mockMessages: ChatMessage[] = [
+      {
+        id: '1',
+        sender: 'System',
+        content: 'Welcome to the Steam Telegraph Network!',
+        timestamp: new Date(Date.now() - 300000),
+        channel: 'global',
+        type: 'system'
+      },
+      {
+        id: '2',
+        sender: 'GearMaster',
+        content: 'Anyone know where to find Steam Crystals?',
+        timestamp: new Date(Date.now() - 240000),
+        channel: 'global',
+        type: 'user'
+      },
+      {
+        id: '3',
+        sender: 'ClockworkQueen',
+        content: 'Try the mining zones in the eastern districts!',
+        timestamp: new Date(Date.now() - 180000),
+        channel: 'global',
+        type: 'user'
+      },
+      {
+        id: '4',
+        sender: 'System',
+        content: 'SteamPunk87 reached level 20!',
+        timestamp: new Date(Date.now() - 120000),
+        channel: 'global',
+        type: 'achievement'
+      },
+      {
+        id: '5',
+        sender: 'BrassBuilder',
+        content: 'WTS: Clockwork Gears x10 - 50 coins each',
+        timestamp: new Date(Date.now() - 60000),
+        channel: 'trade',
+        type: 'user'
+      }
+    ];
+
+    return mockMessages;
   };
 
-  // Handle slash commands
-  const handleSlashCommand = async (command: string, args: string[]) => {
-    if (!activeChannel) return;
-    
-    // This would typically get the current user info from auth context
-    const currentUserId = activeChannel.participants[0]; // Placeholder
-    const currentUserName = 'Player'; // Placeholder - should come from auth
-    
-    try {
-      // Process the slash command through the chat service
-      // The actual processing will be handled by the backend
-      console.log(`Processing command: /${command} with args:`, args);
-    } catch (error) {
-      console.error('Failed to process slash command:', error);
+  // Initialize messages
+  useEffect(() => {
+    setMessages(generateMockMessages());
+  }, []);
+
+  // Auto-scroll to bottom when new messages arrive
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
+  // Handle sending messages
+  const handleSendMessage = () => {
+    if (!inputMessage.trim() || !character) return;
+
+    const newMessage: ChatMessage = {
+      id: Date.now().toString(),
+      sender: character.name,
+      content: inputMessage.trim(),
+      timestamp: new Date(),
+      channel: activeChannel,
+      type: 'user'
+    };
+
+    setMessages(prev => [...prev, newMessage]);
+    setInputMessage('');
+
+    // Simulate other players responding (for demo)
+    if (Math.random() < 0.3) {
+      setTimeout(() => {
+        const responses = [
+          'Nice one!',
+          'Agreed!',
+          'Thanks for the info!',
+          'Good point!',
+          'I see what you mean.',
+        ];
+        
+        const responseMessage: ChatMessage = {
+          id: (Date.now() + 1).toString(),
+          sender: 'MechMaster',
+          content: responses[Math.floor(Math.random() * responses.length)],
+          timestamp: new Date(),
+          channel: activeChannel,
+          type: 'user'
+        };
+        
+        setMessages(prev => [...prev, responseMessage]);
+      }, 1000 + Math.random() * 2000);
     }
   };
 
-  // Handle channel switching
-  const handleChannelSwitch = (channelId: string) => {
-    switchChannel(channelId);
+  // Handle key press
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
   };
 
-  // Handle private message creation
-  const handleCreatePrivateMessage = (recipientId: string, recipientName: string) => {
-    createPrivateConversation(recipientId, recipientName);
-    setShowPrivateModal(false);
+  // Filter messages by active channel
+  const filteredMessages = messages.filter(msg => msg.channel === activeChannel);
+
+  // Format timestamp
+  const formatTime = (date: Date): string => {
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  // Handle typing indicators
-  const handleTyping = () => {
-    sendTypingIndicator();
+  // Get channel info
+  const getChannelInfo = (channel: ChatChannel) => {
+    const channelData = {
+      global: { name: 'Global', icon: '🌍', color: '#4a7c59' },
+      guild: { name: 'Guild', icon: '🏰', color: '#8b4513' },
+      trade: { name: 'Trade', icon: '💼', color: '#b8860b' },
+      help: { name: 'Help', icon: '❓', color: '#6495ed' }
+    };
+    return channelData[channel];
   };
-
-  if (loading) {
-    return (
-      <div className={`chat-interface loading ${className}`} style={{ height }}>
-        <div className="chat-loading">
-          <div className="loading-spinner"></div>
-          <span>Connecting to chat...</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className={`chat-interface error ${className}`} style={{ height }}>
-        <div className="chat-error">
-          <div className="error-icon">⚠️</div>
-          <div className="error-message">{error}</div>
-          <button 
-            className="retry-button"
-            onClick={() => window.location.reload()}
-          >
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   return (
-    <div className={`chat-interface ${isMinimized ? 'minimized' : ''} ${className}`} style={{ height: isMinimized ? 'auto' : height }}>
+    <div className="chat-interface expanded">
       {/* Chat Header */}
       <div className="chat-header">
         <div className="chat-title">
           <span className="chat-icon">💬</span>
-          <span>Chat</span>
-          <div className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-            <div className="status-dot"></div>
-            <span>{isConnected ? 'Connected' : 'Disconnected'}</span>
-          </div>
-        </div>
-        <div className="chat-controls">
-          {enablePrivateMessages && (
-            <button
-              className="private-message-button"
-              onClick={() => setShowPrivateModal(true)}
-              title="Start private conversation"
-            >
-              ✉️
-            </button>
-          )}
-          <button
-            className="minimize-button"
-            onClick={() => setIsMinimized(!isMinimized)}
-            title={isMinimized ? 'Expand chat' : 'Minimize chat'}
-          >
-            {isMinimized ? '⬆️' : '⬇️'}
-          </button>
+          <span>Steam Telegraph</span>
+          <span className="channel-indicator">
+            {getChannelInfo(activeChannel).icon} {getChannelInfo(activeChannel).name}
+          </span>
         </div>
       </div>
 
-      {!isMinimized && (
-        <>
-          {/* Channel Tabs */}
-          {showChannelTabs && channels.length > 0 && (
-            <ChatChannelTabs
-              channels={channels}
-              activeChannelId={activeChannel?.channelId || null}
-              unreadCounts={unreadCounts}
-              onChannelSwitch={handleChannelSwitch}
-            />
-          )}
+      {/* Chat Content - Always Visible */}
+      <div className="chat-content">
+        {/* Channel Tabs */}
+        <div className="chat-channels">
+          {(['global', 'guild', 'trade', 'help'] as ChatChannel[]).map(channel => {
+            const info = getChannelInfo(channel);
+            return (
+              <button
+                key={channel}
+                className={`channel-tab ${activeChannel === channel ? 'active' : ''}`}
+                onClick={() => setActiveChannel(channel)}
+                style={{ '--channel-color': info.color } as React.CSSProperties}
+              >
+                <span className="channel-icon">{info.icon}</span>
+                <span className="channel-name">{info.name}</span>
+              </button>
+            );
+          })}
+        </div>
 
-          {/* Chat Content */}
-          <div className="chat-content">
-            {activeChannel ? (
-              <>
-                {/* Message List */}
-                <ChatMessageList
-                  messages={activeMessages}
-                  currentUserId={activeChannel.participants[0]} // This should come from auth
-                  typingUsers={typingUsers[activeChannel.channelId] || []}
-                  channelType={activeChannel.type}
-                />
-
-                {/* Chat Input */}
-                <ChatInput
-                  onSendMessage={handleSendMessage}
-                  onSlashCommand={handleSlashCommand}
-                  onTyping={handleTyping}
-                  placeholder={`Message ${activeChannel.name}...`}
-                  disabled={!isConnected}
-                  currentUserId={activeChannel.participants[0]} // This should come from auth
-                  currentUserName="Player" // This should come from auth
-                  channelId={activeChannel.channelId}
-                  messageType={activeChannel.type === 'general' ? 'general' : activeChannel.type === 'guild' ? 'guild' : 'private'}
-                />
-              </>
-            ) : (
-              <div className="no-channel-selected">
-                <div className="no-channel-icon">💭</div>
-                <div className="no-channel-message">
-                  Select a channel to start chatting
-                </div>
+        {/* Messages Area */}
+        <div className="chat-messages">
+          {filteredMessages.map(message => (
+            <div
+              key={message.id}
+              className={`chat-message ${message.type}`}
+            >
+              <div className="message-header">
+                <span className="message-sender">{message.sender}</span>
+                <span className="message-time">{formatTime(message.timestamp)}</span>
               </div>
-            )}
-          </div>
-        </>
-      )}
+              <div className="message-content">{message.content}</div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
 
-      {/* Private Message Modal */}
-      {showPrivateModal && (
-        <PrivateMessageModal
-          onClose={() => setShowPrivateModal(false)}
-          onCreateConversation={handleCreatePrivateMessage}
-        />
-      )}
+        {/* Input Area */}
+        <div className="chat-input-area">
+          <div className="input-container">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder={`Message ${getChannelInfo(activeChannel).name}...`}
+              className="chat-input"
+              maxLength={200}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={!inputMessage.trim()}
+              className="send-button"
+            >
+              📤
+            </button>
+          </div>
+          <div className="input-info">
+            <span className="char-count">{inputMessage.length}/200</span>
+            <span className="input-hint">Press Enter to send</span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

@@ -11,8 +11,36 @@ import { setCharacter } from '../../store/slices/gameSlice';
 import './ActivitySelector.css';
 
 const ActivitySelector: React.FC = () => {
+  const dispatch = useDispatch();
   const { character } = useSelector((state: RootState) => state.game);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const [switching, setSwitching] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Safe activity switching with error handling
+  const handleActivitySwitch = async (activityType: ActivityType) => {
+    if (!user?.userId || !character || switching) return;
+
+    setSwitching(true);
+    setError(null);
+
+    try {
+      const result = await ActivityService.switchActivity(user.userId, activityType);
+      
+      // Update character in Redux store
+      dispatch(setCharacter(result.character));
+      
+      // Show success message if there were previous rewards
+      if (result.previousActivityRewards && result.previousActivityRewards.length > 0) {
+        console.log('Previous activity rewards:', result.previousActivityRewards);
+      }
+    } catch (err) {
+      console.error('Activity switch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to switch activity');
+    } finally {
+      setSwitching(false);
+    }
+  };
 
   // Simple error handling wrapper for ActivityService calls
   const safeGetActivityInfo = (activityType: ActivityType) => {
@@ -45,7 +73,7 @@ const ActivitySelector: React.FC = () => {
     return character?.currentActivity?.type === activityType;
   };
 
-  const activities: ActivityType[] = ['crafting', 'harvesting', 'combat'];
+  const activities: ActivityType[] = ['harvesting', 'combat', 'crafting'];
 
   if (!character) {
     return <div className="activity-selector">Loading character...</div>;
@@ -70,7 +98,9 @@ const ActivitySelector: React.FC = () => {
           return (
             <div
               key={activityType}
-              className={`activity-card ${isCurrent ? 'active' : ''}`}
+              className={`activity-card ${isCurrent ? 'active' : ''} ${switching ? 'disabled' : ''}`}
+              onClick={() => !switching && !isCurrent && handleActivitySwitch(activityType)}
+              style={{ cursor: !switching && !isCurrent ? 'pointer' : 'default' }}
             >
               <div className="activity-icon">{info.icon}</div>
               <div className="activity-name">{info.name}</div>
@@ -101,6 +131,13 @@ const ActivitySelector: React.FC = () => {
               {isCurrent && (
                 <div className="current-activity-badge">
                   ⚡ Active
+                </div>
+              )}
+
+              {switching && (
+                <div className="switching-overlay">
+                  <div className="loading-spinner">⚙️</div>
+                  <p>Switching...</p>
                 </div>
               )}
             </div>

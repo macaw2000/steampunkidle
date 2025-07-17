@@ -1,0 +1,437 @@
+.character-panel {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Tab Navigation */
+.character-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #8b4513;
+  padding-bottom: 0.5rem;
+}
+
+.tab-button {
+  background: rgba(139, 69, 19, 0.3);
+  border: 2px solid #8b4513;
+  color: #f4e4bc;
+  padding: 0.75rem 1rem;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  flex: 1;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.tab-button:hover {
+  background: rgba(139, 69, 19, 0.5);
+  border-color: #a0522d;
+}
+
+.tab-button.active {
+  background: #8b4513;
+  color: #fff;
+  border-bottom-color: #8b4513;
+  transform: translateY(2px);
+}
+
+/* Character Content */
+.character-content {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border: 2px solid #8b4513;
+}
+
+/* Attributes Tab */
+.character-overview {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: rgba(139, 69, 19, 0.2);
+  border-radius: 8px;
+}
+
+.character-avatar {
+  text-align: center;
+}
+
+.avatar-placeholder {
+  width: 80px;
+  height: 80px;
+  background: rgba(139, 69, 19, 0.5);
+  border: 2px solid #8b4513;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.character-name {
+  font-weight: bold;
+  color: #f4e4bc;
+  font-size: 1.2rem;
+}
+
+.character-basic-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+}
+
+.info-item .label {
+  color: #d4c4a0;
+  font-weight: bold;
+}
+
+.info-item .value {
+  color: #f4e4bc;
+}
+
+/* Experience Section */
+.experience-section {
+  margin-bottom: 2rem;
+}
+
+.exp-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  color: #f4e4bc;
+  font-size: 0.9rem;
+}
+
+.exp-bar {
+  height: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid #8b4513;
+  position: relative;
+}
+
+.exp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #4a7c59 0%, #5a9b69 100%);
+  transition: width 0.3s ease;
+}
+
+.exp-percentage {
+  text-align: center;
+  margin-top: 0.25rem;
+  color: #4a7c59;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* Attributes Grid */
+.attributes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.attribute-card {
+  background: rgba(139, 69, 19, 0.3);
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.attribute-card:hover {
+  transform: translateY(-2px);
+  background: rgba(139, 69, 19, 0.4);
+}
+
+.attribute-icon {
+  font-size: 2rem;
+}
+
+.attribute-name {
+  color: #d4c4a0;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.attribute-value {
+  color: #f4e4bc;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Inventory Tab */
+.inventory-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.inventory-header h4 {
+  color: #f4e4bc;
+  margin: 0;
+}
+
+.inventory-filters {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.filter-btn {
+  background: rgba(139, 69, 19, 0.3);
+  border: 1px solid #8b4513;
+  color: #d4c4a0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+}
+
+.filter-btn:hover {
+  background: rgba(139, 69, 19, 0.5);
+}
+
+.filter-btn.active {
+  background: #8b4513;
+  color: #fff;
+}
+
+.inventory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.inventory-item {
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid #8b4513;
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.2s ease;
+}
+
+.inventory-item:hover {
+  background: rgba(139, 69, 19, 0.3);
+  transform: translateY(-1px);
+}
+
+.item-icon {
+  font-size: 1.5rem;
+}
+
+.item-name {
+  font-weight: bold;
+  margin-bottom: 0.25rem;
+}
+
+.item-quantity {
+  color: #d4c4a0;
+  font-size: 0.9rem;
+}
+
+/* Skills Tab */
+.skill-category {
+  margin-bottom: 2rem;
+}
+
+.skill-category h4 {
+  color: #f4e4bc;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #8b4513;
+  padding-bottom: 0.5rem;
+}
+
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.skill-item {
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid #8b4513;
+  border-radius: 6px;
+  padding: 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.skill-name {
+  color: #d4c4a0;
+  font-weight: bold;
+}
+
+.skill-value {
+  color: #f4e4bc;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Specialization Tab */
+.specialization-overview {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.specialization-overview h4 {
+  color: #f4e4bc;
+  margin-bottom: 0.5rem;
+}
+
+.specialization-overview p {
+  color: #d4c4a0;
+  margin: 0;
+}
+
+.specialization-progress {
+  margin-bottom: 2rem;
+}
+
+.spec-role {
+  margin-bottom: 1.5rem;
+}
+
+.role-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.role-icon {
+  font-size: 1.2rem;
+}
+
+.role-name {
+  color: #f4e4bc;
+  font-weight: bold;
+  flex: 1;
+}
+
+.role-progress {
+  color: #d4c4a0;
+  font-weight: bold;
+}
+
+.progress-bar {
+  height: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #8b4513;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.progress-fill.tank {
+  background: linear-gradient(90deg, #3b82f6 0%, #60a5fa 100%);
+}
+
+.progress-fill.healer {
+  background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+}
+
+.progress-fill.dps {
+  background: linear-gradient(90deg, #ef4444 0%, #f87171 100%);
+}
+
+.current-roles {
+  background: rgba(139, 69, 19, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.role-assignment {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.role-assignment:last-child {
+  margin-bottom: 0;
+}
+
+.role-assignment .label {
+  color: #d4c4a0;
+  font-weight: bold;
+}
+
+.role-assignment .value {
+  color: #f4e4bc;
+  text-transform: capitalize;
+}
+
+/* Loading State */
+.loading-state {
+  text-align: center;
+  padding: 2rem;
+  color: #d4c4a0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .character-tabs {
+    flex-direction: column;
+  }
+  
+  .tab-button {
+    border-radius: 8px;
+  }
+  
+  .tab-button.active {
+    transform: none;
+  }
+  
+  .character-overview {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .attributes-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .inventory-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .inventory-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+}

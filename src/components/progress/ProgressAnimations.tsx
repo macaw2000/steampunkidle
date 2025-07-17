@@ -178,8 +178,39 @@ const ProgressAnimations: React.FC<ProgressAnimationsProps> = ({
     );
   }
 
-  const activityInfo = ActivityService.getActivityDisplayInfo(activityProgress.activityType);
-  const efficiency = ActivityService.calculateActivityEfficiency(character, activityProgress.activityType);
+  // Safe activity info retrieval with fallback
+  const activityInfo = (() => {
+    try {
+      const info = ActivityService.getActivityDisplayInfo(activityProgress.activityType);
+      return info || {
+        name: 'Unknown Activity',
+        description: 'Activity information unavailable',
+        icon: '❓',
+        primaryStat: 'Unknown',
+        rewards: ['Unknown'],
+        steampunkFlavor: 'Activity details unavailable',
+      };
+    } catch (error) {
+      console.error('Error getting activity info:', error);
+      return {
+        name: 'Unknown Activity',
+        description: 'Activity information unavailable',
+        icon: '❓',
+        primaryStat: 'Unknown',
+        rewards: ['Unknown'],
+        steampunkFlavor: 'Activity details unavailable',
+      };
+    }
+  })();
+
+  const efficiency = (() => {
+    try {
+      return ActivityService.calculateActivityEfficiency(character, activityProgress.activityType);
+    } catch (error) {
+      console.error('Error calculating efficiency:', error);
+      return 1;
+    }
+  })();
 
   return (
     <div className={`progress-animations ${isConnected ? 'progress-animations--connected' : 'progress-animations--offline'}`}>
