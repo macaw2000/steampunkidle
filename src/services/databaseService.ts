@@ -103,6 +103,7 @@ export const TABLE_NAMES = {
   ZONE_INSTANCES: process.env.ZONE_INSTANCES_TABLE || 'steampunk-idle-game-zone-instances',
   CURRENCY_TRANSACTIONS: process.env.CURRENCY_TRANSACTIONS_TABLE || 'steampunk-idle-game-currency-transactions',
   CRAFTING_SESSIONS: process.env.CRAFTING_SESSIONS_TABLE || 'steampunk-idle-game-crafting-sessions',
+  TASK_QUEUES: process.env.TASK_QUEUES_TABLE || 'steampunk-idle-game-task-queues',
 };
 
 // Retry configuration

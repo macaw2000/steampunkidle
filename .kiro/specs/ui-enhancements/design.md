@@ -184,6 +184,65 @@ Each feature will have its own Redux slice:
 - Performance optimization
 - UI/UX improvements and animations
 
+### Harvesting Reward System Component
+
+```typescript
+interface HarvestReward {
+  primaryMaterial: {
+    itemId: string;
+    quantity: number;
+  };
+  exoticItem?: {
+    itemId: string;
+    quantity: number;
+    rarity: 'rare' | 'epic' | 'legendary';
+  };
+  skillGained: number;
+}
+
+interface ExoticItem {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: 'rare' | 'epic' | 'legendary';
+  category: HarvestingCategory;
+  baseDropRate: number; // Very low, < 0.01
+  value: number;
+}
+
+interface HarvestingSkillData {
+  categoryLevels: Record<HarvestingCategory, number>;
+  categoryExperience: Record<HarvestingCategory, number>;
+  totalHarvests: number;
+  exoticItemsFound: number;
+}
+```
+
+## Data Models
+
+### Harvesting Reward System
+- **Primary Material Mapping**: Each activity yields one specific primary material
+- **Exotic Item Database**: Category-specific rare items with <1% base drop rates
+- **Skill Progression**: Harvesting skill levels that slightly improve exotic discovery rates
+- **Reward Calculation**: Formula combining base rates with skill bonuses
+
+### Primary Material Categories
+- Literary Pursuits → Ancient Manuscripts, Rare Books, Research Notes
+- Mechanical Tinkering → Gears, Springs, Mechanical Parts
+- Alchemical Studies → Chemical Compounds, Rare Reagents, Catalysts
+- Archaeological Expeditions → Artifacts, Ancient Tools, Historical Items
+- Botanical Research → Rare Seeds, Plant Specimens, Botanical Samples
+- Metallurgical Mining → Metal Ores, Refined Metals, Alloys
+- Electrical Experiments → Electrical Components, Conductors, Insulators
+- Aeronautical Adventures → Flight Components, Navigation Tools, Aerodynamic Parts
+
+### Exotic Item System
+- **Base Drop Rate**: 0.5% (0.005) for all exotic items
+- **Skill Bonus Formula**: `baseChance * (1 + (skillLevel * 0.02))`
+- **Maximum Bonus**: 100% increase at skill level 50 (1% total chance)
+- **Category-Specific Items**: Thematic exotic items matching each harvesting category
+
 ## User Experience Design
 
 ### Modal Interface
@@ -195,6 +254,12 @@ Each feature will have its own Redux slice:
 - Clear visual indicators for available features
 - Tooltips and help text for new players
 - Progressive disclosure of advanced features
+
+### Harvesting Reward Feedback
+- Clear display of primary material received
+- Exciting notifications for exotic item discoveries
+- Skill progression indicators showing exotic chance improvements
+- Statistics tracking for rare finds and skill development
 
 ### Performance Considerations
 - Lazy loading of feature components

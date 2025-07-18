@@ -1,0 +1,364 @@
+/**
+ * Unified Progress Bar Styles
+ * Fixed position at top of screen for all activities
+ */
+
+.unified-progress-bar {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid #8b4513;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-top: 15px;
+  font-family: 'Georgia', serif;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  height: 80px; /* Fixed height to prevent any resizing */
+  position: relative; /* For absolute positioning of rewards */
+}
+
+.unified-progress-bar.idle {
+  background: rgba(0, 0, 0, 0.2);
+  border-color: #666;
+}
+
+.unified-progress-bar.idle .task-name {
+  color: #ccc;
+}
+
+.unified-progress-bar.idle .task-description {
+  color: #999;
+}
+
+.unified-progress-bar.idle .progress-fill.idle-fill {
+  background: linear-gradient(90deg, #666, #888);
+  width: 100% !important;
+  animation: idlePulse 3s ease-in-out infinite;
+}
+
+@keyframes idlePulse {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.task-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+}
+
+.task-icon {
+  font-size: 1.2em;
+}
+
+.task-name {
+  font-weight: bold;
+  color: #ffd700;
+  font-size: 1.1em;
+}
+
+.queue-indicator {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  border: 1px solid #ffd700;
+}
+
+.task-description {
+  color: #d4af37;
+  font-size: 0.9em;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.progress-section {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.progress-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-bar {
+  flex: 1;
+  height: 20px;
+  background: #2c1810;
+  border: 2px solid #8b4513;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  transition: width 0.3s ease-out;
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+  position: relative;
+}
+
+.progress-fill.transitioning {
+  transition: width 0.1s ease-out;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.progress-text {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.9em;
+  min-width: 40px;
+  text-align: center;
+}
+
+.progress-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8em;
+  color: #e8d5b7;
+}
+
+.left-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.inline-rewards {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  min-width: 120px; /* Reserve minimum space for rewards */
+  min-height: 20px; /* Reserve minimum height */
+}
+
+.inline-rewards.visible {
+  opacity: 1;
+}
+
+.inline-rewards.hidden {
+  opacity: 0;
+}
+
+.reward-placeholder {
+  display: inline-block;
+  min-width: 1px;
+  min-height: 20px; /* Match the height of reward items */
+}
+
+.inline-reward {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  background: rgba(255, 215, 0, 0.2);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  font-size: 0.75em;
+  animation: rewardFadeIn 0.3s ease-out;
+}
+
+@keyframes rewardFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.inline-reward.common {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.inline-reward.uncommon {
+  border-color: rgba(30, 255, 0, 0.4);
+  background: rgba(30, 255, 0, 0.1);
+  box-shadow: 0 0 4px rgba(30, 255, 0, 0.2);
+}
+
+.inline-reward.rare {
+  border-color: rgba(0, 112, 221, 0.4);
+  background: rgba(0, 112, 221, 0.1);
+  box-shadow: 0 0 4px rgba(0, 112, 221, 0.3);
+}
+
+.inline-reward.legendary {
+  border-color: rgba(163, 53, 238, 0.4);
+  background: rgba(163, 53, 238, 0.1);
+  box-shadow: 0 0 4px rgba(163, 53, 238, 0.4);
+  animation: rewardFadeIn 0.3s ease-out, legendaryGlow 2s ease-in-out infinite alternate;
+}
+
+.inline-reward .reward-icon {
+  font-size: 0.9em;
+}
+
+.inline-reward .reward-amount {
+  color: #ffd700;
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.time-remaining {
+  color: #90ee90;
+  font-weight: bold;
+}
+
+.completed-count {
+  color: #d4af37;
+}
+
+.progress-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.stop-button {
+  background: linear-gradient(145deg, #8b0000, #a00000);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.9em;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.stop-button:hover {
+  background: linear-gradient(145deg, #a00000, #b00000);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.stop-button:active {
+  transform: translateY(0);
+}
+
+.stop-button-placeholder {
+  /* Match the exact dimensions of the stop button */
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9em;
+  opacity: 0;
+  pointer-events: none;
+  /* Ensure it takes up the same space as the stop button */
+  min-width: 60px;
+  min-height: 36px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .unified-progress-bar {
+    padding: 10px 15px;
+  }
+  
+  .progress-container {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+  
+  .task-info {
+    text-align: center;
+  }
+  
+  .task-description {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+  }
+  
+  .progress-section {
+    order: -1;
+  }
+  
+  .progress-details {
+    justify-content: center;
+    gap: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .task-header {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .queue-indicator {
+    align-self: center;
+  }
+  
+  .progress-bar-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .progress-text {
+    align-self: center;
+  }
+  
+  .rewards-list {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .reward-item {
+    min-width: 150px;
+    justify-content: center;
+  }
+}

@@ -7,6 +7,7 @@ import GameDashboard from './components/GameDashboard';
 import AuthCallback from './components/auth/AuthCallback';
 import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 import ErrorBoundary from './components/common/ErrorBoundary';
+import AppHeader from './components/common/AppHeader';
 import './App.css';
 
 // Conditionally import test user setup only in development
@@ -28,9 +29,9 @@ function App() {
           <AuthProvider>
             <Router>
               <div className="App">
-                <header className="App-header">
-                  <h1>Steampunk Idle Game</h1>
-                </header>
+                <ErrorBoundary fallback={<div>Header failed to load</div>}>
+                  <AppHeader />
+                </ErrorBoundary>
                 <main>
                   <Routes>
                     <Route 
@@ -51,6 +52,8 @@ function App() {
                     />
                   </Routes>
                 </main>
+
+
               </div>
             </Router>
           </AuthProvider>

@@ -1,80 +1,154 @@
 /**
- * Harvesting-related type definitions for the Steampunk Idle Game
+ * Harvesting System Types
+ * Defines steampunk-themed resource gathering activities
  */
 
-export type HarvestingSkillType = 'mining' | 'foraging' | 'salvaging' | 'crystal_extraction';
-
-export interface HarvestingNode {
-  nodeId: string;
+export interface HarvestingActivity {
+  id: string;
   name: string;
   description: string;
-  type: 'ore_vein' | 'herb_patch' | 'scrap_pile' | 'crystal_formation';
-  requiredSkill: HarvestingSkillType;
+  category: HarvestingCategory;
+  icon: string;
+  baseTime: number; // seconds
+  energyCost: number;
   requiredLevel: number;
-  harvestTime: number; // in seconds
-  resources: HarvestingResource[];
-  respawnTime: number; // in seconds
-  maxYield: number;
-  steampunkTheme: {
-    flavorText: string;
-    visualDescription: string;
+  requiredStats?: {
+    intelligence?: number;
+    dexterity?: number;
+    strength?: number;
+    perception?: number;
   };
+  statBonuses: {
+    intelligence?: number;
+    dexterity?: number;
+    strength?: number;
+    perception?: number;
+    experience?: number;
+  };
+  dropTable: DropTable;
+  unlockConditions?: UnlockCondition[];
+}
+
+export interface DropTable {
+  guaranteed: ResourceDrop[];
+  common: ResourceDrop[];
+  uncommon: ResourceDrop[];
+  rare: ResourceDrop[];
+  legendary: ResourceDrop[];
+}
+
+export interface ResourceDrop {
+  itemId: string;
+  minQuantity: number;
+  maxQuantity: number;
+  dropRate: number; // 0-1 probability
+}
+
+export interface UnlockCondition {
+  type: 'level' | 'stat' | 'item' | 'activity';
+  requirement: string | number;
+  value?: any;
+}
+
+export enum HarvestingCategory {
+  LITERARY = 'literary',
+  MECHANICAL = 'mechanical',
+  ALCHEMICAL = 'alchemical',
+  ARCHAEOLOGICAL = 'archaeological',
+  BOTANICAL = 'botanical',
+  METALLURGICAL = 'metallurgical',
+  ELECTRICAL = 'electrical',
+  AERONAUTICAL = 'aeronautical'
 }
 
 export interface HarvestingResource {
-  resourceId: string;
+  id: string;
   name: string;
-  quantity: number;
-  rarity: 'common' | 'uncommon' | 'rare' | 'legendary';
-  dropChance: number; // 0-1 probability
+  description: string;
+  category: ResourceCategory;
+  rarity: ResourceRarity;
+  icon: string;
+  value: number;
+  stackable: boolean;
+  maxStack?: number;
+  craftingMaterial: boolean;
+  sellable: boolean;
+}
+
+export enum ResourceCategory {
+  LITERARY_MATERIALS = 'literary_materials',
+  MECHANICAL_PARTS = 'mechanical_parts',
+  ALCHEMICAL_REAGENTS = 'alchemical_reagents',
+  ARCHAEOLOGICAL_ARTIFACTS = 'archaeological_artifacts',
+  BOTANICAL_SPECIMENS = 'botanical_specimens',
+  METAL_INGOTS = 'metal_ingots',
+  ELECTRICAL_COMPONENTS = 'electrical_components',
+  AERONAUTICAL_PARTS = 'aeronautical_parts',
+  RARE_TREASURES = 'rare_treasures'
+}
+
+export enum ResourceRarity {
+  COMMON = 'common',
+  UNCOMMON = 'uncommon',
+  RARE = 'rare',
+  LEGENDARY = 'legendary'
 }
 
 export interface HarvestingSession {
-  sessionId: string;
-  userId: string;
-  nodeId: string;
-  startedAt: Date;
-  completedAt?: Date;
-  status: 'in_progress' | 'completed' | 'cancelled';
-  resourcesGathered: HarvestingResource[];
-  experienceEarned: number;
+  activityId: string;
+  startTime: number;
+  duration: number;
+  playerId: string;
+  completed: boolean;
+  rewards?: HarvestingReward[];
 }
 
-export interface HarvestingArea {
-  areaId: string;
+export interface HarvestingReward {
+  itemId: string;
+  quantity: number;
+  rarity: ResourceRarity;
+  isRare: boolean;
+}
+
+export interface EnhancedHarvestingReward {
+  primaryMaterial: {
+    itemId: string;
+    quantity: number;
+  };
+  exoticItem?: {
+    itemId: string;
+    quantity: number;
+    rarity: 'rare' | 'epic' | 'legendary';
+  };
+  skillGained: number;
+}
+
+export interface ExoticItem {
+  id: string;
   name: string;
   description: string;
-  requiredLevel: number;
-  nodes: HarvestingNode[];
-  steampunkTheme: {
-    atmosphere: string;
-    dangers: string[];
-  };
+  icon: string;
+  rarity: 'rare' | 'epic' | 'legendary';
+  category: HarvestingCategory;
+  baseDropRate: number; // Very low, < 0.01
+  value: number;
 }
 
-// Request/Response types
-export interface StartHarvestingRequest {
-  userId: string;
-  nodeId: string;
+export interface HarvestingSkillData {
+  categoryLevels: Record<HarvestingCategory, number>;
+  categoryExperience: Record<HarvestingCategory, number>;
+  totalHarvests: number;
+  exoticItemsFound: number;
 }
 
-export interface StartHarvestingResponse {
-  session: HarvestingSession;
-  estimatedCompletion: Date;
-  potentialResources: HarvestingResource[];
-}
-
-export interface CompleteHarvestingRequest {
-  userId: string;
-  sessionId: string;
-}
-
-export interface CompleteHarvestingResponse {
-  session: HarvestingSession;
-  resourcesGathered: HarvestingResource[];
-  experienceGained: number;
-  skillLevelUp?: {
-    skill: HarvestingSkillType;
-    newLevel: number;
-  };
+export interface PlayerHarvestingStats {
+  playerId: string;
+  totalHarvests: number;
+  totalTimeSpent: number;
+  activitiesUnlocked: string[];
+  categoryLevels: Record<HarvestingCategory, number>;
+  categoryExperience: Record<HarvestingCategory, number>;
+  rareFindCount: number;
+  legendaryFindCount: number;
+  favoriteActivity?: string;
 }

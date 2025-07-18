@@ -18,15 +18,16 @@
   - Create feature availability states (available, coming soon, locked)
   - _Requirements: 1.1, 2.1, 3.1, 4.1, 5.1, 6.1, 7.1_
 
-- [ ] 3. Implement Guild Management system
-  - Create GuildManager component with guild creation and joining interface
-  - Implement guild data types and Redux slice for guild state management
-  - Add guild member management (invite, kick, promote) functionality
-  - Create guild information display with member list and statistics
+- [x] 3. Implement Guild Management system
 
 
 
-  - Add guild service with mock data for development mode
+
+
+  - Connect existing GuildManager component to GameDashboard modal system
+  - Replace placeholder content with actual GuildManager component
+  - Ensure proper character data passing to GuildManager
+  - Test guild functionality integration with existing game state
   - _Requirements: 1.1, 1.2, 1.3, 1.4_
 
 - [x] 4. Build Chat System interface
@@ -54,36 +55,45 @@
   - Add Character button to left sidebar navigation
   - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-- [ ] 6. Enhance Marketplace functionality
+- [x] 6. Enhance Marketplace functionality
+
   - Connect Auction Marketplace button to existing marketplace tab
   - Verify marketplace navigation works correctly from Game Features
   - Add any missing marketplace features or improvements
   - Ensure marketplace state persists when switching between features
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 7. Expand Crafting System interface
+- [x] 7. Build Resource Harvesting interface with enhanced controls
+
+
+
+
+  - Fix HarvestingHub component to open immediately when Resource Harvesting is clicked
+  - Add number input for rounds selection (defaulting to infinite)
+  - Implement "Start Harvesting" button that begins activity and closes all dialogs
+  - Add "Add to Queue" button for queuing activities without interruption
+  - Create visual feedback system showing active and queued harvesting activities
+  - Add progress tracking with real-time updates and reward notifications
+  - Integrate with existing task queue system for seamless activity management
+  - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8_
+
+- [ ] 8. Expand Crafting interface
   - Create CraftingHub component with recipe browser and crafting queue
+  - Replace placeholder content in GameDashboard with CraftingHub component
   - Implement crafting recipe types and material requirements
   - Add crafting progress tracking and completion notifications
   - Create inventory integration for materials and crafted items
   - Add crafting service with recipe data and crafting logic
-  - _Requirements: 5.1, 5.2, 5.3, 5.4_
-
-- [ ] 8. Build Resource Harvesting interface
-  - Create HarvestingHub component with resource collection display
-  - Implement resource types and collection rate calculations
-  - Add harvesting progress visualization and efficiency metrics
-  - Create resource inventory management and storage limits
-  - Add harvesting service with resource generation logic
   - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 9. Implement Combat System mechanics
+- [ ] 9. Implement Combat mechanics
   - Create CombatHub component with enemy selection and battle interface
+  - Replace placeholder content in GameDashboard with CombatHub component
   - Implement combat mechanics with turn-based or real-time options
   - Add combat rewards system and experience distribution
   - Create enemy types and difficulty scaling based on player level
   - Add combat service with battle logic and reward calculations
-  - _Requirements: 7.1, 7.2, 7.3, 7.4_
+  - _Requirements: 8.1, 8.2, 8.3, 8.4_
 
 - [ ] 10. Add shared UI components and utilities
   - Create reusable components (buttons, forms, lists, progress bars)
@@ -99,7 +109,22 @@
   - Implement feature notifications and achievement integration
   - _Requirements: All requirements - game integration_
 
-- [ ] 12. Add error boundaries and testing
+- [x] 12. Implement enhanced harvesting reward system
+
+
+
+
+  - Replace complex drop table system with single primary material per harvest
+  - Create exotic item database with category-specific rare items (<1% drop rate)
+  - Implement harvesting skill progression system that improves exotic discovery rates
+  - Add skill level calculation based on harvesting experience in each category
+  - Create reward calculation engine that combines base rates with skill bonuses
+  - Update harvesting service to use new reward system
+  - Add exotic item discovery notifications and celebrations
+  - Create harvesting statistics tracking for skill progression and rare finds
+  - _Requirements: 9.1, 9.2, 9.3, 9.4_
+
+- [x] 13. Add error boundaries and testing
   - Wrap each feature component with error boundaries
   - Create unit tests for feature components and services
   - Add integration tests for modal system and feature navigation

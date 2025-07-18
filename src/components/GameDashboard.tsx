@@ -7,28 +7,49 @@ import FeatureModal from './common/FeatureModal';
 import LoginComponent from './auth/LoginComponent';
 import UserProfile from './auth/UserProfile';
 import CharacterCreation from './character/CharacterCreation';
-import RealTimeProgressTracker from './progress/RealTimeProgressTracker';
 import MarketplaceHub from './marketplace/MarketplaceHub';
-import ActivitySelector from './activity/ActivitySelector';
 import LeaderboardHub from './leaderboard/LeaderboardHub';
 import ChatInterface from './chat/ChatInterface';
 import CharacterPanel from './character/CharacterPanel';
+import HarvestingRewards from './harvesting/HarvestingRewards';
+import HarvestingHub from './harvesting/HarvestingHub';
+import ExoticDiscoveryNotification from './harvesting/ExoticDiscoveryNotification';
+import GuildManager from './guild/GuildManager';
+import { taskQueueService } from '../services/taskQueueService';
+import { harvestingService } from '../services/harvestingService';
+
 
 const GameDashboard: React.FC = () => {
   const dispatch = useDispatch();
   const [activeTab, setActiveTab] = useState<'dashboard' | 'marketplace'>('dashboard');
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
+  const [harvestingRewards, setHarvestingRewards] = useState<any[]>([]);
+  const [showRewards, setShowRewards] = useState(false);
+  const [exoticDiscovery, setExoticDiscovery] = useState<any>(null);
+  const [showExoticNotification, setShowExoticNotification] = useState(false);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { character, hasCharacter, characterLoading, isOnline } = useSelector((state: RootState) => state.game);
 
-  // Handle feature modal opening
-  const openFeature = (featureName: string) => {
+  // Handle feature actions
+  const handleFeatureAction = (featureName: string) => {
     if (featureName === 'Auction Marketplace') {
-      // Switch to marketplace tab instead of opening modal
+      // Switch to marketplace tab
       setActiveTab('marketplace');
     } else {
+      // Open modal for all other features including Resource Harvesting
       setActiveFeature(featureName);
     }
+  };
+
+
+
+
+
+
+
+  const closeRewards = () => {
+    setShowRewards(false);
+    setHarvestingRewards([]);
   };
 
   // Handle feature modal closing
@@ -58,21 +79,24 @@ const GameDashboard: React.FC = () => {
           </div>
         );
       case 'Resource Harvesting':
-        return (
-          <div className="feature-content">
-            <p>⛏️ <strong>Steam-Powered Mining Operation</strong></p>
-            <p>Extract valuable resources from the industrial landscape!</p>
-            <div className="feature-placeholder">
-              <h4>Available Resources:</h4>
-              <ul>
-                <li>🟤 Copper Ore - <em>Common metal for basic crafting</em></li>
-                <li>⚡ Steam Crystals - <em>Rare energy source for advanced items</em></li>
-                <li>⚫ Coal - <em>Fuel for steam engines</em></li>
-                <li>🟫 Iron Ore - <em>Strong metal for durable equipment</em></li>
-              </ul>
-              <p><em>Enhanced harvesting interface coming soon!</em></p>
-            </div>
-          </div>
+        return character ? (
+          <HarvestingHub
+            playerId={character.characterId}
+            playerLevel={character.level}
+            playerStats={{
+              intelligence: character.stats?.intelligence || 10,
+              dexterity: character.stats?.dexterity || 10,
+              strength: character.stats?.strength || 10,
+              perception: character.stats?.vitality || 10
+            }}
+            onRewardsReceived={(rewards) => {
+              setHarvestingRewards(rewards);
+              setShowRewards(true);
+            }}
+            onClose={closeFeature}
+          />
+        ) : (
+          <div>Loading character data...</div>
         );
       case 'Combat System':
         return (
@@ -91,21 +115,18 @@ const GameDashboard: React.FC = () => {
           </div>
         );
       case 'Guild Management':
-        return (
-          <div className="feature-content">
-            <p>🏰 <strong>Steampunk Guild Hall</strong></p>
-            <p>Join forces with other inventors and engineers!</p>
-            <div className="feature-placeholder">
-              <h4>Guild Features:</h4>
-              <ul>
-                <li>👥 Create or join engineering guilds</li>
-                <li>🏗️ Collaborative workshop projects</li>
-                <li>💬 Guild-specific chat channels</li>
-                <li>🏆 Guild competitions and rankings</li>
-              </ul>
-              <p><em>Guild system coming soon!</em></p>
-            </div>
-          </div>
+        return character ? (
+          <ErrorBoundary fallback={<div>Guild Management failed to load</div>}>
+            <GuildManager 
+              character={character}
+              onGuildUpdate={(guild) => {
+                // Handle guild updates if needed
+                console.log('Guild updated:', guild);
+              }}
+            />
+          </ErrorBoundary>
+        ) : (
+          <div>Loading character data...</div>
         );
       case 'Chat System':
         return (
@@ -126,6 +147,12 @@ const GameDashboard: React.FC = () => {
         );
       case 'Leaderboards':
         return <LeaderboardHub />;
+      case 'User Profile':
+        return (
+          <ErrorBoundary fallback={<div>User profile failed to load</div>}>
+            <UserProfile />
+          </ErrorBoundary>
+        );
       default:
         return <div>Feature not found</div>;
     }
@@ -135,11 +162,49 @@ const GameDashboard: React.FC = () => {
     // Set online status when component mounts
     dispatch(setOnlineStatus(true));
 
+    // Load and restore task queue state when character is available
+    if (character) {
+      // Set up task completion listener FIRST before loading queue
+      taskQueueService.onTaskComplete(character.characterId, (result) => {
+        // Check if any rewards are exotic items
+        const exoticReward = result.rewards.find(reward => 
+          reward.type === 'resource' && reward.isRare && 
+          (reward.rarity === 'rare' || reward.rarity === 'epic' || reward.rarity === 'legendary')
+        );
+
+        if (exoticReward) {
+          // Get the exotic item details
+          const exoticItems = harvestingService.getExoticItemsForCategory(
+            result.task.activityData?.activity?.category
+          );
+          const exoticItem = exoticItems.find(item => item.id === exoticReward.itemId);
+          
+          if (exoticItem) {
+            setExoticDiscovery(exoticItem);
+            setShowExoticNotification(true);
+          }
+        }
+      });
+
+      // Now load the player's task queue to restore idle game state
+      console.log('GameDashboard: Loading task queue for character:', character.characterId);
+      taskQueueService.loadPlayerQueue(character.characterId).catch(error => {
+        console.error('Failed to load task queue:', error);
+      });
+    }
+
     // Cleanup when component unmounts
     return () => {
       dispatch(setOnlineStatus(false));
+      if (character) {
+        // Save task queue state before cleanup
+        taskQueueService.savePlayerQueue(character.characterId).catch(error => {
+          console.error('Failed to save task queue:', error);
+        });
+        taskQueueService.removeCallbacks(character.characterId);
+      }
     };
-  }, [dispatch]);
+  }, [dispatch, character]);
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
@@ -181,57 +246,51 @@ const GameDashboard: React.FC = () => {
   // Show main game interface if user has a character
   return (
     <div className="game-dashboard">
-      <ErrorBoundary fallback={<div>User profile failed to load</div>}>
-        <UserProfile />
-      </ErrorBoundary>
-      
-      <div className="status-bar">
-        <span className={`online-indicator ${isOnline ? 'online' : 'offline'}`}>
-          {isOnline ? '🟢 Online' : '🔴 Offline'}
-        </span>
+      {/* Header with gear icon */}
+      <div className="dashboard-header">
+        <div className="status-bar">
+          <span className={`online-indicator ${isOnline ? 'online' : 'offline'}`}>
+            {isOnline ? '🟢 Online' : '🔴 Offline'}
+          </span>
+        </div>
+        <div className="header-actions">
+          <button 
+            className="gear-icon-button"
+            onClick={() => handleFeatureAction('User Profile')}
+            title="User Profile & Settings"
+          >
+            ⚙️
+          </button>
+        </div>
       </div>
 
-      <div className="main-navigation">
-        <button
-          className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => setActiveTab('dashboard')}
-        >
-          🏠 Dashboard
-        </button>
-        <button
-          className={`nav-button ${activeTab === 'marketplace' ? 'active' : ''}`}
-          onClick={() => setActiveTab('marketplace')}
-        >
-          🏪 Marketplace
-        </button>
-      </div>
+
 
       {/* Main Layout with Sidebar */}
       <div className="dashboard-layout">
         {/* Left Sidebar - Game Features */}
         <div className="game-features-sidebar">
           <ul className="game-features-list-sidebar">
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Character Panel')}>
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Character Panel')}>
               👤 Character
             </li>
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Crafting System')}>
-              🔧 Crafting System
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Resource Harvesting')}>
+              ⛏️ Resources
             </li>
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Resource Harvesting')}>
-              ⛏️ Resource Harvesting
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Crafting System')}>
+              🔧 Crafting
             </li>
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Combat System')}>
-              ⚔️ Combat System
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Combat System')}>
+              ⚔️ Combat
             </li>
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Guild Management')}>
-              🏰 Guild Management
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Guild Management')}>
+              🏰 Guild
             </li>
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Auction Marketplace')}>
-              ✅ Auction Marketplace
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Auction Marketplace')}>
+              ✅ Auction
             </li>
-
-            <li className="game-feature-item-sidebar" onClick={() => openFeature('Leaderboards')}>
-              🏆 Leaderboards
+            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Leaderboards')}>
+              🏆 Leaderboard
             </li>
           </ul>
         </div>
@@ -255,15 +314,15 @@ const GameDashboard: React.FC = () => {
                 )}
               </div>
 
-              {/* Activity Selection */}
-              <ErrorBoundary fallback={<div>Activity selector failed to load</div>}>
-                <ActivitySelector />
-              </ErrorBoundary>
-
-              {/* Real-time Progress Display */}
-              <ErrorBoundary fallback={<div>Progress tracker failed to load</div>}>
-                <RealTimeProgressTracker />
-              </ErrorBoundary>
+              {/* Live Activity Display */}
+              <div className="live-activity-section">
+                <h3>🔧 Current Operations</h3>
+                <p>Your active tasks and progress will appear here</p>
+                <div className="activity-status">
+                  {/* This will show current task details when active */}
+                  <p><em>Start an activity from the sidebar to see live progress</em></p>
+                </div>
+              </div>
             </>
           )}
 
@@ -272,6 +331,8 @@ const GameDashboard: React.FC = () => {
               <MarketplaceHub />
             </ErrorBoundary>
           )}
+
+
         </div>
       </div>
 
@@ -289,6 +350,23 @@ const GameDashboard: React.FC = () => {
       >
         {renderFeatureContent()}
       </FeatureModal>
+
+      {/* Harvesting Rewards Modal */}
+      <HarvestingRewards
+        rewards={harvestingRewards}
+        visible={showRewards}
+        onClose={closeRewards}
+      />
+
+      {/* Exotic Discovery Notification */}
+      <ExoticDiscoveryNotification
+        exoticItem={exoticDiscovery}
+        visible={showExoticNotification}
+        onClose={() => {
+          setShowExoticNotification(false);
+          setExoticDiscovery(null);
+        }}
+      />
     </div>
   );
 };

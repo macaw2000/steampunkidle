@@ -9,7 +9,7 @@ import { ActivityType } from '../../types/character';
 import ActivitySelector from './ActivitySelector';
 import ActivityProgress from './ActivityProgress';
 import CraftingStation from '../crafting/CraftingStation';
-import HarvestingInterface from './HarvestingInterface';
+
 import CombatInterface from './CombatInterface';
 import './ActivityHub.css';
 
@@ -89,7 +89,11 @@ const ActivityHub: React.FC = () => {
         )}
 
         {selectedTab === 'harvesting' && (
-          <HarvestingInterface />
+          <div className="activity-hub__harvesting-placeholder">
+            <h3>🔧 Steampunk Harvesting</h3>
+            <p>Visit the main Harvesting tab for the full resource gathering experience!</p>
+            <p><em>Complete harvesting system available in the main navigation.</em></p>
+          </div>
         )}
 
         {selectedTab === 'combat' && (

@@ -48,18 +48,41 @@ export const GuildManager: React.FC<GuildManagerProps> = ({
       });
 
       if (response.ok) {
-        const data = await response.json();
-        setUserGuild(data);
-        onGuildUpdate?.(data.guild);
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const data = await response.json();
+          setUserGuild(data);
+          onGuildUpdate?.(data.guild);
+        } else {
+          // API endpoint doesn't exist, use development mode
+          console.log('Guild API not available, using development mode');
+          setUserGuild({ guild: null, membership: null });
+          onGuildUpdate?.(null);
+        }
       } else if (response.status === 404) {
         // User is not in a guild
         setUserGuild({ guild: null, membership: null });
         onGuildUpdate?.(null);
       } else {
-        throw new Error('Failed to fetch guild information');
+        // Check if response is HTML (API endpoint doesn't exist)
+        const text = await response.text();
+        if (text.includes('<!DOCTYPE') || text.includes('<html')) {
+          console.log('Guild API not available, using development mode');
+          setUserGuild({ guild: null, membership: null });
+          onGuildUpdate?.(null);
+        } else {
+          throw new Error('Failed to fetch guild information');
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      // Handle JSON parsing errors and network errors gracefully
+      if (err instanceof Error && err.message.includes('Unexpected token')) {
+        console.log('Guild API not available, using development mode');
+        setUserGuild({ guild: null, membership: null });
+        onGuildUpdate?.(null);
+      } else {
+        setError(err instanceof Error ? err.message : 'An error occurred');
+      }
     } finally {
       setLoading(false);
     }

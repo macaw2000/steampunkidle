@@ -1,287 +1,554 @@
 /**
- * Harvesting service for managing resource gathering operations
+ * Harvesting Service
+ * Handles all harvesting activities, resource generation, and player progression
  */
 
 import { 
-  HarvestingNode, 
+  HarvestingActivity, 
   HarvestingSession, 
-  HarvestingArea,
-  StartHarvestingRequest,
-  StartHarvestingResponse,
-  CompleteHarvestingRequest,
-  CompleteHarvestingResponse,
-  HarvestingSkillType,
-  HarvestingResource
+  HarvestingReward, 
+  PlayerHarvestingStats,
+  ResourceRarity,
+  HarvestingCategory,
+  DropTable,
+  EnhancedHarvestingReward,
+  ExoticItem
 } from '../types/harvesting';
-import { Character } from '../types/character';
-import { HARVESTING_NODES, HARVESTING_AREAS } from '../data/harvestingData';
+import { HARVESTING_ACTIVITIES } from '../data/harvestingActivities';
+import { HARVESTING_RESOURCES } from '../data/harvestingResources';
+import { getExoticItemsByCategory } from '../data/exoticItems';
+import { getPrimaryMaterialForActivity } from '../data/primaryMaterials';
 
-export class HarvestingService {
+class HarvestingService {
+  private sessions: Map<string, HarvestingSession> = new Map();
+  private playerStats: Map<string, PlayerHarvestingStats> = new Map();
+
   /**
-   * Calculate harvesting skill level based on experience
+   * Get all available harvesting activities
    */
-  static calculateSkillLevel(experience: number): number {
-    return Math.floor(Math.sqrt(experience / 60)) + 1;
+  getActivities(): HarvestingActivity[] {
+    return HARVESTING_ACTIVITIES;
   }
 
   /**
-   * Calculate experience required for a specific skill level
+   * Get activities available to a player based on their level and stats
    */
-  static calculateExperienceForSkillLevel(level: number): number {
-    return Math.pow(level - 1, 2) * 60;
-  }
-
-  /**
-   * Calculate harvesting time with skill bonuses
-   */
-  static calculateHarvestingTime(baseTime: number, skillLevel: number, nodeRequiredLevel: number): number {
-    const skillAdvantage = Math.max(0, skillLevel - nodeRequiredLevel);
-    const speedBonus = Math.min(0.5, skillAdvantage * 0.03); // Max 50% speed bonus
-    
-    return Math.max(10, Math.floor(baseTime * (1 - speedBonus))); // Minimum 10 seconds
-  }
-
-  /**
-   * Calculate resource yield based on skill level and luck
-   */
-  static calculateResourceYield(
-    baseResources: HarvestingResource[], 
-    skillLevel: number, 
-    nodeRequiredLevel: number
-  ): HarvestingResource[] {
-    const skillAdvantage = Math.max(0, skillLevel - nodeRequiredLevel);
-    const yieldBonus = 1 + (skillAdvantage * 0.05); // 5% yield bonus per skill level above requirement
-    
-    return baseResources.map(resource => {
-      // Check if resource drops based on drop chance
-      if (Math.random() > resource.dropChance) {
-        return { ...resource, quantity: 0 };
+  getAvailableActivities(playerId: string, playerLevel: number, playerStats: any): HarvestingActivity[] {
+    return HARVESTING_ACTIVITIES.filter(activity => {
+      // Check level requirement
+      if (activity.requiredLevel > playerLevel) {
+        return false;
       }
-      
-      // Calculate final quantity with bonuses
-      const baseQuantity = resource.quantity;
-      const bonusQuantity = Math.random() < 0.1 ? 1 : 0; // 10% chance for bonus resource
-      const finalQuantity = Math.floor((baseQuantity + bonusQuantity) * yieldBonus);
-      
-      return {
-        ...resource,
-        quantity: Math.max(1, finalQuantity)
-      };
-    }).filter(resource => resource.quantity > 0);
-  }
 
-  /**
-   * Get available harvesting nodes for a character
-   */
-  static getAvailableNodes(character: Character): HarvestingNode[] {
-    return HARVESTING_NODES.filter(node => {
-      const skillLevel = character.stats.harvestingSkills.level || 1;
-      return skillLevel >= node.requiredLevel;
+      // Check stat requirements
+      if (activity.requiredStats) {
+        for (const [stat, required] of Object.entries(activity.requiredStats)) {
+          if ((playerStats[stat] || 0) < required) {
+            return false;
+          }
+        }
+      }
+
+      // Check unlock conditions
+      if (activity.unlockConditions) {
+        const stats = this.getPlayerStats(playerId);
+        for (const condition of activity.unlockConditions) {
+          if (!this.checkUnlockCondition(condition, playerLevel, playerStats, stats)) {
+            return false;
+          }
+        }
+      }
+
+      return true;
     });
   }
 
   /**
-   * Get available harvesting areas for a character
+   * Get activities by category
    */
-  static getAvailableAreas(character: Character): HarvestingArea[] {
-    return HARVESTING_AREAS.filter(area => {
-      return character.level >= area.requiredLevel;
-    });
+  getActivitiesByCategory(category: HarvestingCategory): HarvestingActivity[] {
+    return HARVESTING_ACTIVITIES.filter(activity => activity.category === category);
   }
 
   /**
    * Start a harvesting session
    */
-  static async startHarvesting(request: StartHarvestingRequest): Promise<StartHarvestingResponse> {
-    try {
-      const response = await fetch('/api/harvesting/start', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to start harvesting');
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Error starting harvesting:', error);
-      throw error;
+  startHarvesting(playerId: string, activityId: string, playerStats: any): HarvestingSession {
+    const activity = HARVESTING_ACTIVITIES.find(a => a.id === activityId);
+    if (!activity) {
+      throw new Error('Activity not found');
     }
-  }
 
-  /**
-   * Complete a harvesting session
-   */
-  static async completeHarvesting(request: CompleteHarvestingRequest): Promise<CompleteHarvestingResponse> {
-    try {
-      const response = await fetch('/api/harvesting/complete', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(request),
-      });
+    // Check if player has enough energy
+    // This would integrate with your character system
+    
+    // Calculate actual duration based on player stats
+    const duration = this.calculateHarvestingTime(activity, playerStats);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to complete harvesting');
-      }
-
-      const result = await response.json();
-      return result;
-    } catch (error) {
-      console.error('Error completing harvesting:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Get node by ID
-   */
-  static getNodeById(nodeId: string): HarvestingNode | null {
-    return HARVESTING_NODES.find(node => node.nodeId === nodeId) || null;
-  }
-
-  /**
-   * Get area by ID
-   */
-  static getAreaById(areaId: string): HarvestingArea | null {
-    return HARVESTING_AREAS.find(area => area.areaId === areaId) || null;
-  }
-
-  /**
-   * Format harvesting time for display
-   */
-  static formatHarvestingTime(seconds: number): string {
-    if (seconds < 60) {
-      return `${seconds}s`;
-    } else if (seconds < 3600) {
-      const minutes = Math.floor(seconds / 60);
-      const remainingSeconds = seconds % 60;
-      return remainingSeconds > 0 ? `${minutes}m ${remainingSeconds}s` : `${minutes}m`;
-    } else {
-      const hours = Math.floor(seconds / 3600);
-      const remainingMinutes = Math.floor((seconds % 3600) / 60);
-      return remainingMinutes > 0 ? `${hours}h ${remainingMinutes}m` : `${hours}h`;
-    }
-  }
-
-  /**
-   * Get skill display information
-   */
-  static getSkillDisplay(skillType: HarvestingSkillType) {
-    const skillInfo = {
-      mining: {
-        name: 'Mining',
-        description: 'Extract valuable ores and minerals from the earth',
-        icon: '⛏️',
-        color: '#8b4513'
-      },
-      foraging: {
-        name: 'Foraging',
-        description: 'Gather herbs and natural materials from the wilderness',
-        icon: '🌿',
-        color: '#228b22'
-      },
-      salvaging: {
-        name: 'Salvaging',
-        description: 'Recover useful parts from abandoned machinery and workshops',
-        icon: '🔧',
-        color: '#696969'
-      },
-      crystal_extraction: {
-        name: 'Crystal Extraction',
-        description: 'Harvest crystallized steam energy from rare formations',
-        icon: '💎',
-        color: '#4169e1'
-      }
+    const session: HarvestingSession = {
+      activityId,
+      startTime: Date.now(),
+      duration: duration * 1000, // Convert to milliseconds
+      playerId,
+      completed: false
     };
+
+    this.sessions.set(`${playerId}-${activityId}-${Date.now()}`, session);
     
-    return skillInfo[skillType];
+    // Update player stats
+    this.updatePlayerStats(playerId, activity);
+
+    return session;
   }
 
   /**
-   * Calculate harvesting efficiency based on character stats
+   * Complete a harvesting session and generate rewards
    */
-  static calculateHarvestingEfficiency(character: Character, skillType: HarvestingSkillType): number {
-    if (!character) return 1;
+  completeHarvesting(sessionId: string): HarvestingReward[] {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
 
-    const skillLevel = character.stats.harvestingSkills.level || 1;
-    const statBonus = character.stats.dexterity * 0.01; // Dexterity affects harvesting
+    if (session.completed) {
+      throw new Error('Session already completed');
+    }
+
+    const currentTime = Date.now();
+    if (currentTime < session.startTime + session.duration) {
+      throw new Error('Session not yet complete');
+    }
+
+    const activity = HARVESTING_ACTIVITIES.find(a => a.id === session.activityId);
+    if (!activity) {
+      throw new Error('Activity not found');
+    }
+
+    // Generate rewards based on drop table
+    const rewards = this.generateRewards(activity.dropTable);
     
-    return 1 + (skillLevel * 0.05) + statBonus;
+    session.completed = true;
+    session.rewards = rewards;
+
+    // Update player harvesting stats
+    this.updateHarvestingStats(session.playerId, activity, rewards);
+
+    return rewards;
   }
 
   /**
-   * Get recommended harvesting activity based on character level
+   * Get active harvesting sessions for a player
    */
-  static getRecommendedActivity(character: Character): HarvestingNode | null {
-    const availableNodes = this.getAvailableNodes(character);
-    
-    if (availableNodes.length === 0) return null;
-    
-    // Recommend highest level node the character can access
-    return availableNodes.reduce((best, current) => 
-      current.requiredLevel > best.requiredLevel ? current : best
-    );
+  getActiveSessions(playerId: string): HarvestingSession[] {
+    return Array.from(this.sessions.values())
+      .filter(session => session.playerId === playerId && !session.completed);
   }
 
   /**
-   * Calculate experience gain from harvesting
+   * Get player harvesting statistics
    */
-  static calculateExperienceGain(
-    node: HarvestingNode, 
-    resourcesGathered: HarvestingResource[], 
-    skillLevel: number
-  ): number {
-    const baseExperience = 15 + (node.requiredLevel * 5);
-    const resourceBonus = resourcesGathered.reduce((total, resource) => {
-      const rarityMultiplier = {
-        'common': 1,
-        'uncommon': 1.5,
-        'rare': 2,
-        'legendary': 3
-      }[resource.rarity];
+  getPlayerStats(playerId: string): PlayerHarvestingStats {
+    if (!this.playerStats.has(playerId)) {
+      this.playerStats.set(playerId, {
+        playerId,
+        totalHarvests: 0,
+        totalTimeSpent: 0,
+        activitiesUnlocked: [],
+        categoryLevels: {
+          [HarvestingCategory.LITERARY]: 1,
+          [HarvestingCategory.MECHANICAL]: 1,
+          [HarvestingCategory.ALCHEMICAL]: 1,
+          [HarvestingCategory.ARCHAEOLOGICAL]: 1,
+          [HarvestingCategory.BOTANICAL]: 1,
+          [HarvestingCategory.METALLURGICAL]: 1,
+          [HarvestingCategory.ELECTRICAL]: 1,
+          [HarvestingCategory.AERONAUTICAL]: 1
+        },
+        categoryExperience: {
+          [HarvestingCategory.LITERARY]: 0,
+          [HarvestingCategory.MECHANICAL]: 0,
+          [HarvestingCategory.ALCHEMICAL]: 0,
+          [HarvestingCategory.ARCHAEOLOGICAL]: 0,
+          [HarvestingCategory.BOTANICAL]: 0,
+          [HarvestingCategory.METALLURGICAL]: 0,
+          [HarvestingCategory.ELECTRICAL]: 0,
+          [HarvestingCategory.AERONAUTICAL]: 0
+        },
+        rareFindCount: 0,
+        legendaryFindCount: 0
+      });
+    }
+    return this.playerStats.get(playerId)!;
+  }
+
+  /**
+   * Get resource information
+   */
+  getResource(resourceId: string) {
+    return HARVESTING_RESOURCES.find(r => r.id === resourceId);
+  }
+
+  /**
+   * Get all resources by category
+   */
+  getResourcesByCategory(category: string) {
+    return HARVESTING_RESOURCES.filter(r => r.category === category);
+  }
+
+  /**
+   * Calculate harvesting time based on player stats
+   */
+  private calculateHarvestingTime(activity: HarvestingActivity, playerStats: any): number {
+    let timeModifier = 1.0;
+
+    // Apply stat bonuses to reduce time
+    if (activity.requiredStats) {
+      for (const [stat, required] of Object.entries(activity.requiredStats)) {
+        const playerStat = playerStats[stat] || 0;
+        if (playerStat > required) {
+          // 1% time reduction per stat point above requirement
+          const bonus = (playerStat - required) * 0.01;
+          timeModifier -= Math.min(bonus, 0.5); // Cap at 50% reduction
+        }
+      }
+    }
+
+    // Ensure minimum time
+    timeModifier = Math.max(timeModifier, 0.3); // Never less than 30% of base time
+
+    return Math.floor(activity.baseTime * timeModifier);
+  }
+
+  /**
+   * Generate rewards from drop table
+   */
+  generateRewards(dropTable: DropTable): HarvestingReward[] {
+    const rewards: HarvestingReward[] = [];
+
+    // Process guaranteed drops
+    for (const drop of dropTable.guaranteed) {
+      const quantity = this.randomBetween(drop.minQuantity, drop.maxQuantity);
+      rewards.push({
+        itemId: drop.itemId,
+        quantity,
+        rarity: ResourceRarity.COMMON,
+        isRare: false
+      });
+    }
+
+    // Process chance-based drops
+    const rarityTables = [
+      { drops: dropTable.common, rarity: ResourceRarity.COMMON },
+      { drops: dropTable.uncommon, rarity: ResourceRarity.UNCOMMON },
+      { drops: dropTable.rare, rarity: ResourceRarity.RARE },
+      { drops: dropTable.legendary, rarity: ResourceRarity.LEGENDARY }
+    ];
+
+    for (const table of rarityTables) {
+      for (const drop of table.drops) {
+        if (Math.random() < drop.dropRate) {
+          const quantity = this.randomBetween(drop.minQuantity, drop.maxQuantity);
+          rewards.push({
+            itemId: drop.itemId,
+            quantity,
+            rarity: table.rarity,
+            isRare: table.rarity === ResourceRarity.RARE || table.rarity === ResourceRarity.LEGENDARY
+          });
+        }
+      }
+    }
+
+    return rewards;
+  }
+
+  /**
+   * Update player statistics after harvesting
+   */
+  private updatePlayerStats(playerId: string, activity: HarvestingActivity): void {
+    const stats = this.getPlayerStats(playerId);
+    
+    // Add activity to unlocked list if not already there
+    if (!stats.activitiesUnlocked.includes(activity.id)) {
+      stats.activitiesUnlocked.push(activity.id);
+    }
+  }
+
+  /**
+   * Update harvesting statistics after completion
+   */
+  private updateHarvestingStats(playerId: string, activity: HarvestingActivity, rewards: HarvestingReward[]): void {
+    const stats = this.getPlayerStats(playerId);
+    
+    stats.totalHarvests++;
+    stats.totalTimeSpent += activity.baseTime;
+    
+    // Add category experience
+    const expGain = activity.statBonuses.experience || 10;
+    stats.categoryExperience[activity.category] += expGain;
+    
+    // Check for level up
+    const currentExp = stats.categoryExperience[activity.category];
+    const currentLevel = stats.categoryLevels[activity.category];
+    const expForNextLevel = this.getExpRequiredForLevel(currentLevel + 1);
+    
+    if (currentExp >= expForNextLevel) {
+      stats.categoryLevels[activity.category]++;
+    }
+
+    // Count rare finds
+    for (const reward of rewards) {
+      if (reward.rarity === ResourceRarity.RARE) {
+        stats.rareFindCount++;
+      } else if (reward.rarity === ResourceRarity.LEGENDARY) {
+        stats.legendaryFindCount++;
+      }
+    }
+
+    // Update favorite activity (most used)
+    // This would require tracking usage counts
+  }
+
+  /**
+   * Check unlock conditions
+   */
+  private checkUnlockCondition(condition: any, playerLevel: number, playerStats: any, harvestingStats: PlayerHarvestingStats): boolean {
+    switch (condition.type) {
+      case 'level':
+        return playerLevel >= condition.requirement;
+      case 'stat':
+        return (playerStats[condition.requirement] || 0) >= condition.value;
+      case 'activity':
+        return harvestingStats.activitiesUnlocked.includes(condition.requirement);
+      default:
+        return true;
+    }
+  }
+
+  /**
+   * Calculate experience required for a level
+   */
+  private getExpRequiredForLevel(level: number): number {
+    return Math.floor(100 * Math.pow(1.5, level - 1));
+  }
+
+  /**
+   * Generate random number between min and max (inclusive)
+   */
+  private randomBetween(min: number, max: number): number {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+  }
+
+  /**
+   * Get session progress (0-1)
+   */
+  getSessionProgress(sessionId: string): number {
+    const session = this.sessions.get(sessionId);
+    if (!session) return 0;
+
+    const elapsed = Date.now() - session.startTime;
+    return Math.min(elapsed / session.duration, 1);
+  }
+
+  /**
+   * Cancel an active session
+   */
+  cancelSession(sessionId: string): void {
+    this.sessions.delete(sessionId);
+  }
+
+  /**
+   * Get time remaining for a session
+   */
+  getTimeRemaining(sessionId: string): number {
+    const session = this.sessions.get(sessionId);
+    if (!session) return 0;
+
+    const elapsed = Date.now() - session.startTime;
+    return Math.max(session.duration - elapsed, 0);
+  }
+
+  /**
+   * Generate enhanced rewards using the new system (one primary material + rare exotic chance)
+   */
+  generateEnhancedRewards(activityId: string, playerId: string): EnhancedHarvestingReward {
+    const activity = HARVESTING_ACTIVITIES.find(a => a.id === activityId);
+    if (!activity) {
+      throw new Error('Activity not found');
+    }
+
+    const primaryMaterial = getPrimaryMaterialForActivity(activityId);
+    if (!primaryMaterial) {
+      throw new Error('Primary material not found for activity');
+    }
+
+    const playerStats = this.getPlayerStats(playerId);
+    const categoryLevel = playerStats.categoryLevels[activity.category];
+
+    // Calculate primary material quantity (can be modified by skill)
+    const skillBonus = Math.floor(categoryLevel / 10); // +1 quantity per 10 levels
+    const primaryQuantity = primaryMaterial.baseQuantity + skillBonus;
+
+    // Calculate exotic item chance
+    const exoticItem = this.rollForExoticItem(activity.category, categoryLevel);
+
+    // Calculate skill gained
+    const baseSkillGain = activity.statBonuses.experience || 10;
+    const skillGained = baseSkillGain + (exoticItem ? 5 : 0); // Bonus XP for exotic finds
+
+    return {
+      primaryMaterial: {
+        itemId: primaryMaterial.itemId,
+        quantity: primaryQuantity
+      },
+      exoticItem: exoticItem ? {
+        itemId: exoticItem.id,
+        quantity: 1,
+        rarity: exoticItem.rarity
+      } : undefined,
+      skillGained
+    };
+  }
+
+  /**
+   * Roll for exotic item discovery with skill-based bonus
+   */
+  private rollForExoticItem(category: HarvestingCategory, skillLevel: number): ExoticItem | null {
+    const categoryExotics = getExoticItemsByCategory(category);
+    if (categoryExotics.length === 0) return null;
+
+    // Calculate skill bonus: 2% improvement per skill level, capped at 100% (double chance)
+    const skillBonus = Math.min(skillLevel * 0.02, 1.0);
+
+    for (const exotic of categoryExotics) {
+      // Apply skill bonus to base drop rate
+      const adjustedDropRate = exotic.baseDropRate * (1 + skillBonus);
       
-      return total + (resource.quantity * rarityMultiplier);
-    }, 0);
-    
-    const skillBonus = Math.max(0, (skillLevel - node.requiredLevel) * 0.1);
-    
-    return Math.floor(baseExperience + resourceBonus + (baseExperience * skillBonus));
+      if (Math.random() < adjustedDropRate) {
+        return exotic;
+      }
+    }
+
+    return null;
   }
 
   /**
-   * Check if node is available (not on cooldown)
+   * Calculate skill level from experience
    */
-  static isNodeAvailable(nodeId: string, lastHarvestTime?: Date): boolean {
-    if (!lastHarvestTime) return true;
-    
-    const node = this.getNodeById(nodeId);
-    if (!node) return false;
-    
-    const timeSinceHarvest = Date.now() - lastHarvestTime.getTime();
-    return timeSinceHarvest >= (node.respawnTime * 1000);
+  calculateSkillLevel(experience: number): number {
+    return Math.floor(Math.sqrt(experience / 100));
   }
 
   /**
-   * Get time until node respawns
+   * Calculate exotic discovery bonus based on skill level
    */
-  static getTimeUntilRespawn(nodeId: string, lastHarvestTime: Date): number {
-    const node = this.getNodeById(nodeId);
-    if (!node) return 0;
+  calculateExoticBonus(skillLevel: number): number {
+    return Math.min(skillLevel * 0.02, 1.0); // 2% per level, capped at 100%
+  }
+
+  /**
+   * Get experience required for next level
+   */
+  getExperienceForNextLevel(currentLevel: number): number {
+    return Math.floor(100 * Math.pow(currentLevel + 1, 2));
+  }
+
+  /**
+   * Complete harvesting session with enhanced rewards
+   */
+  completeHarvestingEnhanced(sessionId: string): EnhancedHarvestingReward {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      throw new Error('Session not found');
+    }
+
+    if (session.completed) {
+      throw new Error('Session already completed');
+    }
+
+    const currentTime = Date.now();
+    if (currentTime < session.startTime + session.duration) {
+      throw new Error('Session not yet complete');
+    }
+
+    // Generate enhanced rewards
+    const enhancedReward = this.generateEnhancedRewards(session.activityId, session.playerId);
     
-    const timeSinceHarvest = Date.now() - lastHarvestTime.getTime();
-    const respawnTime = node.respawnTime * 1000;
+    session.completed = true;
+
+    // Update player harvesting stats with new system
+    this.updateHarvestingStatsEnhanced(session.playerId, session.activityId, enhancedReward);
+
+    return enhancedReward;
+  }
+
+  /**
+   * Update harvesting statistics with enhanced reward system
+   */
+  private updateHarvestingStatsEnhanced(playerId: string, activityId: string, reward: EnhancedHarvestingReward): void {
+    const stats = this.getPlayerStats(playerId);
+    const activity = HARVESTING_ACTIVITIES.find(a => a.id === activityId);
+    if (!activity) return;
+
+    stats.totalHarvests++;
+    stats.totalTimeSpent += activity.baseTime;
     
-    return Math.max(0, respawnTime - timeSinceHarvest);
+    // Add category experience
+    stats.categoryExperience[activity.category] += reward.skillGained;
+    
+    // Check for level up
+    const currentExp = stats.categoryExperience[activity.category];
+    const currentLevel = stats.categoryLevels[activity.category];
+    const newLevel = this.calculateSkillLevel(currentExp);
+    
+    if (newLevel > currentLevel) {
+      stats.categoryLevels[activity.category] = newLevel;
+      console.log(`${activity.category} skill leveled up to ${newLevel}!`);
+    }
+
+    // Count exotic finds
+    if (reward.exoticItem) {
+      if (reward.exoticItem.rarity === 'rare') {
+        stats.rareFindCount++;
+      } else if (reward.exoticItem.rarity === 'epic' || reward.exoticItem.rarity === 'legendary') {
+        stats.legendaryFindCount++;
+      }
+    }
+
+    // Add activity to unlocked list if not already there
+    if (!stats.activitiesUnlocked.includes(activityId)) {
+      stats.activitiesUnlocked.push(activityId);
+    }
+  }
+
+  /**
+   * Get exotic items for a category
+   */
+  getExoticItemsForCategory(category: HarvestingCategory): ExoticItem[] {
+    return getExoticItemsByCategory(category);
+  }
+
+  /**
+   * Get player's current exotic discovery rates for each category
+   */
+  getPlayerExoticRates(playerId: string): Record<HarvestingCategory, number> {
+    const stats = this.getPlayerStats(playerId);
+    const rates: Record<HarvestingCategory, number> = {} as any;
+
+    for (const category of Object.values(HarvestingCategory)) {
+      const skillLevel = stats.categoryLevels[category];
+      const skillBonus = this.calculateExoticBonus(skillLevel);
+      
+      // Get average base rate for this category
+      const categoryExotics = getExoticItemsByCategory(category);
+      const avgBaseRate = categoryExotics.length > 0 
+        ? categoryExotics.reduce((sum, item) => sum + item.baseDropRate, 0) / categoryExotics.length
+        : 0;
+      
+      rates[category] = avgBaseRate * (1 + skillBonus);
+    }
+
+    return rates;
   }
 }
 
-export default HarvestingService;
+export const harvestingService = new HarvestingService();

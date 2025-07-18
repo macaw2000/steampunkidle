@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature implements the core game systems shown in the Game Features menu, transforming them from static display items into fully functional interactive components. The implementation will provide players with engaging gameplay mechanics including guild management, chat systems, leaderboards, and enhanced marketplace functionality.
+This feature enhances the user interface and user experience of the existing Steampunk Idle Game by making the Game Features menu fully interactive and improving the accessibility of core game systems. The implementation focuses on UI/UX improvements, modal interfaces, and streamlined user interactions rather than backend functionality (which is covered in the steampunk-idle-game spec).
 
 ## Requirements
 
@@ -75,14 +75,18 @@ This feature implements the core game systems shown in the Game Features menu, t
 
 ### Requirement 7
 
-**User Story:** As a player, I want the Resource Harvesting system to provide detailed resource management, so that I can collect and manage materials effectively.
+**User Story:** As a player, I want the Resource Harvesting system to provide detailed resource management with flexible control options, so that I can collect and manage materials effectively.
 
 #### Acceptance Criteria
 
-1. WHEN a player clicks "Resource Harvesting" THEN the system SHALL show the harvesting interface
-2. WHEN viewing harvesting THEN the system SHALL display available resources and collection rates
-3. WHEN a player is harvesting THEN the system SHALL show real-time resource collection
-4. WHEN resources are collected THEN the system SHALL add them to the player's inventory
+1. WHEN a player clicks "Resource Harvesting" THEN the system SHALL show the harvesting interface immediately
+2. WHEN viewing harvesting THEN the system SHALL display available resources, collection rates, and activity categories
+3. WHEN a player selects an activity THEN the system SHALL show a number input for rounds (defaulting to infinite)
+4. WHEN a player clicks "Start Harvesting" THEN the activity SHALL begin immediately and all dialogs SHALL close
+5. WHEN a player clicks "Add to Queue" THEN the activity SHALL be queued without interrupting current activities
+6. WHEN a player is harvesting THEN the system SHALL show real-time progress with visual feedback
+7. WHEN activities complete THEN the system SHALL show earned rewards and continue with queued activities
+8. WHEN resources are collected THEN the system SHALL add them to the player's inventory
 
 ### Requirement 8
 
@@ -94,3 +98,14 @@ This feature implements the core game systems shown in the Game Features menu, t
 2. WHEN viewing combat THEN the system SHALL show available enemies and combat options
 3. WHEN a player engages in combat THEN the system SHALL handle the battle mechanics
 4. WHEN combat ends THEN the system SHALL distribute rewards and update player stats
+
+### Requirement 9
+
+**User Story:** As a player, I want each harvest to yield one primary material with a very rare chance for exotic items, so that I have predictable resource collection with exciting rare discoveries.
+
+#### Acceptance Criteria
+
+1. WHEN a player completes a harvesting activity THEN they SHALL receive exactly one primary material
+2. WHEN a harvest completes THEN there SHALL be a base chance of less than 1% to receive an exotic item in addition to the primary material
+3. WHEN a player's harvesting skill level increases THEN their exotic item discovery rate SHALL increase slightly
+4. WHEN different harvesting activities are performed THEN they SHALL have unique exotic item pools appropriate to their category
