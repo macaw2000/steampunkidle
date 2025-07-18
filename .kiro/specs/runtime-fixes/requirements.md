@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This feature addresses runtime issues that prevent the Steampunk Idle Game application from starting and running properly in development mode. The application builds successfully but encounters errors when attempting to run `npm start`, preventing developers from testing and developing the application locally.
+This feature addresses runtime issues that prevent the Steampunk Idle Game application from starting and running properly in development mode, and implements a robust server-side architecture for true idle game functionality. The application builds successfully but encounters errors when attempting to run `npm start`, preventing developers from testing and developing the application locally. Additionally, the game requires continuous background processing to maintain idle game mechanics where progress continues even when players are offline.
 
 ## Requirements
 
@@ -62,3 +62,42 @@ This feature addresses runtime issues that prevent the Steampunk Idle Game appli
 4. WHEN displaying task progress THEN it SHALL always use the existing unified progress system located in the AppHeader
 5. WHEN any developer adds progress visualization THEN it MUST use the UnifiedProgressBar component only
 6. WHEN code reviews are conducted THEN any additional progress bars SHALL be rejected and removed immediately
+
+### Requirement 6
+
+**User Story:** As a player, I want my game progress to continue even when I'm not actively playing, so that I can enjoy true idle game mechanics.
+
+#### Acceptance Criteria
+
+1. WHEN I close the browser or go offline THEN my active tasks SHALL continue processing on the server
+2. WHEN I return to the game after being offline THEN I SHALL see all progress and rewards earned during my absence
+3. WHEN I refresh the browser THEN my current task progress SHALL resume from where it left off
+4. WHEN the server processes my tasks THEN rewards SHALL be automatically applied to my character
+5. WHEN I have queued tasks THEN they SHALL execute in order even while I'm offline
+6. WHEN I reconnect to the game THEN the progress bar SHALL immediately show my current task status
+
+### Requirement 7
+
+**User Story:** As a system administrator, I want the game engine to run continuously and reliably on AWS infrastructure, so that all players can enjoy uninterrupted idle gameplay.
+
+#### Acceptance Criteria
+
+1. WHEN the game engine starts THEN it SHALL run continuously on ECS Fargate without manual intervention
+2. WHEN processing player queues THEN the system SHALL handle all active players every second
+3. WHEN a Fargate container fails THEN a new container SHALL automatically start to maintain service availability
+4. WHEN system load increases THEN additional Fargate containers SHALL automatically scale up
+5. WHEN system load decreases THEN excess Fargate containers SHALL automatically scale down
+6. WHEN the game engine processes tasks THEN all changes SHALL be persisted to DynamoDB immediately
+
+### Requirement 8
+
+**User Story:** As a developer, I want the client application to seamlessly sync with the server-side game engine, so that players see real-time updates of their progress.
+
+#### Acceptance Criteria
+
+1. WHEN the client starts THEN it SHALL attempt to connect to the Fargate game engine
+2. WHEN the Fargate service is unavailable THEN the client SHALL fall back to local task processing
+3. WHEN the client reconnects to the server THEN it SHALL sync the current game state immediately
+4. WHEN server-side tasks complete THEN the client SHALL receive real-time progress updates
+5. WHEN network connectivity is restored THEN the client SHALL automatically reconnect to the server
+6. WHEN switching between server and local modes THEN the user experience SHALL remain consistent

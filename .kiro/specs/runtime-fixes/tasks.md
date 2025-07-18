@@ -30,14 +30,27 @@
   - Add error recovery mechanisms for corrupted state data
   - _Requirements: 1.1, 1.4, 2.1, 3.4_
 
-- [x] 5. Implement service health check system
+- [x] 5. Implement ECS Fargate game engine architecture
+  - Create Node.js game engine service for continuous background processing
+  - Implement REST API endpoints for task queue management (/health, /task-queue/sync, /task-queue/add-task, /task-queue/stop-tasks)
+  - Add Docker containerization with health checks and auto-scaling
+  - Create CDK infrastructure for VPC, ECS cluster, and Application Load Balancer
+  - Integrate with DynamoDB for persistent task queue and character state
+  - _Requirements: 6.1, 6.2, 7.1, 7.2, 7.6_
 
+- [x] 5.1 Create server-side task queue processing
+  - Implement continuous processing of all player task queues every second
+  - Add reward generation and character state updates
+  - Create task completion logic with automatic task cycling for idle gameplay
+  - Implement offline progress calculation for players returning to the game
+  - _Requirements: 6.1, 6.2, 6.4, 7.2_
 
-  - Create ServiceHealthChecker utility to monitor external service availability
-  - Add health check methods for authentication, API, and WebSocket services
-  - Implement startup sequence manager to initialize services in correct order
-  - Add service status indicators to the UI
-  - _Requirements: 1.1, 1.2, 3.1, 3.2_
+- [x] 5.2 Implement client-server synchronization
+  - Create serverTaskQueueService for client-server communication
+  - Add fallback mechanism to local taskQueueService when server unavailable
+  - Implement real-time progress synchronization between client and server
+  - Add automatic reconnection and state sync when server becomes available
+  - _Requirements: 6.3, 6.6, 8.1, 8.2, 8.3, 8.6_
 
 - [ ] 6. Add network error resilience to services
   - Enhance existing services with better error handling and retry logic
@@ -74,9 +87,18 @@
   - Add code comments and documentation to prevent future progress bar duplication
   - _Requirements: 5.1, 5.2, 5.3, 5.4_
 
-- [ ] 11. Test error scenarios and recovery
+- [ ] 11. Deploy Fargate infrastructure to AWS
+  - Deploy CDK stack with VPC, ECS cluster, and Fargate service
+  - Configure Application Load Balancer with health checks
+  - Set up auto-scaling policies for the game engine service
+  - Configure DynamoDB tables for task queues and game state
+  - Update client-side API endpoints to use deployed Fargate service
+  - _Requirements: 7.1, 7.3, 7.4, 7.5, 8.1_
+
+- [ ] 12. Test error scenarios and recovery
   - Create unit tests for all error boundary components
   - Add integration tests for service failure scenarios
   - Test authentication error handling and recovery
   - Verify graceful degradation under various error conditions
-  - _Requirements: 1.1, 1.4, 2.4, 3.1_
+  - Test Fargate service failover and auto-scaling
+  - _Requirements: 1.1, 1.4, 2.4, 3.1, 7.3_

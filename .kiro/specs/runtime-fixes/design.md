@@ -2,7 +2,7 @@
 
 ## Overview
 
-This design addresses runtime issues preventing the Steampunk Idle Game from starting successfully. The analysis reveals several potential failure points in the application startup process, including authentication initialization, Redux store configuration, component rendering, and service dependencies.
+This design addresses runtime issues preventing the Steampunk Idle Game from starting successfully and implements a robust server-side architecture for true idle game functionality. The analysis reveals several potential failure points in the application startup process, including authentication initialization, Redux store configuration, component rendering, and service dependencies. Additionally, the design establishes a continuous background processing system using ECS Fargate to maintain idle game mechanics.
 
 ## Architecture
 
@@ -20,6 +20,19 @@ This design addresses runtime issues preventing the Steampunk Idle Game from sta
 - Add error handling to Redux actions and reducers
 - Implement state validation to prevent invalid states from causing crashes
 - Add recovery mechanisms for corrupted or missing state data
+
+### ECS Fargate Game Engine Architecture
+- Deploy a containerized Node.js service on ECS Fargate for continuous background processing
+- Implement REST API endpoints for client-server communication
+- Process all player task queues every second for real-time idle game mechanics
+- Auto-scaling configuration to handle varying player loads
+- Health checks and automatic container replacement for high availability
+
+### Client-Server Synchronization
+- Hybrid architecture with server-first approach and local fallback
+- Real-time synchronization between browser client and Fargate service
+- Graceful degradation when server is unavailable
+- Automatic reconnection and state synchronization when server becomes available
 
 ## Components and Interfaces
 
@@ -62,6 +75,57 @@ interface SafeComponentProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
   errorMessage?: string;
+}
+```
+
+### Server Task Queue Interface
+
+```typescript
+interface ServerTaskQueue {
+  currentTask: Task | null;
+  queueLength: number;
+  queuedTasks: Task[];
+  isRunning: boolean;
+  totalCompleted: number;
+}
+
+interface Task {
+  id: string;
+  type: 'HARVESTING' | 'COMBAT' | 'CRAFTING';
+  name: string;
+  description: string;
+  icon: string;
+  duration: number;
+  startTime: number;
+  playerId: string;
+  activityData: any;
+  completed: boolean;
+  rewards?: TaskReward[];
+}
+
+interface TaskReward {
+  type: 'resource' | 'experience' | 'currency' | 'item';
+  itemId?: string;
+  quantity: number;
+  rarity?: string;
+  isRare?: boolean;
+}
+```
+
+### Fargate Service Interface
+
+```typescript
+interface GameEngineStatus {
+  status: 'healthy' | 'unhealthy';
+  timestamp: string;
+  activeQueues: number;
+  uptime: number;
+}
+
+interface TaskQueueSyncRequest {
+  playerId: string;
+  action: 'sync' | 'addTask' | 'stopTasks';
+  task?: Task;
 }
 ```
 
@@ -144,17 +208,26 @@ interface SafeComponentProps {
 - Add error logging and reporting mechanisms
 - Create fallback UI components for error states
 
-### Phase 2: Service Health Checks
-- Implement service health monitoring
-- Add startup sequence management
-- Create service fallback mechanisms
+### Phase 2: ECS Fargate Game Engine
+- Deploy containerized Node.js service on ECS Fargate for 24/7 operation
+- Implement REST API endpoints for task queue management
+- Create continuous background processing of all player queues
+- Set up auto-scaling and health monitoring for high availability
 
-### Phase 3: State Resilience
+### Phase 3: Client-Server Integration
+- Implement hybrid client-server task queue synchronization
+- Add fallback mechanisms for offline/local processing
+- Create real-time progress updates from server to client
+- Implement automatic reconnection and state synchronization
+
+### Phase 4: State Resilience
 - Add state validation and recovery
 - Implement graceful degradation for missing data
 - Add error handling to all Redux actions
+- Ensure seamless transitions between server and local modes
 
-### Phase 4: User Experience
+### Phase 5: User Experience
 - Improve error messages and user feedback
 - Add loading states and progress indicators (text-based only)
 - Implement retry mechanisms and recovery options
+- Ensure consistent experience across server and local modes
