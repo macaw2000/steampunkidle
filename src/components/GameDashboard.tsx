@@ -27,6 +27,8 @@ const GameDashboard: React.FC = () => {
   const [showRewards, setShowRewards] = useState(false);
   const [exoticDiscovery, setExoticDiscovery] = useState<any>(null);
   const [showExoticNotification, setShowExoticNotification] = useState(false);
+  const [currentTaskProgress, setCurrentTaskProgress] = useState<any>(null);
+  const [queueStatus, setQueueStatus] = useState<any>(null);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { character, hasCharacter, characterLoading, isOnline } = useSelector((state: RootState) => state.game);
 
@@ -164,8 +166,17 @@ const GameDashboard: React.FC = () => {
 
     // Load and restore task queue state when character is available
     if (character) {
+      // Set up progress tracking callback
+      taskQueueService.onProgress(character.characterId, (progress) => {
+        setCurrentTaskProgress(progress);
+      });
+
       // Set up task completion listener FIRST before loading queue
       taskQueueService.onTaskComplete(character.characterId, (result) => {
+        // Update queue status after task completion
+        const status = taskQueueService.getQueueStatus(character.characterId);
+        setQueueStatus(status);
+
         // Check if any rewards are exotic items
         const exoticReward = result.rewards.find(reward => 
           reward.type === 'resource' && reward.isRare && 
@@ -188,7 +199,11 @@ const GameDashboard: React.FC = () => {
 
       // Now load the player's task queue to restore idle game state
       console.log('GameDashboard: Loading task queue for character:', character.characterId);
-      taskQueueService.loadPlayerQueue(character.characterId).catch(error => {
+      taskQueueService.loadPlayerQueue(character.characterId).then(() => {
+        // Update initial queue status after loading
+        const status = taskQueueService.getQueueStatus(character.characterId);
+        setQueueStatus(status);
+      }).catch(error => {
         console.error('Failed to load task queue:', error);
       });
     }
@@ -205,6 +220,18 @@ const GameDashboard: React.FC = () => {
       }
     };
   }, [dispatch, character]);
+
+  // Update queue status periodically
+  useEffect(() => {
+    if (!character) return;
+
+    const interval = setInterval(() => {
+      const status = taskQueueService.getQueueStatus(character.characterId);
+      setQueueStatus(status);
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, [character]);
 
   // Show login screen if not authenticated
   if (!isAuthenticated) {
@@ -317,11 +344,46 @@ const GameDashboard: React.FC = () => {
               {/* Live Activity Display */}
               <div className="live-activity-section">
                 <h3>🔧 Current Operations</h3>
-                <p>Your active tasks and progress will appear here</p>
-                <div className="activity-status">
-                  {/* This will show current task details when active */}
-                  <p><em>Start an activity from the sidebar to see live progress</em></p>
-                </div>
+                {queueStatus && queueStatus.currentTask ? (
+                  <div className="current-task">
+                    <div className="task-info">
+                      <h4>{queueStatus.currentTask.icon} {queueStatus.currentTask.name}</h4>
+                      <p>{queueStatus.currentTask.description}</p>
+                    </div>
+                    
+                    {currentTaskProgress && (
+                      <div className="task-progress">
+                        <div className="progress-bar">
+                          <div 
+                            className="progress-fill" 
+                            style={{ width: `${currentTaskProgress.progress * 100}%` }}
+                          ></div>
+                        </div>
+                        <div className="progress-info">
+                          <span>{Math.round(currentTaskProgress.progress * 100)}% Complete</span>
+                          <span>{Math.ceil(currentTaskProgress.timeRemaining / 1000)}s remaining</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="no-active-task">
+                    <p>No active tasks</p>
+                    <p><em>Start an activity from the sidebar to see live progress</em></p>
+                  </div>
+                )}
+                
+                {queueStatus && (
+                  <div className="queue-summary">
+                    <div className="queue-stats">
+                      <span>📋 Queued: {queueStatus.queueLength}</span>
+                      <span>✅ Completed: {queueStatus.totalCompleted}</span>
+                      <span className={`status ${queueStatus.isRunning ? 'running' : 'idle'}`}>
+                        {queueStatus.isRunning ? '🟢 Active' : '⏸️ Idle'}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             </>
           )}

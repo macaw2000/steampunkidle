@@ -474,4 +474,125 @@ hboard Layout with Sidebar */
   .game-features-sidebar {
     padding: var(--steampunk-spacing-md);
   }
+}/* 
+Current Operations / Live Activity Section */
+.live-activity-section {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--steampunk-primary-light);
+  border-radius: var(--steampunk-radius-large);
+  padding: var(--steampunk-spacing-lg);
+  margin-bottom: var(--steampunk-spacing-lg);
+  box-shadow: var(--steampunk-shadow-medium);
+}
+
+.live-activity-section h3 {
+  color: var(--steampunk-accent-primary);
+  margin-bottom: var(--steampunk-spacing-md);
+  font-family: var(--steampunk-font-heading);
+  text-shadow: var(--steampunk-text-shadow);
+}
+
+.current-task {
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid var(--steampunk-accent-primary);
+  border-radius: var(--steampunk-radius-medium);
+  padding: var(--steampunk-spacing-md);
+  margin-bottom: var(--steampunk-spacing-md);
+}
+
+.task-info h4 {
+  color: var(--steampunk-text-primary);
+  margin: 0 0 var(--steampunk-spacing-xs) 0;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: var(--steampunk-spacing-xs);
+}
+
+.task-info p {
+  color: var(--steampunk-text-secondary);
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.task-progress {
+  margin-top: var(--steampunk-spacing-md);
+}
+
+.progress-bar {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--steampunk-primary-light);
+  border-radius: var(--steampunk-radius-small);
+  height: 20px;
+  overflow: hidden;
+  margin-bottom: var(--steampunk-spacing-xs);
+}
+
+.progress-fill {
+  background: linear-gradient(90deg, var(--steampunk-accent-primary), var(--steampunk-accent-secondary));
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: var(--steampunk-radius-small);
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.5);
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+  color: var(--steampunk-text-secondary);
+}
+
+.no-active-task {
+  text-align: center;
+  color: var(--steampunk-text-secondary);
+  padding: var(--steampunk-spacing-lg);
+  font-style: italic;
+}
+
+.queue-summary {
+  border-top: 1px solid var(--steampunk-primary-light);
+  padding-top: var(--steampunk-spacing-md);
+  margin-top: var(--steampunk-spacing-md);
+}
+
+.queue-stats {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: var(--steampunk-spacing-md);
+  font-size: 0.9rem;
+}
+
+.queue-stats span {
+  color: var(--steampunk-text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--steampunk-spacing-xs);
+}
+
+.queue-stats .status {
+  font-weight: bold;
+}
+
+.queue-stats .status.running {
+  color: var(--steampunk-success);
+}
+
+.queue-stats .status.idle {
+  color: var(--steampunk-text-secondary);
+}
+
+/* Responsive design for Current Operations */
+@media (max-width: 768px) {
+  .queue-stats {
+    flex-direction: column;
+    gap: var(--steampunk-spacing-sm);
+  }
+  
+  .progress-info {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--steampunk-spacing-xs);
+  }
 }
