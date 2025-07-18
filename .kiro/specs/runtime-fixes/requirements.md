@@ -49,3 +49,14 @@ This feature addresses runtime issues that prevent the Steampunk Idle Game appli
 2. WHEN CSS changes are made THEN styles SHALL update without full page refresh
 3. WHEN TypeScript compilation errors occur THEN they SHALL be displayed clearly in the browser
 4. WHEN the development server restarts THEN it SHALL reconnect automatically
+
+### Requirement 5
+
+**User Story:** As a user, I want a single unified progress bar for all activities, so that the interface remains clean and uncluttered.
+
+#### Acceptance Criteria
+
+1. WHEN any task is running THEN there SHALL be only one progress bar visible in the application
+2. WHEN multiple tasks are queued THEN the single progress bar SHALL show the current active task progress
+3. WHEN implementing new features THEN no additional progress bars SHALL be created
+4. WHEN displaying task progress THEN it SHALL always use the existing unified progress system

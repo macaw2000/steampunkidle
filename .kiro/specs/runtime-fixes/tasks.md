@@ -63,7 +63,14 @@
   - Implement error boundary testing utilities
   - _Requirements: 2.1, 2.2, 2.3, 4.3_
 
-- [ ] 10. Test error scenarios and recovery
+- [ ] 10. Enforce single progress bar constraint
+  - Audit all components to identify and remove duplicate progress bars
+  - Ensure all progress indicators use the unified progress system in Current Operations
+  - Update any components that create their own progress bars to use text-based status instead
+  - Add code comments and documentation to prevent future progress bar duplication
+  - _Requirements: 5.1, 5.2, 5.3, 5.4_
+
+- [ ] 11. Test error scenarios and recovery
   - Create unit tests for all error boundary components
   - Add integration tests for service failure scenarios
   - Test authentication error handling and recovery

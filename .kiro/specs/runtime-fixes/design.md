@@ -116,6 +116,25 @@ interface SafeComponentProps {
 - Test that the application remains usable even with partial failures
 - Verify that recovery mechanisms don't interfere with normal operation
 
+## UI Design Constraints
+
+### Single Progress Bar Principle
+- **CRITICAL CONSTRAINT**: The application SHALL maintain only one progress bar at any time
+- All task progress, loading states, and activity indicators MUST use the unified progress system
+- The progress bar is located in the "Current Operations" section of the GameDashboard
+- New features MUST NOT introduce additional progress bars or progress indicators
+
+### Progress Bar Implementation
+- Use the existing progress bar in the `live-activity-section` for all progress display
+- Task queue service provides progress updates through callbacks
+- Progress bar shows current active task completion percentage
+- Multiple queued tasks are indicated by queue count, not additional progress bars
+
+### Design Enforcement
+- Code reviews MUST check for additional progress bar implementations
+- Any new progress-related UI MUST integrate with the existing unified system
+- Progress indicators in modals or components MUST use text-based status instead of bars
+
 ## Implementation Approach
 
 ### Phase 1: Error Boundaries
@@ -135,5 +154,5 @@ interface SafeComponentProps {
 
 ### Phase 4: User Experience
 - Improve error messages and user feedback
-- Add loading states and progress indicators
+- Add loading states and progress indicators (text-based only)
 - Implement retry mechanisms and recovery options
