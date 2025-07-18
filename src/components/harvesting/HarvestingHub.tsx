@@ -57,15 +57,15 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
 
   const startHarvesting = (activity: HarvestingActivity, rounds: number | 'infinite' = 'infinite') => {
     try {
-      // Add task to the unified queue system with rounds information
+      // Start task immediately, replacing any current task
       const taskData = {
         ...activity,
         rounds: rounds,
         metadata: { rounds }
       };
-      taskQueueService.addHarvestingTask(playerId, taskData, playerStats);
+      taskQueueService.startHarvestingTask(playerId, taskData, playerStats);
       
-      console.log(`Started ${activity.name} with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
+      console.log(`Started ${activity.name} immediately with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       
       // Close the dialog after starting the activity
       if (onClose) {
@@ -85,7 +85,7 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         rounds: rounds,
         metadata: { rounds, queued: true }
       };
-      taskQueueService.addHarvestingTask(playerId, taskData, playerStats);
+      taskQueueService.queueHarvestingTask(playerId, taskData, playerStats);
       
       console.log(`Added ${activity.name} to queue with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       

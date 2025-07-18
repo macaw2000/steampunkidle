@@ -193,6 +193,56 @@ class TaskQueueService {
   }
 
   /**
+   * Start a harvesting task immediately (replaces current task)
+   */
+  startHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Task {
+    const task: Task = {
+      id: `harvesting-${activity.id}-${Date.now()}`,
+      type: TaskType.HARVESTING,
+      name: activity.name,
+      description: activity.description,
+      icon: activity.icon,
+      duration: 15000, // 15 seconds
+      startTime: 0,
+      playerId,
+      activityData: { activity, playerStats },
+      completed: false
+    };
+
+    // Stop current task and start this one immediately
+    this.stopCurrentTask(playerId);
+    this.startTask(playerId, task);
+    return task;
+  }
+
+  /**
+   * Queue a harvesting task (adds to queue without interrupting current task)
+   */
+  queueHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Task {
+    const task: Task = {
+      id: `harvesting-${activity.id}-${Date.now()}`,
+      type: TaskType.HARVESTING,
+      name: activity.name,
+      description: activity.description,
+      icon: activity.icon,
+      duration: 15000, // 15 seconds
+      startTime: 0,
+      playerId,
+      activityData: { activity, playerStats },
+      completed: false
+    };
+
+    // Always add to queue, never start immediately
+    const queue = this.getQueue(playerId);
+    queue.queuedTasks.push(task);
+    
+    // Save the updated queue state
+    this.savePlayerQueue(playerId);
+    
+    return task;
+  }
+
+  /**
    * Add a combat task to the queue
    */
   addCombatTask(playerId: string, enemyName: string, enemyData: any): Task {
