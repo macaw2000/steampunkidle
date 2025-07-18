@@ -2,6 +2,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cloudfront from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
@@ -11,6 +12,7 @@ import * as iam from 'aws-cdk-lib/aws-iam';
 import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
+import { FargateGameEngine } from './fargate-game-engine';
 
 export class SteampunkIdleGameStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -427,6 +429,22 @@ export class SteampunkIdleGameStack extends cdk.Stack {
       sortKey: { name: 'status', type: dynamodb.AttributeType.STRING },
     });
 
+    // Task Queues Table (for Fargate game engine)
+    const taskQueuesTable = new dynamodb.Table(this, 'TaskQueuesTable', {
+      tableName: 'steampunk-idle-game-task-queues',
+      partitionKey: { name: 'playerId', type: dynamodb.AttributeType.STRING },
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
+      pointInTimeRecovery: true,
+    });
+
+    // Add GSI for active task queues
+    taskQueuesTable.addGlobalSecondaryIndex({
+      indexName: 'running-status-index',
+      partitionKey: { name: 'isRunning', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'lastProcessed', type: dynamodb.AttributeType.STRING },
+    });
+
     // API Gateway for REST API
     const api = new apigateway.RestApi(this, 'SteampunkIdleGameApi', {
       restApiName: 'Steampunk Idle Game API',
@@ -471,6 +489,35 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     zoneInstancesTable.grantReadWriteData(lambdaExecutionRole);
     currencyTransactionsTable.grantReadWriteData(lambdaExecutionRole);
     craftingSessionsTable.grantReadWriteData(lambdaExecutionRole);
+    taskQueuesTable.grantReadWriteData(lambdaExecutionRole);
+
+    // Create VPC for Fargate service
+    const vpc = new ec2.Vpc(this, 'GameEngineVpc', {
+      maxAzs: 2,
+      natGateways: 1,
+      subnetConfiguration: [
+        {
+          cidrMask: 24,
+          name: 'Public',
+          subnetType: ec2.SubnetType.PUBLIC,
+        },
+        {
+          cidrMask: 24,
+          name: 'Private',
+          subnetType: ec2.SubnetType.PRIVATE_WITH_EGRESS,
+        },
+      ],
+    });
+
+    // Create Fargate Game Engine Service
+    const gameEngine = new FargateGameEngine(this, 'GameEngine', {
+      vpc,
+      tableNames: {
+        taskQueues: taskQueuesTable.tableName,
+        characters: charactersTable.tableName,
+        users: usersTable.tableName,
+      },
+    });
 
     // Authentication Lambda Functions
     const loginFunction = new lambda.Function(this, 'LoginFunction', {

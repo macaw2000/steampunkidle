@@ -6,6 +6,7 @@
 
 import { Task, TaskType, TaskProgress, TaskCompletionResult, TaskReward } from '../types/taskQueue';
 import { HarvestingActivity } from '../types/harvesting';
+import { taskQueueService } from './taskQueueService';
 
 interface ServerTaskQueue {
   currentTask: Task | null;
@@ -28,6 +29,7 @@ class ServerTaskQueueService {
   private completionCallbacks: Map<string, (result: TaskCompletionResult) => void> = new Map();
   private syncIntervals: Map<string, NodeJS.Timeout> = new Map();
   private lastKnownState: Map<string, ServerTaskQueue> = new Map();
+  private useLocalFallback: boolean = false;
 
   constructor() {
     this.apiUrl = process.env.REACT_APP_API_URL || 'http://localhost:3001';
@@ -70,6 +72,10 @@ class ServerTaskQueueService {
       console.error('ServerTaskQueueService: Failed to sync with server:', error);
       // Fall back to local processing if server is unavailable
       console.warn('ServerTaskQueueService: Falling back to local task processing');
+      this.useLocalFallback = true;
+      
+      // Initialize local task queue service
+      await taskQueueService.loadPlayerQueue(playerId);
     }
   }
 
@@ -210,6 +216,12 @@ class ServerTaskQueueService {
    * Add a harvesting task to the server queue
    */
   async addHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Promise<Task> {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      console.log('ServerTaskQueueService: Using local fallback for addHarvestingTask');
+      return taskQueueService.addHarvestingTask(playerId, activity, playerStats);
+    }
+
     const task: Task = {
       id: `harvesting-${activity.id}-${Date.now()}`,
       type: TaskType.HARVESTING,
@@ -247,7 +259,10 @@ class ServerTaskQueueService {
 
     } catch (error) {
       console.error('ServerTaskQueueService: Failed to add task to server:', error);
-      // TODO: Fall back to local processing
+      // Fall back to local processing
+      console.warn('ServerTaskQueueService: Falling back to local task processing');
+      this.useLocalFallback = true;
+      return taskQueueService.addHarvestingTask(playerId, activity, playerStats);
     }
 
     return task;
@@ -257,6 +272,12 @@ class ServerTaskQueueService {
    * Start a harvesting task immediately (replaces current task)
    */
   async startHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Promise<Task> {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      console.log('ServerTaskQueueService: Using local fallback for startHarvestingTask');
+      return taskQueueService.startHarvestingTask(playerId, activity, playerStats);
+    }
+
     // Stop current tasks first
     await this.stopAllTasks(playerId);
     
@@ -268,6 +289,12 @@ class ServerTaskQueueService {
    * Queue a harvesting task (adds to queue without interrupting current task)
    */
   async queueHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Promise<Task> {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      console.log('ServerTaskQueueService: Using local fallback for queueHarvestingTask');
+      return taskQueueService.queueHarvestingTask(playerId, activity, playerStats);
+    }
+
     return await this.addHarvestingTask(playerId, activity, playerStats);
   }
 
@@ -275,6 +302,12 @@ class ServerTaskQueueService {
    * Stop all tasks for a player
    */
   async stopAllTasks(playerId: string): Promise<void> {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      console.log('ServerTaskQueueService: Using local fallback for stopAllTasks');
+      return taskQueueService.stopAllTasks(playerId);
+    }
+
     try {
       const response = await fetch(`${this.apiUrl}/task-queue/stop-tasks`, {
         method: 'POST',
@@ -298,6 +331,10 @@ class ServerTaskQueueService {
 
     } catch (error) {
       console.error('ServerTaskQueueService: Failed to stop tasks on server:', error);
+      // Fall back to local processing
+      console.warn('ServerTaskQueueService: Falling back to local task processing');
+      this.useLocalFallback = true;
+      return taskQueueService.stopAllTasks(playerId);
     }
   }
 
@@ -311,6 +348,11 @@ class ServerTaskQueueService {
     isRunning: boolean;
     totalCompleted: number;
   } {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      return taskQueueService.getQueueStatus(playerId);
+    }
+
     const serverQueue = this.lastKnownState.get(playerId);
     
     if (!serverQueue) {
@@ -330,6 +372,11 @@ class ServerTaskQueueService {
    * Register progress callback
    */
   onProgress(playerId: string, callback: (progress: TaskProgress) => void): void {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      return taskQueueService.onProgress(playerId, callback);
+    }
+
     this.progressCallbacks.set(playerId, callback);
   }
 
@@ -337,6 +384,11 @@ class ServerTaskQueueService {
    * Register completion callback
    */
   onTaskComplete(playerId: string, callback: (result: TaskCompletionResult) => void): void {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      return taskQueueService.onTaskComplete(playerId, callback);
+    }
+
     this.completionCallbacks.set(playerId, callback);
   }
 
@@ -344,6 +396,11 @@ class ServerTaskQueueService {
    * Remove callbacks and stop sync (cleanup)
    */
   removeCallbacks(playerId: string): void {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      return taskQueueService.removeCallbacks(playerId);
+    }
+
     this.progressCallbacks.delete(playerId);
     this.completionCallbacks.delete(playerId);
     

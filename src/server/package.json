@@ -1,0 +1,32 @@
+{
+  "name": "steampunk-idle-game-server",
+  "version": "1.0.0",
+  "description": "ECS Fargate service for Steampunk Idle Game background processing",
+  "main": "gameEngine.js",
+  "scripts": {
+    "start": "node gameEngine.js",
+    "dev": "nodemon gameEngine.js",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.0.0",
+    "@aws-sdk/lib-dynamodb": "^3.0.0",
+    "express": "^4.18.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.0",
+    "jest": "^29.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "idle-game",
+    "fargate",
+    "aws",
+    "steampunk"
+  ],
+  "author": "Steampunk Idle Game Team",
+  "license": "MIT"
+}
