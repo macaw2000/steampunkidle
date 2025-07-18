@@ -13,10 +13,10 @@ import ChatInterface from './chat/ChatInterface';
 import CharacterPanel from './character/CharacterPanel';
 import HarvestingRewards from './harvesting/HarvestingRewards';
 import HarvestingHub from './harvesting/HarvestingHub';
-import ExoticDiscoveryNotification from './harvesting/ExoticDiscoveryNotification';
+
 import GuildManager from './guild/GuildManager';
 import { taskQueueService } from '../services/taskQueueService';
-import { harvestingService } from '../services/harvestingService';
+// harvestingService import removed - exotic items now handled by UnifiedProgressBar
 
 
 const GameDashboard: React.FC = () => {
@@ -25,9 +25,8 @@ const GameDashboard: React.FC = () => {
   const [activeFeature, setActiveFeature] = useState<string | null>(null);
   const [harvestingRewards, setHarvestingRewards] = useState<any[]>([]);
   const [showRewards, setShowRewards] = useState(false);
-  const [exoticDiscovery, setExoticDiscovery] = useState<any>(null);
-  const [showExoticNotification, setShowExoticNotification] = useState(false);
-  const [currentTaskProgress, setCurrentTaskProgress] = useState<any>(null);
+  // Exotic items are now displayed in the unified progress bar - no popups needed
+  // Removed currentTaskProgress - now handled by UnifiedProgressBar
   const [queueStatus, setQueueStatus] = useState<any>(null);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { character, hasCharacter, characterLoading, isOnline } = useSelector((state: RootState) => state.game);
@@ -166,10 +165,8 @@ const GameDashboard: React.FC = () => {
 
     // Load and restore task queue state when character is available
     if (character) {
-      // Set up progress tracking callback
-      taskQueueService.onProgress(character.characterId, (progress) => {
-        setCurrentTaskProgress(progress);
-      });
+      // Progress tracking is now handled by UnifiedProgressBar
+      // No need to track progress in GameDashboard anymore
 
       // Set up task completion listener FIRST before loading queue
       taskQueueService.onTaskComplete(character.characterId, (result) => {
@@ -177,24 +174,7 @@ const GameDashboard: React.FC = () => {
         const status = taskQueueService.getQueueStatus(character.characterId);
         setQueueStatus(status);
 
-        // Check if any rewards are exotic items
-        const exoticReward = result.rewards.find(reward => 
-          reward.type === 'resource' && reward.isRare && 
-          (reward.rarity === 'rare' || reward.rarity === 'epic' || reward.rarity === 'legendary')
-        );
-
-        if (exoticReward) {
-          // Get the exotic item details
-          const exoticItems = harvestingService.getExoticItemsForCategory(
-            result.task.activityData?.activity?.category
-          );
-          const exoticItem = exoticItems.find(item => item.id === exoticReward.itemId);
-          
-          if (exoticItem) {
-            setExoticDiscovery(exoticItem);
-            setShowExoticNotification(true);
-          }
-        }
+        // Exotic items are now displayed in the unified progress bar - no popups needed
       });
 
       // Now load the player's task queue to restore idle game state
@@ -351,20 +331,9 @@ const GameDashboard: React.FC = () => {
                       <p>{queueStatus.currentTask.description}</p>
                     </div>
                     
-                    {currentTaskProgress && (
-                      <div className="task-progress">
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill" 
-                            style={{ width: `${currentTaskProgress.progress * 100}%` }}
-                          ></div>
-                        </div>
-                        <div className="progress-info">
-                          <span>{Math.round(currentTaskProgress.progress * 100)}% Complete</span>
-                          <span>{Math.ceil(currentTaskProgress.timeRemaining / 1000)}s remaining</span>
-                        </div>
-                      </div>
-                    )}
+                    <div className="task-status">
+                      <p><em>Progress will be shown in the unified progress bar</em></p>
+                    </div>
                   </div>
                 ) : (
                   <div className="no-active-task">
@@ -382,6 +351,26 @@ const GameDashboard: React.FC = () => {
                         {queueStatus.isRunning ? '🟢 Active' : '⏸️ Idle'}
                       </span>
                     </div>
+                    
+                    {queueStatus.queueLength > 0 && (
+                      <div className="queued-tasks">
+                        <h4>📋 Upcoming Tasks:</h4>
+                        <div className="task-list">
+                          {queueStatus.queuedTasks?.slice(0, 5).map((task: any, index: number) => (
+                            <div key={task.id} className="queued-task-item">
+                              <span className="task-position">{index + 1}.</span>
+                              <span className="task-icon">{task.icon}</span>
+                              <span className="task-name">{task.name}</span>
+                            </div>
+                          ))}
+                          {queueStatus.queueLength > 5 && (
+                            <div className="more-tasks">
+                              +{queueStatus.queueLength - 5} more tasks...
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -420,15 +409,7 @@ const GameDashboard: React.FC = () => {
         onClose={closeRewards}
       />
 
-      {/* Exotic Discovery Notification */}
-      <ExoticDiscoveryNotification
-        exoticItem={exoticDiscovery}
-        visible={showExoticNotification}
-        onClose={() => {
-          setShowExoticNotification(false);
-          setExoticDiscovery(null);
-        }}
-      />
+
     </div>
   );
 };

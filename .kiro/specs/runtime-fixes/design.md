@@ -120,9 +120,11 @@ interface SafeComponentProps {
 
 ### Single Progress Bar Principle
 - **CRITICAL CONSTRAINT**: The application SHALL maintain only one progress bar at any time
+- **ABSOLUTE RULE**: NO additional progress bars SHALL EVER be created under any circumstances
 - All task progress, loading states, and activity indicators MUST use the unified progress system
-- The progress bar is located in the "Current Operations" section of the GameDashboard
+- The ONLY progress bar is located in the AppHeader as the UnifiedProgressBar component
 - New features MUST NOT introduce additional progress bars or progress indicators
+- Any attempt to create additional progress bars MUST be immediately rejected and removed
 
 ### Progress Bar Implementation
 - Use the existing progress bar in the `live-activity-section` for all progress display

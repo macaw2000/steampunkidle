@@ -309,6 +309,14 @@ class TaskQueueService {
     queue.currentTask = task;
     queue.isRunning = true;
 
+    console.log('TaskQueueService: Starting task:', {
+      taskName: task.name,
+      taskId: task.id,
+      startTime: task.startTime,
+      duration: task.duration,
+      playerId
+    });
+
     // Start progress tracking
     this.startProgressTracking(playerId);
     
@@ -356,10 +364,23 @@ class TaskQueueService {
       isComplete
     };
 
+    // Debug logging
+    if (Math.random() < 0.01) { // Log 1% of the time to avoid spam
+      console.log('TaskQueue Progress:', {
+        taskName: task.name,
+        elapsed,
+        duration: task.duration,
+        progress: Math.round(progress * 100) + '%',
+        timeRemaining: Math.round(timeRemaining / 1000) + 's'
+      });
+    }
+
     // Notify progress callback
     const progressCallback = this.progressCallbacks.get(playerId);
     if (progressCallback) {
       progressCallback(progressData);
+    } else {
+      console.warn('No progress callback registered for player:', playerId);
     }
 
     // Check for completion
@@ -403,12 +424,23 @@ class TaskQueueService {
     // Stop current progress tracking to prevent rubber-banding
     this.stopProgressTracking(playerId);
     
-    // Clear current task temporarily for clean transition
-    queue.currentTask = null;
+    // Keep the current task but mark it as completed and reset progress
+    queue.isRunning = false;
 
-    // Add a brief delay before starting the next task to ensure clean UI transition
+    // Send a final reset signal to ensure progress bar shows 0%
+    const progressCallback = this.progressCallbacks.get(playerId);
+    if (progressCallback) {
+      progressCallback({
+        taskId: task.id,
+        progress: 0,
+        timeRemaining: 0,
+        isComplete: false
+      });
+    }
+
+    // Add a delay to ensure progress bar stays at 0% before starting new task
     setTimeout(() => {
-      // IDLE GAME BEHAVIOR: If no queued tasks, repeat the same task automatically
+      // Start the next task after visual reset
       if (nextTask) {
         this.startTask(playerId, nextTask);
       } else {
@@ -416,7 +448,7 @@ class TaskQueueService {
         const newTask = this.createIdenticalTask(task);
         this.startTask(playerId, newTask);
       }
-    }, 150); // 150ms delay for smooth transition
+    }, 300); // 300ms delay to ensure progress bar stays completely blank
   }
 
   /**
@@ -426,7 +458,7 @@ class TaskQueueService {
     return {
       ...originalTask,
       id: `${originalTask.type}-${Date.now()}`,
-      startTime: Date.now(), // Set start time immediately to prevent timing issues
+      startTime: 0, // Will be set properly by startTask
       completed: false,
       rewards: undefined
     };
@@ -614,6 +646,7 @@ class TaskQueueService {
   getQueueStatus(playerId: string): {
     currentTask: Task | null;
     queueLength: number;
+    queuedTasks: Task[];
     isRunning: boolean;
     totalCompleted: number;
   } {
@@ -622,6 +655,7 @@ class TaskQueueService {
     return {
       currentTask: queue.currentTask,
       queueLength: queue.queuedTasks.length,
+      queuedTasks: queue.queuedTasks,
       isRunning: queue.isRunning,
       totalCompleted: queue.totalTasksCompleted
     };

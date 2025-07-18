@@ -10,7 +10,7 @@ import { setActivityProgress, addExperience, updateCurrency, setOnlineStatus } f
 import WebSocketService, { WebSocketMessage, GameWebSocketMessage, ProgressUpdateMessage, NotificationMessage, AchievementMessage, LevelUpMessage } from '../../services/websocketService';
 import { ActivityService } from '../../services/activityService';
 import NotificationToast from './NotificationToast';
-import ProgressAnimations from './ProgressAnimations';
+
 import './RealTimeProgressTracker.css';
 
 interface RealTimeProgressTrackerProps {
@@ -224,12 +224,14 @@ const RealTimeProgressTracker: React.FC<RealTimeProgressTrackerProps> = ({ class
         )}
       </div>
 
-      {/* Progress Animations */}
-      <ProgressAnimations 
-        activityProgress={activityProgress}
-        character={character}
-        isConnected={connectionStatus === 'connected'}
-      />
+      {/* Progress Status - Text Only */}
+      {activityProgress && (
+        <div className="progress-status-text">
+          <p>Activity: {activityProgress.activityType}</p>
+          <p>Progress: {Math.floor(activityProgress.progressPercentage)}%</p>
+          <p><em>Visual progress shown in Current Operations section</em></p>
+        </div>
+      )}
 
       {/* Notification Toasts */}
       <div className="notification-container">

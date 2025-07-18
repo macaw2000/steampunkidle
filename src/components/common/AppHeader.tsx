@@ -29,6 +29,7 @@ const AppHeader: React.FC = () => {
           />
         </div>
       )}
+
     </header>
   );
 };

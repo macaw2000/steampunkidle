@@ -137,13 +137,9 @@ const CraftingStation: React.FC<CraftingStationProps> = ({ selectedSkill }) => {
                 </span>
               </div>
             </div>
-            <div className="crafting-session__progress">
-              <div className="crafting-session__progress-bar">
-                <div className="crafting-session__progress-fill"></div>
-              </div>
-              <p className="crafting-session__status">
-                Creating {selectedRecipe.name}... Please wait.
-              </p>
+            <div className="crafting-session__status">
+              <p>Creating {selectedRecipe.name}... Please wait.</p>
+              <p><em>Progress will be shown in Current Operations section</em></p>
             </div>
           </div>
         </div>
@@ -188,14 +184,8 @@ const CraftingStation: React.FC<CraftingStationProps> = ({ selectedSkill }) => {
                   </div>
                 </div>
                 <div className="crafting-skill__progress">
-                  <div className="crafting-skill__progress-bar">
-                    <div 
-                      className="crafting-skill__progress-fill"
-                      style={{ width: `${Math.min(100, progressPercent)}%` }}
-                    />
-                  </div>
                   <span className="crafting-skill__progress-text">
-                    {skillExp - currentLevelExp} / {nextLevelExp - currentLevelExp} XP
+                    {skillExp - currentLevelExp} / {nextLevelExp - currentLevelExp} XP ({Math.round(progressPercent)}%)
                   </span>
                 </div>
               </div>

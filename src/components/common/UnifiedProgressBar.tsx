@@ -1,226 +1,222 @@
-/**
- * Unified Progress Bar Component
- * Shows progress for all activities (harvesting, combat, crafting) at the top of the screen
- */
-
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { taskQueueService } from '../../services/taskQueueService';
-import { TaskProgress, TaskCompletionResult, Task } from '../../types/taskQueue';
 import './UnifiedProgressBar.css';
 
 interface UnifiedProgressBarProps {
   playerId: string;
 }
 
-const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({
-  playerId
-}) => {
-  const [progress, setProgress] = useState<TaskProgress | null>(null);
-  const [queueStatus, setQueueStatus] = useState<{
-    currentTask: Task | null;
-    queueLength: number;
-    isRunning: boolean;
-    totalCompleted: number;
-  }>({
-    currentTask: null,
-    queueLength: 0,
-    isRunning: false,
-    totalCompleted: 0
-  });
-  const [recentRewards, setRecentRewards] = useState<any[]>([]);
-  const [showRewards, setShowRewards] = useState(false);
-  const [isTransitioning, setIsTransitioning] = useState(false);
-  const lastTaskIdRef = useRef<string | null>(null);
-  const isTransitioningRef = useRef<boolean>(false);
+// Helper function to format item names for display
+const formatItemName = (itemId: string): string => {
+  return itemId
+    .replace(/_/g, ' ')           // Replace underscores with spaces
+    .replace(/-/g, ' ')           // Replace hyphens with spaces
+    .replace(/\b\w/g, (l: string) => l.toUpperCase()) // Capitalize first letter of each word
+    .replace(/\s+/g, ' ')         // Remove extra spaces
+    .trim();                      // Remove leading/trailing spaces
+};
 
-  const updateQueueStatus = useCallback(() => {
-    const status = taskQueueService.getQueueStatus(playerId);
-    setQueueStatus(status);
-  }, [playerId]);
+// Helper function to format item types
+const formatItemType = (type: string): string => {
+  if (type === 'experience') return 'XP';
+  if (type === 'currency') return 'Gold';
+  return type.charAt(0).toUpperCase() + type.slice(1);
+};
+
+// Interface for grouped items
+interface GroupedItem {
+  key: string;
+  type: string;
+  itemId?: string;
+  totalQuantity: number;
+  isRare: boolean;
+  name: string;
+  icon: string;
+}
+
+// Helper function to group identical items together
+const getGroupedItems = (items: any[]): GroupedItem[] => {
+  const grouped = items.reduce((acc, item) => {
+    const key = `${item.type}-${item.itemId || 'generic'}`;
+    if (!acc[key]) {
+      acc[key] = {
+        key,
+        type: item.type,
+        itemId: item.itemId,
+        totalQuantity: 0,
+        isRare: item.isRare,
+        name: item.itemId ? formatItemName(item.itemId) : formatItemType(item.type),
+        icon: getItemIcon(item)
+      };
+    }
+    acc[key].totalQuantity += item.quantity;
+    return acc;
+  }, {} as Record<string, GroupedItem>);
+  
+  return Object.values(grouped);
+};
+
+// Helper function to get item icons
+const getItemIcon = (item: any): string => {
+  if (item.type === 'experience') return '📚';
+  if (item.type === 'currency') return '💰';
+  
+  // Resource icons based on item ID
+  if (item.itemId) {
+    const itemId = item.itemId.toLowerCase();
+    if (itemId.includes('copper')) return '🟤';
+    if (itemId.includes('iron')) return '⚫';
+    if (itemId.includes('gold')) return '🟡';
+    if (itemId.includes('silver')) return '⚪';
+    if (itemId.includes('crystal')) return '💎';
+    if (itemId.includes('gem')) return '💍';
+    if (itemId.includes('manuscript')) return '📜';
+    if (itemId.includes('book')) return '📖';
+    if (itemId.includes('scroll')) return '📃';
+    if (itemId.includes('gear')) return '⚙️';
+    if (itemId.includes('spring')) return '🌀';
+    if (itemId.includes('valve')) return '🔧';
+    if (itemId.includes('herb')) return '🌿';
+    if (itemId.includes('flower')) return '🌸';
+    if (itemId.includes('seed')) return '🌱';
+    if (itemId.includes('fossil')) return '🦴';
+    if (itemId.includes('artifact')) return '🏺';
+    if (itemId.includes('relic')) return '⚱️';
+  }
+  
+  // Default icons by rarity
+  if (item.isRare) return '✨';
+  return '📦';
+};
+
+const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => {
+  const [currentTask, setCurrentTask] = useState<any>(null);
+  const [progress, setProgress] = useState(0);
+  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [queueStatus, setQueueStatus] = useState<any>(null);
+  const [recentItems, setRecentItems] = useState<any[]>([]);
 
   useEffect(() => {
-    console.log('UnifiedProgressBar: Registering callbacks for player:', playerId);
-    
-    // Register progress callback
-    taskQueueService.onProgress(playerId, (progressData: TaskProgress) => {
-      console.log('UnifiedProgressBar: Progress update received:', progressData);
+    // Set up progress tracking
+    taskQueueService.onProgress(playerId, (progressData) => {
+      setProgress(progressData.progress);
+      setTimeRemaining(progressData.timeRemaining);
+    });
+
+    // Set up task completion tracking
+    taskQueueService.onTaskComplete(playerId, (result) => {
+      // Update queue status after completion
+      const status = taskQueueService.getQueueStatus(playerId);
+      setQueueStatus(status);
+      setCurrentTask(status.currentTask);
       
-      // Check if this is a new task starting by comparing task IDs
-      if (progressData.taskId !== lastTaskIdRef.current) {
-        console.log('UnifiedProgressBar: New task detected, transitioning from', lastTaskIdRef.current, 'to', progressData.taskId);
-        // New task detected - start transition
-        setIsTransitioning(true);
-        isTransitioningRef.current = true;
-        lastTaskIdRef.current = progressData.taskId;
+      // Add rewards to recent items display
+      if (result.rewards && result.rewards.length > 0) {
+        const newItems = result.rewards.map(reward => ({
+          id: `${reward.type}-${reward.itemId || 'generic'}-${Date.now()}`,
+          type: reward.type,
+          itemId: reward.itemId,
+          quantity: reward.quantity,
+          rarity: reward.rarity,
+          isRare: reward.isRare,
+          timestamp: Date.now()
+        }));
         
-        // Reset progress to 0 for clean transition
-        setProgress({
-          ...progressData,
-          progress: 0
+        setRecentItems(prev => {
+          // Keep only the last 10 items and add new ones
+          const updated = [...prev, ...newItems].slice(-10);
+          return updated;
         });
         
-        // After a brief moment, allow normal progress updates
-        setTimeout(() => {
-          setIsTransitioning(false);
-          isTransitioningRef.current = false;
-          setProgress(progressData);
-        }, 100);
-      } else if (!isTransitioningRef.current) {
-        // Normal progress update
-        setProgress(progressData);
+        // Remove items after 8 seconds
+        newItems.forEach(item => {
+          setTimeout(() => {
+            setRecentItems(prev => prev.filter(existingItem => existingItem.id !== item.id));
+          }, 8000);
+        });
       }
-      
-      // Update queue status immediately when progress updates
-      updateQueueStatus();
     });
 
-    // Register completion callback
-    taskQueueService.onTaskComplete(playerId, (result: TaskCompletionResult) => {
-      console.log('UnifiedProgressBar: Task completed:', result);
-      
-      // Show completion at 100% briefly before transitioning
-      setProgress(prev => prev ? { ...prev, progress: 1 } : null);
-      
-      // Show rewards briefly inline
-      if (result.rewards && result.rewards.length > 0) {
-        setRecentRewards(result.rewards);
-        setShowRewards(true);
-        
-        // Hide rewards after 8 seconds
-        setTimeout(() => {
-          setShowRewards(false);
-          setRecentRewards([]);
-        }, 8000);
-      }
-      
-      // Update queue status after completion
-      updateQueueStatus();
-    });
+    // Update queue status periodically
+    const interval = setInterval(() => {
+      const status = taskQueueService.getQueueStatus(playerId);
+      setQueueStatus(status);
+      setCurrentTask(status.currentTask);
+    }, 1000);
 
-    // Initial queue status and current progress
-    updateQueueStatus();
-    
-    // Get current progress if there's an active task
-    const currentProgress = taskQueueService.getCurrentProgress(playerId);
-    if (currentProgress) {
-      console.log('UnifiedProgressBar: Found existing progress on mount:', currentProgress);
-      setProgress(currentProgress);
-      lastTaskIdRef.current = currentProgress.taskId;
-    }
+    // Initial load
+    const initialStatus = taskQueueService.getQueueStatus(playerId);
+    setQueueStatus(initialStatus);
+    setCurrentTask(initialStatus.currentTask);
 
-    // Set up a more frequent status check to catch task starts immediately
-    const statusInterval = setInterval(updateQueueStatus, 200);
-
-    // Cleanup on unmount
     return () => {
-      console.log('UnifiedProgressBar: Cleaning up callbacks for player:', playerId);
+      // Clean up callbacks
       taskQueueService.removeCallbacks(playerId);
-      clearInterval(statusInterval);
+      clearInterval(interval);
     };
-  }, [playerId, updateQueueStatus]);
+  }, [playerId]);
 
-  const stopAllTasks = () => {
-    taskQueueService.stopAllTasks(playerId);
-    setProgress(null);
-    updateQueueStatus();
-  };
-
-  const formatTime = (milliseconds: number): string => {
-    const seconds = Math.ceil(milliseconds / 1000);
-    return `${seconds}s`;
-  };
-
-  const getProgressPercentage = (): number => {
-    return progress ? Math.round(progress.progress * 100) : 0;
-  };
-
-  // Show idle state if no active task
-  const isIdle = !queueStatus.currentTask;
-
-  return (
-    <div className={`unified-progress-bar ${isIdle ? 'idle' : 'active'}`}>
-      <div className="progress-container">
-        <div className="task-info">
-          <div className="task-header">
-            <span className="task-icon">
-              {isIdle ? '⚙️' : queueStatus.currentTask!.icon}
-            </span>
-            <span className="task-name">
-              {isIdle ? 'Ready for Action' : queueStatus.currentTask!.name}
-            </span>
-            {!isIdle && queueStatus.queueLength > 0 && (
-              <span className="queue-indicator">
-                +{queueStatus.queueLength} queued
-              </span>
-            )}
-          </div>
-          <div className="task-description">
-            {isIdle 
-              ? 'Start an activity from the sidebar to begin earning rewards'
-              : queueStatus.currentTask!.description
-            }
-          </div>
-        </div>
-
-        <div className="progress-section">
-          <div className="progress-bar-container">
-            <div className="progress-bar">
-              <div 
-                className={`progress-fill ${isIdle ? 'idle-fill' : ''} ${isTransitioning ? 'transitioning' : ''}`}
-                style={{ width: `${getProgressPercentage()}%` }}
-              />
-            </div>
-            <div className="progress-text">
-              {isIdle ? 'Ready' : `${getProgressPercentage()}%`}
-            </div>
-          </div>
-          
-          <div className="progress-details">
-            <div className="left-section">
-              <span className="time-remaining">
-                {isIdle ? 'No active tasks' : (progress ? formatTime(progress.timeRemaining) : '0s')}
-              </span>
-              <div className={`inline-rewards ${showRewards && recentRewards.length > 0 ? 'visible' : 'hidden'}`}>
-                {showRewards && recentRewards.length > 0 ? (
-                  recentRewards.map((reward, index) => (
-                    <span key={index} className={`inline-reward ${reward.rarity || 'common'}`}>
-                      <span className="reward-icon">
-                        {reward.type === 'resource' ? '📦' : 
-                         reward.type === 'experience' ? '⭐' : 
-                         reward.type === 'currency' ? '💰' : '🎁'}
-                      </span>
-                      <span className="reward-amount">+{reward.quantity}</span>
-                    </span>
-                  ))
-                ) : (
-                  // Invisible placeholder to maintain layout space
-                  <span className="reward-placeholder">&nbsp;</span>
-                )}
-              </div>
-            </div>
-            <span className="completed-count">
-              Completed: {queueStatus.totalCompleted}
-            </span>
-          </div>
-        </div>
-
-        <div className="progress-actions">
-          {!isIdle ? (
-            <button 
-              className="stop-button"
-              onClick={stopAllTasks}
-              title="Stop all tasks"
-            >
-              ⏹️ Stop
-            </button>
-          ) : (
-            // Invisible placeholder to maintain layout space
-            <div className="stop-button-placeholder"></div>
-          )}
+  if (!currentTask) {
+    return (
+      <div className="unified-progress-bar idle">
+        <div className="no-activity">
+          <span>No active tasks</span>
         </div>
       </div>
+    );
+  }
 
+  return (
+    <div className="unified-progress-bar active">
+      <div className="progress-main">
+        <div className="task-info">
+          <span className="task-icon">{currentTask.icon}</span>
+          <span className="task-name">{currentTask.name}</span>
+          <span className="task-time">{Math.ceil(timeRemaining / 1000)}s</span>
+        </div>
+        
+        <div className="progress-container">
+          <div className="progress-bar">
+            <div 
+              className="progress-fill"
+              style={{ width: `${progress * 100}%` }}
+            />
+          </div>
+          <span className="progress-text">{Math.round(progress * 100)}%</span>
+        </div>
 
+        <div className="progress-controls">
+          {queueStatus && queueStatus.queueLength > 0 && (
+            <div className="queue-info">
+              <span>+{queueStatus.queueLength} queued</span>
+            </div>
+          )}
+          <button 
+            className="stop-button"
+            onClick={() => taskQueueService.stopAllTasks(playerId)}
+            title="Stop all tasks"
+          >
+            ⏹️
+          </button>
+        </div>
+      </div>
+      
+      {/* Recent Items Display - Below Progress Bar */}
+      <div className="recent-items">
+        <div className="items-list">
+          {getGroupedItems(recentItems).map(groupedItem => (
+            <div 
+              key={groupedItem.key} 
+              className={`item-display ${groupedItem.isRare ? 'rare-item' : 'common-item'}`}
+              title={groupedItem.name}
+            >
+              <span className="item-quantity">{groupedItem.totalQuantity}</span>
+              <span className="item-icon">{groupedItem.icon}</span>
+              {groupedItem.isRare && <span className="rare-indicator">✨</span>}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };

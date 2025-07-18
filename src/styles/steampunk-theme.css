@@ -23,6 +23,8 @@
   --steampunk-text-muted: #d4c4a8; /* Light Tan */
   
   /* Accent Colors */
+  --steampunk-accent-primary: #ff8c00; /* Dark Orange - for progress bars and highlights */
+  --steampunk-accent-secondary: #ffd700; /* Gold - for progress bar gradients */
   --steampunk-copper: #b87333; /* Copper */
   --steampunk-brass: #b5a642; /* Brass */
   --steampunk-bronze: #cd7f32; /* Bronze */

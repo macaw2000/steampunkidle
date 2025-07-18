@@ -57,6 +57,8 @@ This feature addresses runtime issues that prevent the Steampunk Idle Game appli
 #### Acceptance Criteria
 
 1. WHEN any task is running THEN there SHALL be only one progress bar visible in the application
-2. WHEN multiple tasks are queued THEN the single progress bar SHALL show the current active task progress
-3. WHEN implementing new features THEN no additional progress bars SHALL be created
-4. WHEN displaying task progress THEN it SHALL always use the existing unified progress system
+2. WHEN multiple tasks are queued THEN the single progress bar SHALL show the current active task progress  
+3. WHEN implementing new features THEN no additional progress bars SHALL EVER be created
+4. WHEN displaying task progress THEN it SHALL always use the existing unified progress system located in the AppHeader
+5. WHEN any developer adds progress visualization THEN it MUST use the UnifiedProgressBar component only
+6. WHEN code reviews are conducted THEN any additional progress bars SHALL be rejected and removed immediately

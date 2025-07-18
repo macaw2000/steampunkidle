@@ -5,6 +5,7 @@ import { loginSuccess, refreshTokens, logout } from '../../store/slices/authSlic
 import { setCharacter, setHasCharacter, setCharacterLoading, clearCharacter } from '../../store/slices/gameSlice';
 import { authService } from '../../services/authService';
 import { CharacterService } from '../../services/characterService';
+import { taskQueueService } from '../../services/taskQueueService';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -68,12 +69,22 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => window.removeEventListener('focus', handleFocus);
   }, [isAuthenticated, tokens, refreshTokensIfNeeded]);
 
-  // Check for character existence after authentication
+  // Check for character existence and restore game state after authentication
   useEffect(() => {
-    const checkCharacterExists = async () => {
+    const initializeGameState = async () => {
       if (!isAuthenticated || !user) {
         dispatch(setHasCharacter(null));
         dispatch(clearCharacter()); // Clear character state when not authenticated
+        
+        // Clean up task queue callbacks when user logs out
+        // Note: We can't get the character ID here since user is logging out,
+        // so we'll need to clean up all callbacks or use a different approach
+        try {
+          // For now, we'll just log this - the taskQueueService should handle cleanup
+          console.log('AuthProvider: User logged out, task queue callbacks should be cleaned up');
+        } catch (error) {
+          console.warn('AuthProvider: Error during logout cleanup:', error);
+        }
         return;
       }
 
@@ -84,18 +95,42 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         if (character) {
           dispatch(setCharacter(character));
           dispatch(setHasCharacter(true));
+          
+          // Restore task queue state for idle game continuity
+          console.log('AuthProvider: Restoring task queue for character:', character.characterId);
+          try {
+            await taskQueueService.loadPlayerQueue(character.characterId);
+            console.log('AuthProvider: Task queue restored successfully');
+            
+            // Verify queue status after restoration
+            const queueStatus = taskQueueService.getQueueStatus(character.characterId);
+            console.log('AuthProvider: Queue status after restoration:', {
+              hasCurrentTask: !!queueStatus.currentTask,
+              isRunning: queueStatus.isRunning,
+              queueLength: queueStatus.queueLength,
+              totalCompleted: queueStatus.totalCompleted
+            });
+            
+          } catch (queueError) {
+            console.error('AuthProvider: Failed to restore task queue:', queueError);
+            // Create user-friendly error message for task queue issues
+            console.warn('AuthProvider: Task queue restoration failed, but character loading will continue');
+          }
         } else {
           dispatch(setHasCharacter(false));
         }
       } catch (error) {
-        console.error('Failed to check character existence:', error);
+        console.error('AuthProvider: Failed to initialize game state:', error);
         dispatch(setHasCharacter(false));
+        
+        // Show user-friendly error message
+        console.error('AuthProvider: Character loading failed. Please try refreshing the page.');
       } finally {
         dispatch(setCharacterLoading(false));
       }
     };
 
-    checkCharacterExists();
+    initializeGameState();
   }, [isAuthenticated, user, dispatch]);
 
   return <>{children}</>;

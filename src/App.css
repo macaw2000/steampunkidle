@@ -595,4 +595,80 @@ Current Operations / Live Activity Section */
     text-align: center;
     gap: var(--steampunk-spacing-xs);
   }
+}.que
+ued-tasks {
+  margin-top: var(--steampunk-spacing-md);
+}
+
+.queued-tasks h4 {
+  color: var(--steampunk-text-primary);
+  margin: 0 0 var(--steampunk-spacing-sm) 0;
+  font-size: 0.9rem;
+  font-family: var(--steampunk-font-primary);
+}
+
+.task-list {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--steampunk-primary);
+  border-radius: var(--steampunk-radius-small);
+  padding: var(--steampunk-spacing-sm);
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.queued-task-item {
+  display: flex;
+  align-items: center;
+  gap: var(--steampunk-spacing-xs);
+  padding: var(--steampunk-spacing-xs) 0;
+  color: var(--steampunk-text-secondary);
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(139, 69, 19, 0.2);
+}
+
+.queued-task-item:last-child {
+  border-bottom: none;
+}
+
+.task-position {
+  color: var(--steampunk-text-muted);
+  font-weight: bold;
+  min-width: 20px;
+}
+
+.task-icon {
+  font-size: 1rem;
+}
+
+.task-name {
+  flex: 1;
+  color: var(--steampunk-text-primary);
+}
+
+.more-tasks {
+  text-align: center;
+  color: var(--steampunk-text-muted);
+  font-style: italic;
+  padding: var(--steampunk-spacing-xs);
+  border-top: 1px solid rgba(139, 69, 19, 0.2);
+  margin-top: var(--steampunk-spacing-xs);
+}
+
+/* Scrollbar styling for task list */
+.task-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.task-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+}
+
+.task-list::-webkit-scrollbar-thumb {
+  background: var(--steampunk-primary);
+  border-radius: 3px;
+}
+
+.task-list::-webkit-scrollbar-thumb:hover {
+  background: var(--steampunk-primary-light);
 }

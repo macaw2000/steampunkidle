@@ -83,18 +83,9 @@ const UserRankingCard: React.FC<UserRankingCardProps> = ({
         </span>
       </div>
 
-      <div className="progress-bar-container">
+      <div className="progress-text-container">
         <div className="progress-label">
-          Progress to Top 1%
-        </div>
-        <div className="progress-bar">
-          <div 
-            className="progress-fill"
-            style={{ width: `${Math.min(userPosition.percentile, 100)}%` }}
-          />
-        </div>
-        <div className="progress-text">
-          {userPosition.percentile.toFixed(1)}%
+          Progress to Top 1%: {userPosition.percentile.toFixed(1)}%
         </div>
       </div>
     </div>
