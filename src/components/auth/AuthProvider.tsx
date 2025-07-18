@@ -5,7 +5,7 @@ import { loginSuccess, refreshTokens, logout } from '../../store/slices/authSlic
 import { setCharacter, setHasCharacter, setCharacterLoading, clearCharacter } from '../../store/slices/gameSlice';
 import { authService } from '../../services/authService';
 import { CharacterService } from '../../services/characterService';
-import { taskQueueService } from '../../services/taskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 
 interface AuthProviderProps {
   children: React.ReactNode;
@@ -99,11 +99,11 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Restore task queue state for idle game continuity
           console.log('AuthProvider: Restoring task queue for character:', character.characterId);
           try {
-            await taskQueueService.loadPlayerQueue(character.characterId);
+            await serverTaskQueueService.loadPlayerQueue(character.characterId);
             console.log('AuthProvider: Task queue restored successfully');
             
             // Verify queue status after restoration
-            const queueStatus = taskQueueService.getQueueStatus(character.characterId);
+            const queueStatus = serverTaskQueueService.getQueueStatus(character.characterId);
             console.log('AuthProvider: Queue status after restoration:', {
               hasCurrentTask: !!queueStatus.currentTask,
               isRunning: queueStatus.isRunning,

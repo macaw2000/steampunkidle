@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { harvestingService } from '../../services/harvestingService';
-import { taskQueueService } from '../../services/taskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 import { 
   HarvestingActivity, 
   HarvestingCategory, 
@@ -63,7 +63,7 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         rounds: rounds,
         metadata: { rounds }
       };
-      taskQueueService.startHarvestingTask(playerId, taskData, playerStats);
+      serverTaskQueueService.startHarvestingTask(playerId, taskData, playerStats);
       
       console.log(`Started ${activity.name} immediately with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       
@@ -85,7 +85,7 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         rounds: rounds,
         metadata: { rounds, queued: true }
       };
-      taskQueueService.queueHarvestingTask(playerId, taskData, playerStats);
+      serverTaskQueueService.queueHarvestingTask(playerId, taskData, playerStats);
       
       console.log(`Added ${activity.name} to queue with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       

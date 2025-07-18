@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { taskQueueService } from '../../services/taskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 import './UnifiedProgressBar.css';
 
 interface UnifiedProgressBarProps {
@@ -98,15 +98,15 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
 
   useEffect(() => {
     // Set up progress tracking
-    taskQueueService.onProgress(playerId, (progressData) => {
+    serverTaskQueueService.onProgress(playerId, (progressData) => {
       setProgress(progressData.progress);
       setTimeRemaining(progressData.timeRemaining);
     });
 
     // Set up task completion tracking
-    taskQueueService.onTaskComplete(playerId, (result) => {
+    serverTaskQueueService.onTaskComplete(playerId, (result) => {
       // Update queue status after completion
-      const status = taskQueueService.getQueueStatus(playerId);
+      const status = serverTaskQueueService.getQueueStatus(playerId);
       setQueueStatus(status);
       setCurrentTask(status.currentTask);
       
@@ -139,19 +139,19 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
 
     // Update queue status periodically
     const interval = setInterval(() => {
-      const status = taskQueueService.getQueueStatus(playerId);
+      const status = serverTaskQueueService.getQueueStatus(playerId);
       setQueueStatus(status);
       setCurrentTask(status.currentTask);
     }, 1000);
 
     // Initial load
-    const initialStatus = taskQueueService.getQueueStatus(playerId);
+    const initialStatus = serverTaskQueueService.getQueueStatus(playerId);
     setQueueStatus(initialStatus);
     setCurrentTask(initialStatus.currentTask);
 
     return () => {
       // Clean up callbacks
-      taskQueueService.removeCallbacks(playerId);
+      serverTaskQueueService.removeCallbacks(playerId);
       clearInterval(interval);
     };
   }, [playerId]);
@@ -193,7 +193,7 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
           )}
           <button 
             className="stop-button"
-            onClick={() => taskQueueService.stopAllTasks(playerId)}
+            onClick={() => serverTaskQueueService.stopAllTasks(playerId)}
             title="Stop all tasks"
           >
             ⏹️
