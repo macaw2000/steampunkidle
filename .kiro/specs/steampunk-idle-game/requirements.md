@@ -223,3 +223,41 @@ This document outlines the requirements for a Steampunk-themed idle game. The ga
 3. WHEN using touch devices THEN the system SHALL provide touch-friendly interactions
 4. WHEN on mobile devices THEN the system SHALL maintain core functionality
 5. WHEN performance varies by device THEN the system SHALL optimize rendering accordingly
+
+### Requirement 17
+
+**User Story:** As a player, I want an enhanced Character Panel interface, so that I can easily view my attributes, inventory, skills, and specialization details.
+
+#### Acceptance Criteria
+
+1. WHEN a player clicks "Character" THEN the system SHALL display the character panel modal
+2. WHEN viewing the character panel THEN the system SHALL show character attributes, level, and experience
+3. WHEN viewing inventory THEN the system SHALL display all items with rarity colors and categories
+4. WHEN viewing skills THEN the system SHALL show all skill categories with current values
+5. WHEN viewing specialization THEN the system SHALL display role progression and current assignments
+
+### Requirement 18
+
+**User Story:** As a player, I want the Resource Harvesting system to provide detailed resource management with flexible control options, so that I can collect and manage materials effectively.
+
+#### Acceptance Criteria
+
+1. WHEN a player clicks "Resource Harvesting" THEN the system SHALL show the harvesting interface immediately
+2. WHEN viewing harvesting THEN the system SHALL display available resources, collection rates, and activity categories
+3. WHEN a player selects an activity THEN the system SHALL show a number input for rounds (defaulting to infinite)
+4. WHEN a player clicks "Start Harvesting" THEN the activity SHALL begin immediately and all dialogs SHALL close
+5. WHEN a player clicks "Add to Queue" THEN the activity SHALL be queued without interrupting current activities
+6. WHEN a player is harvesting THEN the system SHALL show real-time progress with visual feedback
+7. WHEN activities complete THEN the system SHALL show earned rewards and continue with queued activities
+8. WHEN resources are collected THEN the system SHALL add them to the player's inventory
+
+### Requirement 19
+
+**User Story:** As a player, I want each harvest to yield one primary material with a very rare chance for exotic items, so that I have predictable resource collection with exciting rare discoveries.
+
+#### Acceptance Criteria
+
+1. WHEN a player completes a harvesting activity THEN they SHALL receive exactly one primary material
+2. WHEN a harvest completes THEN there SHALL be a base chance of less than 1% to receive an exotic item in addition to the primary material
+3. WHEN a player's harvesting skill level increases THEN their exotic item discovery rate SHALL increase slightly
+4. WHEN different harvesting activities are performed THEN they SHALL have unique exotic item pools appropriate to their category
