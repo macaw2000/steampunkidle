@@ -125,7 +125,7 @@ export const useChat = (options: UseChatOptions = {}) => {
     const targetChannelId = channelId || chatState.activeChannelId;
     if (!targetChannelId) return;
 
-    const channel = chatState.channels.find(c => c.channelId === targetChannelId);
+    const channel = chatState.channels.find((c: ChatChannel) => c.channelId === targetChannelId);
     if (!channel) return;
 
     // Check if it's a slash command
@@ -185,7 +185,7 @@ export const useChat = (options: UseChatOptions = {}) => {
 
     // Load history if enabled and not already loaded
     if (loadHistoryOnChannelChange && !chatState.messages[channelId]) {
-      const channel = chatState.channels.find(c => c.channelId === channelId);
+      const channel = chatState.channels.find((c: ChatChannel) => c.channelId === channelId);
       if (channel) {
         let messageType: 'general' | 'guild' | 'private' = 'general';
         if (channel.type === 'guild') messageType = 'guild';
@@ -237,7 +237,7 @@ export const useChat = (options: UseChatOptions = {}) => {
     const channelId = `private_${[character.userId, recipientId].sort().join('_')}`;
     
     // Check if channel already exists
-    const existingChannel = chatState.channels.find(c => c.channelId === channelId);
+    const existingChannel = chatState.channels.find((c: ChatChannel) => c.channelId === channelId);
     if (existingChannel) {
       dispatch(setActiveChannel(channelId));
       return;
@@ -304,10 +304,10 @@ export const useChat = (options: UseChatOptions = {}) => {
     loadChannelHistory,
     
     // Computed values
-    activeChannel: chatState.channels.find(c => c.channelId === chatState.activeChannelId),
+    activeChannel: chatState.channels.find((c: ChatChannel) => c.channelId === chatState.activeChannelId),
     activeMessages: chatState.activeChannelId ? chatState.messages[chatState.activeChannelId] || [] : [],
-    totalUnreadCount: Object.values(chatState.unreadCounts).reduce((sum, count) => sum + count, 0),
-    hasUnreadMessages: Object.values(chatState.unreadCounts).some(count => count > 0),
+    totalUnreadCount: (Object.values(chatState.unreadCounts) as number[]).reduce((sum: number, count: number) => sum + count, 0),
+    hasUnreadMessages: (Object.values(chatState.unreadCounts) as number[]).some((count: number) => count > 0),
   };
 };
 

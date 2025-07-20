@@ -4,18 +4,21 @@ import { RootState } from '../store/store';
 import { setOnlineStatus } from '../store/slices/gameSlice';
 import ErrorBoundary from './common/ErrorBoundary';
 import FeatureModal from './common/FeatureModal';
+import ResponsiveLayout from './layout/ResponsiveLayout';
+import ResponsiveGrid from './common/ResponsiveGrid';
+import ResponsiveCard from './common/ResponsiveCard';
+import ResponsiveChatInterface from './chat/ResponsiveChatInterface';
 import LoginComponent from './auth/LoginComponent';
 import UserProfile from './auth/UserProfile';
 import CharacterCreation from './character/CharacterCreation';
 import MarketplaceHub from './marketplace/MarketplaceHub';
 import LeaderboardHub from './leaderboard/LeaderboardHub';
-import ChatInterface from './chat/ChatInterface';
 import CharacterPanel from './character/CharacterPanel';
 import HarvestingRewards from './harvesting/HarvestingRewards';
 import HarvestingHub from './harvesting/HarvestingHub';
 
 import GuildManager from './guild/GuildManager';
-import { taskQueueService } from '../services/taskQueueService';
+import { serverTaskQueueService } from '../services/serverTaskQueueService';
 // harvestingService import removed - exotic items now handled by UnifiedProgressBar
 
 
@@ -28,6 +31,7 @@ const GameDashboard: React.FC = () => {
   // Exotic items are now displayed in the unified progress bar - no popups needed
   // Removed currentTaskProgress - now handled by UnifiedProgressBar
   const [queueStatus, setQueueStatus] = useState<any>(null);
+  const [onlinePlayerCount, setOnlinePlayerCount] = useState<number>(0);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
   const { character, hasCharacter, characterLoading, isOnline } = useSelector((state: RootState) => state.game);
 
@@ -159,6 +163,19 @@ const GameDashboard: React.FC = () => {
     }
   };
 
+  // Fetch online player count
+  const fetchOnlinePlayerCount = async () => {
+    try {
+      const response = await fetch('/api/players/online');
+      if (response.ok) {
+        const players = await response.json();
+        setOnlinePlayerCount(players.length);
+      }
+    } catch (error) {
+      console.error('Failed to fetch online player count:', error);
+    }
+  };
+
   useEffect(() => {
     // Set online status when component mounts
     dispatch(setOnlineStatus(true));
@@ -168,35 +185,39 @@ const GameDashboard: React.FC = () => {
       // Progress tracking is now handled by UnifiedProgressBar
       // No need to track progress in GameDashboard anymore
 
-      // Set up task completion listener FIRST before loading queue
-      taskQueueService.onTaskComplete(character.characterId, (result) => {
+      // Set up task completion listener FIRST before syncing with server
+      serverTaskQueueService.onTaskComplete(character.characterId, (result) => {
         // Update queue status after task completion
-        const status = taskQueueService.getQueueStatus(character.characterId);
+        const status = serverTaskQueueService.getQueueStatus(character.characterId);
         setQueueStatus(status);
 
         // Exotic items are now displayed in the unified progress bar - no popups needed
       });
 
-      // Now load the player's task queue to restore idle game state
-      console.log('GameDashboard: Loading task queue for character:', character.characterId);
-      taskQueueService.loadPlayerQueue(character.characterId).then(() => {
-        // Update initial queue status after loading
-        const status = taskQueueService.getQueueStatus(character.characterId);
+      // Sync with server-side task queue to restore idle game state
+      console.log('GameDashboard: Syncing with server task queue for character:', character.characterId);
+      serverTaskQueueService.syncWithServer(character.characterId).then(() => {
+        // Update initial queue status after syncing
+        const status = serverTaskQueueService.getQueueStatus(character.characterId);
         setQueueStatus(status);
       }).catch(error => {
-        console.error('Failed to load task queue:', error);
+        console.error('Failed to sync with server task queue:', error);
       });
     }
+
+    // Fetch initial online player count
+    fetchOnlinePlayerCount();
+
+    // Set up interval to update online player count every 30 seconds
+    const playerCountInterval = setInterval(fetchOnlinePlayerCount, 30000);
 
     // Cleanup when component unmounts
     return () => {
       dispatch(setOnlineStatus(false));
+      clearInterval(playerCountInterval);
       if (character) {
-        // Save task queue state before cleanup
-        taskQueueService.savePlayerQueue(character.characterId).catch(error => {
-          console.error('Failed to save task queue:', error);
-        });
-        taskQueueService.removeCallbacks(character.characterId);
+        // Clean up server sync before component unmount
+        serverTaskQueueService.removeCallbacks(character.characterId);
       }
     };
   }, [dispatch, character]);
@@ -206,7 +227,7 @@ const GameDashboard: React.FC = () => {
     if (!character) return;
 
     const interval = setInterval(() => {
-      const status = taskQueueService.getQueueStatus(character.characterId);
+      const status = serverTaskQueueService.getQueueStatus(character.characterId);
       setQueueStatus(status);
     }, 1000); // Update every second
 
@@ -250,146 +271,108 @@ const GameDashboard: React.FC = () => {
     );
   }
 
+  // Create navigation items for responsive navigation
+  const navigationItems = [
+    { id: 'character', label: 'Character', icon: '👤', onClick: () => handleFeatureAction('Character Panel') },
+    { id: 'resources', label: 'Resources', icon: '⛏️', onClick: () => handleFeatureAction('Resource Harvesting') },
+    { id: 'crafting', label: 'Crafting', icon: '🔧', onClick: () => handleFeatureAction('Crafting System') },
+    { id: 'combat', label: 'Combat', icon: '⚔️', onClick: () => handleFeatureAction('Combat System') },
+    { id: 'guild', label: 'Guild', icon: '🏰', onClick: () => handleFeatureAction('Guild Management') },
+    { id: 'auction', label: 'Auction', icon: '💰', onClick: () => handleFeatureAction('Auction Marketplace') },
+    { id: 'leaderboard', label: 'Leaderboard', icon: '🏆', onClick: () => handleFeatureAction('Leaderboards') },
+    { id: 'profile', label: 'Profile', icon: '⚙️', onClick: () => handleFeatureAction('User Profile') },
+  ];
+
   // Show main game interface if user has a character
   return (
-    <div className="game-dashboard">
-      {/* Header with gear icon */}
-      <div className="dashboard-header">
-        <div className="status-bar">
-          <span className={`online-indicator ${isOnline ? 'online' : 'offline'}`}>
-            {isOnline ? '🟢 Online' : '🔴 Offline'}
-          </span>
+    <ResponsiveLayout
+      sidebar={
+        <div className="game-features-sidebar-content">
+          {/* Player Information Section */}
+          {character && (
+            <div className="player-info-section">
+              <div className="player-name-display">
+                <span className="player-icon">👤</span>
+                <span className="player-name">{character.name}</span>
+              </div>
+              <div className="player-level-display">
+                <span className="level-icon">⭐</span>
+                <span className="level-text">Level {character.level}</span>
+              </div>
+              <div className="online-players-display">
+                <span className="online-icon">🌍</span>
+                <span className="online-text">{onlinePlayerCount} Players Online</span>
+              </div>
+            </div>
+          )}
+          
+          {/* Navigation Section */}
+          <div className="sidebar-navigation">
+            {navigationItems.slice(0, 7).map((item) => (
+              <button
+                key={item.id}
+                className="sidebar-nav-button"
+                onClick={item.onClick}
+                title={item.label}
+              >
+                <span className="nav-icon">{item.icon}</span>
+                <span className="nav-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="header-actions">
-          <button 
-            className="gear-icon-button"
-            onClick={() => handleFeatureAction('User Profile')}
-            title="User Profile & Settings"
+      }
+      className="game-dashboard"
+    >
+      {/* Main Content - Focus on Current Operations Only */}
+      {activeTab === 'dashboard' && (
+        <div className="main-operations-area">
+          <ResponsiveCard
+            title="Current Operations"
+            icon="🔧"
+            size="large"
+            className="operations-card"
           >
-            ⚙️
-          </button>
-        </div>
-      </div>
-
-
-
-      {/* Main Layout with Sidebar */}
-      <div className="dashboard-layout">
-        {/* Left Sidebar - Game Features */}
-        <div className="game-features-sidebar">
-          <ul className="game-features-list-sidebar">
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Character Panel')}>
-              👤 Character
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Resource Harvesting')}>
-              ⛏️ Resources
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Crafting System')}>
-              🔧 Crafting
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Combat System')}>
-              ⚔️ Combat
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Guild Management')}>
-              🏰 Guild
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Auction Marketplace')}>
-              ✅ Auction
-            </li>
-            <li className="game-feature-item-sidebar" onClick={() => handleFeatureAction('Leaderboards')}>
-              🏆 Leaderboard
-            </li>
-          </ul>
-        </div>
-
-        {/* Main Content Area */}
-        <div className="main-content">
-          {activeTab === 'dashboard' && (
-            <>
-              <div className="character-section">
-                {character ? (
-                  <div className="character-info">
-                    <h3>{character.name}</h3>
-                    <p>Level: {character.level}</p>
-                    <p>Experience: {character.experience}</p>
-                    <p>Current Activity: {character.currentActivity?.type || 'None'}</p>
+            {queueStatus && queueStatus.currentTask ? (
+              <div className="current-operations">
+                <div className="current-task-info">
+                  <h4>{queueStatus.currentTask.icon} {queueStatus.currentTask.name}</h4>
+                  <p>{queueStatus.currentTask.description}</p>
+                </div>
+                <div className="queue-summary-compact">
+                  <div className="queue-stat">
+                    <span className="stat-icon">📋</span>
+                    <span>Queued: {queueStatus.queueLength}</span>
                   </div>
-                ) : (
-                  <div className="no-character">
-                    <p>Loading character data...</p>
+                  <div className="queue-stat">
+                    <span className="stat-icon">✅</span>
+                    <span>Completed: {queueStatus.totalCompleted}</span>
                   </div>
-                )}
+                  <div className={`queue-stat status ${queueStatus.isRunning ? 'running' : 'idle'}`}>
+                    <span className="stat-icon">{queueStatus.isRunning ? '🟢' : '⏸️'}</span>
+                    <span>{queueStatus.isRunning ? 'Active' : 'Idle'}</span>
+                  </div>
+                </div>
               </div>
-
-              {/* Live Activity Display */}
-              <div className="live-activity-section">
-                <h3>🔧 Current Operations</h3>
-                {queueStatus && queueStatus.currentTask ? (
-                  <div className="current-task">
-                    <div className="task-info">
-                      <h4>{queueStatus.currentTask.icon} {queueStatus.currentTask.name}</h4>
-                      <p>{queueStatus.currentTask.description}</p>
-                    </div>
-                    
-                    <div className="task-status">
-                      <p><em>Progress will be shown in the unified progress bar</em></p>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="no-active-task">
-                    <p>No active tasks</p>
-                    <p><em>Start an activity from the sidebar to see live progress</em></p>
-                  </div>
-                )}
-                
-                {queueStatus && (
-                  <div className="queue-summary">
-                    <div className="queue-stats">
-                      <span>📋 Queued: {queueStatus.queueLength}</span>
-                      <span>✅ Completed: {queueStatus.totalCompleted}</span>
-                      <span className={`status ${queueStatus.isRunning ? 'running' : 'idle'}`}>
-                        {queueStatus.isRunning ? '🟢 Active' : '⏸️ Idle'}
-                      </span>
-                    </div>
-                    
-                    {queueStatus.queueLength > 0 && (
-                      <div className="queued-tasks">
-                        <h4>📋 Upcoming Tasks:</h4>
-                        <div className="task-list">
-                          {queueStatus.queuedTasks?.slice(0, 5).map((task: any, index: number) => (
-                            <div key={task.id} className="queued-task-item">
-                              <span className="task-position">{index + 1}.</span>
-                              <span className="task-icon">{task.icon}</span>
-                              <span className="task-name">{task.name}</span>
-                            </div>
-                          ))}
-                          {queueStatus.queueLength > 5 && (
-                            <div className="more-tasks">
-                              +{queueStatus.queueLength - 5} more tasks...
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+            ) : (
+              <div className="no-operations">
+                <p>No active tasks</p>
+                <p><em>Start an activity to see live progress</em></p>
               </div>
-            </>
-          )}
-
-          {activeTab === 'marketplace' && (
-            <ErrorBoundary fallback={<div>Marketplace failed to load</div>}>
-              <MarketplaceHub />
-            </ErrorBoundary>
-          )}
-
-
+            )}
+          </ResponsiveCard>
         </div>
-      </div>
+      )}
 
-      {/* Persistent Chat Interface */}
+      {activeTab === 'marketplace' && (
+        <ErrorBoundary fallback={<div>Marketplace failed to load</div>}>
+          <MarketplaceHub />
+        </ErrorBoundary>
+      )}
+
+      {/* Responsive Chat Interface */}
       <ErrorBoundary fallback={<div>Chat failed to load</div>}>
-        <ChatInterface />
+        <ResponsiveChatInterface />
       </ErrorBoundary>
 
       {/* Feature Modal */}
@@ -408,9 +391,7 @@ const GameDashboard: React.FC = () => {
         visible={showRewards}
         onClose={closeRewards}
       />
-
-
-    </div>
+    </ResponsiveLayout>
   );
 };
 

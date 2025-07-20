@@ -4,6 +4,8 @@
 
 import { Character, CharacterStats, CraftingSkillSet, HarvestingSkillSet, CombatSkillSet, CreateCharacterRequest, UpdateCharacterRequest } from '../types/character';
 import { SpecializationService } from './specializationService';
+import { NetworkUtils } from '../utils/networkUtils';
+
 import { v4 as uuidv4 } from 'uuid';
 
 export class CharacterService {
@@ -178,22 +180,27 @@ export class CharacterService {
       return newCharacter;
     }
 
-    // Production mode - call the actual API
-    const response = await fetch('/api/character', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(request),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to create character');
+    // Production mode - call the actual API with network resilience
+    try {
+      const result = await NetworkUtils.postJson('/api/character', request, {
+        timeout: 15000, // 15 seconds for character creation
+        retries: 2,
+        exponentialBackoff: true,
+      });
+      
+      return result.character;
+    } catch (error: any) {
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot create character while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('Character creation timed out - please try again', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error during character creation', { statusCode: error.statusCode });
+        }
+      }
+      throw new Error(error.error || error.message || 'Failed to create character');
     }
-
-    const result = await response.json();
-    return result.character;
   }
 
   /**
@@ -210,22 +217,31 @@ export class CharacterService {
     }
 
     try {
-      const response = await fetch(`/api/character?userId=${userId}`);
+      const result = await NetworkUtils.fetchJson(`/api/character?userId=${userId}`, {}, {
+        timeout: 10000, // 10 seconds
+        retries: 2,
+        exponentialBackoff: true,
+      });
       
-      if (response.status === 404) {
+      return result.character;
+    } catch (error: any) {
+      // Handle 404 as null (no character found)
+      if (error.statusCode === 404) {
         return null;
       }
       
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to get character');
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot load character while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('Character loading timed out - please try again', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error loading character', { statusCode: error.statusCode });
+        }
       }
-
-      const result = await response.json();
-      return result.character;
-    } catch (error) {
+      
       console.error('Error getting character:', error);
-      throw error;
+      throw new Error(error.message || 'Failed to get character');
     }
   }
 
@@ -246,34 +262,49 @@ export class CharacterService {
    * Update character
    */
   static async updateCharacter(userId: string, updates: UpdateCharacterRequest): Promise<Character> {
-    const response = await fetch(`/api/character/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updates),
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to update character');
+    try {
+      const result = await NetworkUtils.putJson(`/api/character/${userId}`, updates, {
+        timeout: 12000, // 12 seconds
+        retries: 2,
+        exponentialBackoff: true,
+      });
+      
+      return result.character;
+    } catch (error: any) {
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot update character while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('Character update timed out - please try again', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error updating character', { statusCode: error.statusCode });
+        }
+      }
+      throw new Error(error.error || error.message || 'Failed to update character');
     }
-
-    const result = await response.json();
-    return result.character;
   }
 
   /**
    * Delete character
    */
   static async deleteCharacter(userId: string): Promise<void> {
-    const response = await fetch(`/api/character/${userId}`, {
-      method: 'DELETE',
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to delete character');
+    try {
+      await NetworkUtils.delete(`/api/character/${userId}`, {
+        timeout: 10000, // 10 seconds
+        retries: 1, // Only retry once for delete operations
+        exponentialBackoff: false,
+      });
+    } catch (error: any) {
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot delete character while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('Character deletion timed out - please try again', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error deleting character', { statusCode: error.statusCode });
+        }
+      }
+      throw new Error(error.error || error.message || 'Failed to delete character');
     }
   }
 

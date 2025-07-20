@@ -1,5 +1,6 @@
 /* Import Steampunk Theme System */
 @import './styles/steampunk-theme.css';
+@import './styles/responsive.css';
 @import './styles/icons.css';
 @import './styles/placeholders.css';
 

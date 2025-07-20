@@ -1,0 +1,339 @@
+/* Responsive Layout Styles */
+
+.responsive-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--steampunk-gradient-primary);
+}
+
+/* Navigation Area */
+.layout-navigation {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: var(--steampunk-gradient-secondary);
+  border-bottom: 2px solid var(--steampunk-primary-light);
+  box-shadow: var(--steampunk-shadow-medium);
+}
+
+/* Main Layout Container */
+.layout-container {
+  flex: 1;
+  display: flex;
+  position: relative;
+  min-height: 0; /* Allow flex children to shrink */
+}
+
+/* Sidebar */
+.layout-sidebar {
+  background: var(--steampunk-gradient-primary);
+  border-right: 2px solid var(--steampunk-primary-light);
+  box-shadow: var(--steampunk-shadow-medium);
+  transition: all 0.3s ease;
+  z-index: 150;
+}
+
+.layout-sidebar.expanded {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.layout-sidebar.collapsed {
+  width: 0;
+  overflow: hidden;
+}
+
+.sidebar-content {
+  width: 280px;
+  height: 100%;
+  overflow-y: auto;
+  padding: var(--steampunk-spacing-md);
+}
+
+.sidebar-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-content::-webkit-scrollbar-thumb {
+  background: var(--steampunk-primary);
+  border-radius: 3px;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+  position: fixed;
+  top: 80px;
+  left: 10px;
+  z-index: 160;
+  background: var(--steampunk-gradient-secondary);
+  border: 2px solid var(--steampunk-primary-light);
+  border-radius: var(--steampunk-radius-medium);
+  color: var(--steampunk-text-primary);
+  padding: var(--steampunk-spacing-sm);
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  min-width: var(--touch-target-comfortable);
+  min-height: var(--touch-target-comfortable);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--steampunk-shadow-medium);
+}
+
+.sidebar-toggle:hover {
+  background: rgba(205, 133, 63, 0.3);
+  transform: translateX(5px);
+}
+
+.toggle-icon {
+  font-size: 1.2rem;
+}
+
+/* Sidebar Overlay (Mobile) */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 140;
+  backdrop-filter: blur(2px);
+}
+
+/* Main Content Area */
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: all 0.3s ease;
+}
+
+.layout-main.with-sidebar.sidebar-expanded {
+  margin-left: 0;
+}
+
+.layout-main.with-sidebar.sidebar-collapsed {
+  margin-left: 0;
+}
+
+.layout-main.full-width {
+  width: 100%;
+}
+
+.main-content {
+  flex: 1;
+  padding: var(--steampunk-spacing-lg);
+  overflow-y: auto;
+  max-width: 100%;
+}
+
+/* Mobile Navigation Spacer */
+.mobile-nav-spacer {
+  height: 70px;
+  flex-shrink: 0;
+}
+
+/* Device-Specific Styles */
+
+/* Desktop Layout */
+.responsive-layout.desktop .layout-container {
+  flex-direction: row;
+}
+
+.responsive-layout.desktop .sidebar-toggle {
+  display: none;
+}
+
+.responsive-layout.desktop .layout-sidebar.expanded {
+  position: static;
+}
+
+.responsive-layout.desktop .main-content {
+  padding: var(--steampunk-spacing-xl);
+}
+
+/* Tablet Layout */
+.responsive-layout.tablet .layout-container {
+  flex-direction: row;
+}
+
+.responsive-layout.tablet .layout-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 150;
+}
+
+.responsive-layout.tablet .layout-sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+.responsive-layout.tablet .layout-sidebar.expanded {
+  transform: translateX(0);
+}
+
+.responsive-layout.tablet .main-content {
+  padding: var(--steampunk-spacing-lg);
+}
+
+/* Mobile Layout */
+.responsive-layout.mobile .layout-container {
+  flex-direction: column;
+}
+
+.responsive-layout.mobile .layout-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  z-index: 150;
+  width: 100% !important;
+}
+
+.responsive-layout.mobile .layout-sidebar.collapsed {
+  transform: translateX(-100%);
+}
+
+.responsive-layout.mobile .layout-sidebar.expanded {
+  transform: translateX(0);
+}
+
+.responsive-layout.mobile .sidebar-content {
+  width: 100%;
+  padding: var(--steampunk-spacing-md);
+}
+
+.responsive-layout.mobile .main-content {
+  padding: var(--steampunk-spacing-md);
+}
+
+.responsive-layout.mobile .sidebar-toggle {
+  top: 70px;
+}
+
+/* Responsive Breakpoints */
+
+/* Large screens and up */
+@media (min-width: 1200px) {
+  .layout-sidebar.expanded {
+    width: 320px;
+  }
+  
+  .sidebar-content {
+    width: 320px;
+    padding: var(--steampunk-spacing-lg);
+  }
+  
+  .main-content {
+    padding: var(--steampunk-spacing-xl);
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* Medium screens */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .layout-sidebar.expanded {
+    width: 260px;
+  }
+  
+  .sidebar-content {
+    width: 260px;
+  }
+}
+
+/* Small screens */
+@media (max-width: 767.98px) {
+  .layout-navigation {
+    position: relative; /* Don't stick on mobile */
+  }
+  
+  .main-content {
+    padding: var(--steampunk-spacing-sm);
+  }
+  
+  .sidebar-toggle {
+    top: 10px;
+    left: 10px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 575.98px) {
+  .main-content {
+    padding: var(--steampunk-spacing-xs);
+  }
+  
+  .mobile-nav-spacer {
+    height: 60px;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .layout-sidebar {
+    width: 60% !important;
+  }
+  
+  .sidebar-content {
+    width: 100%;
+  }
+  
+  .sidebar-toggle {
+    top: 5px;
+  }
+  
+  .main-content {
+    padding: var(--steampunk-spacing-sm);
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .layout-sidebar {
+    border-right-width: 3px;
+  }
+  
+  .sidebar-toggle {
+    border-width: 3px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .layout-sidebar,
+  .layout-main,
+  .sidebar-toggle {
+    transition: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .layout-navigation,
+  .sidebar-toggle,
+  .sidebar-overlay {
+    display: none !important;
+  }
+  
+  .layout-sidebar {
+    display: none !important;
+  }
+  
+  .layout-main {
+    margin: 0 !important;
+  }
+  
+  .main-content {
+    padding: 0 !important;
+  }
+}

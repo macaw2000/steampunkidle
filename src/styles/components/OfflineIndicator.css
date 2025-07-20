@@ -1,0 +1,92 @@
+/**
+ * Offline indicator styles
+ */
+
+.offline-indicator {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  animation: pulse-offline 2s infinite;
+}
+
+.offline-indicator__content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.offline-indicator__icon {
+  display: flex;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.offline-indicator__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.offline-indicator__status {
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.offline-indicator__duration {
+  font-size: 0.75rem;
+  opacity: 0.8;
+}
+
+.offline-indicator__message {
+  margin-top: 4px;
+  font-size: 0.75rem;
+  opacity: 0.9;
+  font-style: italic;
+}
+
+/* Compact version */
+.offline-indicator--compact {
+  padding: 4px 8px;
+  font-size: 0.75rem;
+}
+
+.offline-indicator--compact .offline-indicator__message {
+  display: none;
+}
+
+/* Pulse animation */
+@keyframes pulse-offline {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+/* Position variants */
+.offline-indicator--fixed-top {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+.offline-indicator--fixed-bottom {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  z-index: 1000;
+}
+
+/* Dark theme support */
+@media (prefers-color-scheme: dark) {
+  .offline-indicator {
+    background: linear-gradient(135deg, #d63031, #b71c1c);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}

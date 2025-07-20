@@ -85,7 +85,7 @@ const UserProfile: React.FC = () => {
           <div className="detail-section">
             <h4>Connected Accounts</h4>
             <div className="social-providers">
-              {user.socialProviders.map((provider, index) => (
+              {user.socialProviders.map((provider: string, index: number) => (
                 <div key={index} className="provider-item">
                   <span className="provider-icon">
                     {getSocialProviderIcon(provider)}

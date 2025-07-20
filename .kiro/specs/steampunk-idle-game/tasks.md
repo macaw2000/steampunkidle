@@ -2,8 +2,9 @@
 
 - [x] 1. Set up project infrastructure and core configuration
   - Create React application with TypeScript and required dependencies
-  - Set up AWS CDK infrastructure code for serverless backend
+  - Set up AWS CDK infrastructure code for hybrid serverless-container backend
   - Configure development environment with LocalStack for local testing
+  - Add ECS Fargate infrastructure for continuous game engine processing
   - _Requirements: 7.1, 7.2, 7.3_
 
 - [x] 2. Implement authentication system
@@ -19,6 +20,14 @@
     - Add authentication state management to Redux store
     - Write tests for authentication components
     - _Requirements: 1.1, 1.2, 1.3, 1.5_
+
+  - [ ] 2.3 Implement mandatory character creation flow
+    - Create character creation redirect logic for first-time users
+    - Build character name uniqueness validation API endpoint
+    - Implement real-time name validation in character creation form
+    - Add character creation prevention of game access until completion
+    - Write tests for mandatory character creation flow
+    - _Requirements: 16.1, 16.2, 16.3, 16.4, 16.5_
 
 - [x] 3. Create core data models and database schema
   - [x] 3.1 Define TypeScript interfaces for all game entities
@@ -49,6 +58,14 @@
     - Write tests for specialization calculation logic
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5_
 
+  - [ ] 4.3 Build enhanced character panel with detailed attributes
+    - Create responsive modal character panel that adapts to screen sizes
+    - Implement detailed character attribute display with stats and skills
+    - Add inventory display with item rarity color coding
+    - Build specialization progress visualization with Steampunk theming
+    - Write tests for character panel responsiveness and functionality
+    - _Requirements: 19.1, 19.2, 19.3, 19.4, 19.5_
+
 - [x] 5. Build activity system (crafting, harvesting, combat)
   - [x] 5.1 Create activity switching mechanism
 
@@ -76,21 +93,54 @@
     - Write tests for harvesting and combat functionality
     - _Requirements: 3.4, 3.5_
 
-- [x] 6. Implement idle progression system
-  - [x] 6.1 Create offline progress calculation engine
-    - Build Lambda function for calculating offline progress
-    - Implement progress calculation based on selected activity and stats
-    - Create EventBridge scheduled events for progress updates
-    - Add progress notification system
-    - Write tests for offline progress accuracy
+  - [ ] 5.4 Implement enhanced harvesting system with predictable rewards
+    - Create guaranteed primary material collection for each harvest action
+    - Implement exotic item discovery system with <1% base chance
+    - Build activity-specific exotic item pools for different harvesting types
+    - Add skill progression impact on exotic discovery rates
+    - Write tests for harvesting reward mechanics and drop rates
+    - _Requirements: 17.1, 17.2, 17.3, 17.4, 17.5_
+
+  - [ ] 5.5 Build enhanced harvesting interface with flexible controls
+    - Create immediate access harvesting interface without navigation delays
+    - Implement number input for harvest rounds with infinite default option
+    - Add "Start Harvesting" and "Add to Queue" button functionality
+    - Build activity queuing system for sequential harvesting tasks
+    - Add real-time progress feedback and completion notifications
+    - Write tests for harvesting interface and queuing functionality
+    - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
+
+- [x] 6. Implement Fargate-based continuous game engine
+  - [ ] 6.1 Build containerized game engine for ECS Fargate
+    - Create Node.js Express application for continuous task processing
+    - Implement in-memory task queue management with database persistence
+    - Add health check endpoints and graceful shutdown handling
+    - Build RESTful API for task queue management and player synchronization
+    - Write unit tests for game engine core functionality
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [x] 6.2 Build real-time progress display
-    - Create React components for live progress tracking
-    - Implement WebSocket connection for real-time updates
-    - Add progress animations and visual feedback
-    - Build notification system for achievements and unlocks
-    - Write tests for real-time progress functionality
+  - [ ] 6.2 Implement ECS Fargate infrastructure with auto-scaling
+    - Create CDK infrastructure for ECS cluster and Fargate service
+    - Configure Application Load Balancer with health checks
+    - Implement auto-scaling based on CPU and memory utilization
+    - Add CloudWatch logging and monitoring for container instances
+    - Write infrastructure tests for Fargate deployment and scaling
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+
+  - [ ] 6.3 Build task queue processing and reward system
+    - Implement continuous task processing every second for all active players
+    - Create reward generation system for harvesting, combat, and crafting tasks
+    - Add character stat updates and experience/currency distribution
+    - Build task completion notifications and progress tracking
+    - Write tests for task processing accuracy and reward distribution
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5_
+
+  - [ ] 6.4 Integrate frontend with Fargate game engine
+    - Create React service layer for communicating with game engine API
+    - Implement real-time task queue status updates and progress display
+    - Add task queue management UI for starting, stopping, and queuing activities
+    - Build progress animations and visual feedback for continuous processing
+    - Write tests for frontend-backend integration and real-time updates
     - _Requirements: 4.1, 4.3, 4.5_
 
 - [x] 7. Implement guild system
@@ -207,11 +257,18 @@
     - Build themed representations for character classes and items
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
 
-  - [x] 12.2 Make application responsive
-    - Implement responsive design for desktop, tablet, and mobile
-    - Add touch-friendly interactions for mobile devices
-    - Optimize performance and rendering for different devices
-    - Test responsive behavior across various screen sizes
+  - [x] 12.2 Implement comprehensive responsive design
+
+
+
+
+
+    - Create responsive layouts for desktop, tablet, and mobile experiences
+    - Build touch-friendly controls with appropriate sizing for mobile devices
+    - Implement adaptive navigation (horizontal menus to hamburger/bottom nav)
+    - Add collapsible chat panels and swipe gestures for mobile
+    - Optimize performance and rendering for different hardware capabilities
+    - Write tests for responsive behavior across various screen sizes
     - _Requirements: 15.1, 15.2, 15.3, 15.4, 15.5_
 
 - [x] 13. Complete missing Lambda function implementations
@@ -269,25 +326,23 @@
 
 
 
-  - [x] 15.1 Conduct end-to-end testing
-
-
-
-    - Write Cypress E2E tests for authentication and character creation flows
+  - [ ] 15.1 Conduct comprehensive end-to-end testing
+    - Write Cypress E2E tests for authentication and mandatory character creation flows
+    - Test enhanced harvesting system with predictable rewards and exotic discoveries
+    - Validate Fargate game engine continuous processing and task queue management
+    - Test responsive design across desktop, tablet, and mobile devices
+    - Verify enhanced character panel functionality and inventory display
     - Test real-time features like chat, party coordination, and progress updates
-    - Validate idle progression accuracy and offline calculation logic
-    - Test auction system integrity, bidding, and currency transactions
+    - Validate auction system integrity, bidding, and currency transactions
     - Verify guild management, invitations, and member permissions
     - Test zone/dungeon creation, joining, and completion flows
     - _Requirements: All requirements validation_
 
-  - [x] 15.2 Performance optimization and final deployment
-
-
-    - Optimize DynamoDB queries and add appropriate indexes
-    - Implement Lambda function performance tuning and memory optimization
+  - [ ] 15.2 Performance optimization and final deployment
+    - Optimize DynamoDB queries and add appropriate indexes for new features
+    - Implement Fargate service performance tuning and resource optimization
     - Add caching strategies for leaderboards and frequently accessed data
-    - Conduct load testing for concurrent users and real-time features
-    - Set up production monitoring and alerting before deployment
-    - Deploy to production with health checks and rollback readiness
+    - Conduct load testing for concurrent users, real-time features, and Fargate scaling
+    - Set up production monitoring for both Lambda functions and Fargate containers
+    - Deploy to production with health checks, auto-scaling, and rollback readiness
     - _Requirements: 7.2, 7.3, 8.3, 8.4_

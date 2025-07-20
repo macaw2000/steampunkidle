@@ -95,6 +95,7 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
   const [timeRemaining, setTimeRemaining] = useState(0);
   const [queueStatus, setQueueStatus] = useState<any>(null);
   const [recentItems, setRecentItems] = useState<any[]>([]);
+  const [showMockProgress, setShowMockProgress] = useState(false);
 
   useEffect(() => {
     // Set up progress tracking
@@ -149,6 +150,72 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
     setQueueStatus(initialStatus);
     setCurrentTask(initialStatus.currentTask);
 
+    // Add mock progress for development if no real tasks
+    if (!initialStatus.currentTask && process.env.NODE_ENV === 'development') {
+      console.log('UnifiedProgressBar: No active tasks found, showing mock progress for development');
+      setShowMockProgress(true);
+      
+      // Create mock task
+      const mockTask = {
+        id: 'mock-task-1',
+        name: 'Reading Jules Verne Novels',
+        icon: '📚',
+        description: 'Immersing in steampunk literature'
+      };
+      setCurrentTask(mockTask);
+      
+      // Simulate progress
+      let mockProgress = 0;
+      let isCompleting = false;
+      const mockInterval = setInterval(() => {
+        if (!isCompleting) {
+          mockProgress += 0.01; // 1% per 100ms = 10 seconds total
+          if (mockProgress >= 1) {
+            isCompleting = true;
+            setProgress(1); // Ensure it shows 100%
+            setTimeRemaining(0);
+            
+            // Add mock rewards
+            setRecentItems(prev => {
+              const newItem = {
+                id: `mock-item-${Date.now()}`,
+                type: 'resource',
+                itemId: 'book_page',
+                quantity: Math.floor(Math.random() * 3) + 1,
+                rarity: 'common',
+                isRare: Math.random() < 0.2,
+                timestamp: Date.now()
+              };
+              const updated = [...prev, newItem].slice(-10);
+              
+              // Remove after 8 seconds
+              setTimeout(() => {
+                setRecentItems(current => current.filter(item => item.id !== newItem.id));
+              }, 8000);
+              
+              return updated;
+            });
+            
+            // Wait 1 second at 100%, then reset to 0 and start new task
+            setTimeout(() => {
+              mockProgress = 0; // Reset mock progress first
+              setProgress(0);   // Then set display progress to 0
+              setTimeRemaining(10000);
+              isCompleting = false;
+            }, 1000);
+          } else {
+            setProgress(mockProgress);
+            setTimeRemaining((1 - mockProgress) * 10000); // 10 seconds total
+          }
+        }
+      }, 100);
+      
+      return () => {
+        clearInterval(mockInterval);
+        clearInterval(interval);
+      };
+    }
+
     return () => {
       // Clean up callbacks
       serverTaskQueueService.removeCallbacks(playerId);
@@ -171,7 +238,10 @@ const UnifiedProgressBar: React.FC<UnifiedProgressBarProps> = ({ playerId }) => 
       <div className="progress-main">
         <div className="task-info">
           <span className="task-icon">{currentTask.icon}</span>
-          <span className="task-name">{currentTask.name}</span>
+          <span className="task-name">
+            {currentTask.name}
+            {showMockProgress && <span className="mock-indicator"> (Demo)</span>}
+          </span>
           <span className="task-time">{Math.ceil(timeRemaining / 1000)}s</span>
         </div>
         

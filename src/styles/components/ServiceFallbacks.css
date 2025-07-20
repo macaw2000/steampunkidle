@@ -1,0 +1,269 @@
+/**
+ * Service Fallback Component Styles
+ * Provides consistent styling for service unavailable states
+ */
+
+/* Service Fallback Base Styles */
+.service-fallback {
+  padding: 20px;
+  margin: 16px 0;
+  border: 1px solid var(--color-border-light, #e9ecef);
+  border-radius: 8px;
+  background-color: var(--color-background-secondary, #f8f9fa);
+  text-align: center;
+  font-family: var(--font-family, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif);
+}
+
+.service-fallback__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.service-fallback__icon {
+  color: var(--color-text-muted, #6c757d);
+  opacity: 0.7;
+}
+
+.service-fallback__icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.service-fallback__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+}
+
+.service-fallback__message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+  line-height: 1.5;
+}
+
+.service-fallback__retry-button {
+  padding: 8px 16px;
+  border: 1px solid var(--color-primary, #007bff);
+  border-radius: 4px;
+  background-color: var(--color-primary, #007bff);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.service-fallback__retry-button:hover {
+  background-color: var(--color-primary-dark, #0056b3);
+  border-color: var(--color-primary-dark, #0056b3);
+}
+
+.service-fallback__retry-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.service-fallback__additional {
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Auth Service Fallback */
+.auth-fallback-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.auth-fallback__login-button {
+  padding: 8px 16px;
+  border: 1px solid var(--color-secondary, #6c757d);
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--color-secondary, #6c757d);
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.auth-fallback__login-button:hover {
+  background-color: var(--color-secondary, #6c757d);
+  color: white;
+}
+
+/* Game Engine Fallback */
+.game-engine-fallback-info {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-info-light, #e7f3ff);
+  border: 1px solid var(--color-info, #007bff);
+  border-radius: 4px;
+}
+
+.game-engine-fallback__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-info-dark, #004085);
+}
+
+/* Network Fallback */
+.network-fallback-info {
+  width: 100%;
+  padding: 12px;
+  background-color: var(--color-warning-light, #fff3cd);
+  border: 1px solid var(--color-warning, #ffc107);
+  border-radius: 4px;
+}
+
+.network-fallback__note {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-warning-dark, #856404);
+}
+
+/* Loading Fallback */
+.loading-fallback {
+  padding: 20px;
+  text-align: center;
+}
+
+.loading-fallback__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.loading-fallback__spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--color-border-light, #e9ecef);
+  border-top: 2px solid var(--color-primary, #007bff);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-fallback__message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+}
+
+/* Empty State Fallback */
+.empty-state-fallback {
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.empty-state-fallback__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.empty-state-fallback__icon {
+  font-size: 32px;
+  opacity: 0.6;
+}
+
+.empty-state-fallback__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary, #212529);
+}
+
+.empty-state-fallback__message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary, #6c757d);
+  line-height: 1.5;
+}
+
+.empty-state-fallback__action {
+  padding: 10px 20px;
+  border: 1px solid var(--color-primary, #007bff);
+  border-radius: 4px;
+  background-color: var(--color-primary, #007bff);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.empty-state-fallback__action:hover {
+  background-color: var(--color-primary-dark, #0056b3);
+  border-color: var(--color-primary-dark, #0056b3);
+}
+
+/* Compact variants for smaller spaces */
+.service-fallback--compact {
+  padding: 12px;
+  margin: 8px 0;
+}
+
+.service-fallback--compact .service-fallback__content {
+  gap: 8px;
+}
+
+.service-fallback--compact .service-fallback__title {
+  font-size: 14px;
+}
+
+.service-fallback--compact .service-fallback__message {
+  font-size: 12px;
+}
+
+.service-fallback--compact .service-fallback__retry-button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* Inline variants */
+.service-fallback--inline {
+  display: inline-block;
+  padding: 8px 12px;
+  margin: 0 4px;
+  border-radius: 4px;
+  background-color: var(--color-warning-light, #fff3cd);
+  border: 1px solid var(--color-warning, #ffc107);
+  text-align: left;
+}
+
+.service-fallback--inline .service-fallback__content {
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.service-fallback--inline .service-fallback__icon {
+  font-size: 14px;
+}
+
+.service-fallback--inline .service-fallback__title,
+.service-fallback--inline .service-fallback__message {
+  font-size: 12px;
+  margin: 0;
+}

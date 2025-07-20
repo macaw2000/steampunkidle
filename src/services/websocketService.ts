@@ -4,6 +4,8 @@
 
 import { ActivityProgress } from './activityService';
 import { GameNotification } from './notificationService';
+import { NetworkUtils } from '../utils/networkUtils';
+import { offlineService } from './offlineService';
 
 export interface BaseWebSocketMessage {
   type: 'progress_update' | 'notification' | 'achievement' | 'level_up' | 'connection_status';
@@ -89,8 +91,15 @@ export class WebSocketService {
    */
   connect(userId: string): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Check if already connected
       if (this.socket?.readyState === WebSocket.OPEN) {
         resolve();
+        return;
+      }
+
+      // Check if offline
+      if (offlineService.isOffline()) {
+        reject(NetworkUtils.createNetworkError('Cannot connect to WebSocket while offline', { isOffline: true }));
         return;
       }
 
@@ -118,7 +127,19 @@ export class WebSocketService {
       try {
         this.socket = new WebSocket(wsUrl);
 
+        // Set connection timeout
+        const connectionTimeout = setTimeout(() => {
+          if (this.isConnecting) {
+            this.isConnecting = false;
+            if (this.socket) {
+              this.socket.close();
+            }
+            reject(NetworkUtils.createNetworkError('WebSocket connection timeout', { isTimeout: true }));
+          }
+        }, 10000); // 10 second timeout
+
         this.socket.onopen = () => {
+          clearTimeout(connectionTimeout);
           console.log('WebSocket connected');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
@@ -136,21 +157,31 @@ export class WebSocketService {
         };
 
         this.socket.onclose = (event) => {
+          clearTimeout(connectionTimeout);
           console.log('WebSocket disconnected:', event.code, event.reason);
           this.isConnecting = false;
           this.notifyConnectionStatus(false);
           
-          // Attempt to reconnect if not a clean close
-          if (event.code !== 1000 && this.reconnectAttempts < this.maxReconnectAttempts) {
+          // Attempt to reconnect if not a clean close and not offline
+          if (event.code !== 1000 && 
+              this.reconnectAttempts < this.maxReconnectAttempts && 
+              !offlineService.isOffline()) {
             this.scheduleReconnect(userId);
           }
         };
 
         this.socket.onerror = (error) => {
+          clearTimeout(connectionTimeout);
           console.error('WebSocket error:', error);
           this.isConnecting = false;
           this.notifyConnectionStatus(false);
-          reject(error);
+          
+          // Create appropriate network error
+          const networkError = NetworkUtils.createNetworkError(
+            'WebSocket connection failed',
+            { isOffline: offlineService.isOffline() }
+          );
+          reject(networkError);
         };
 
       } catch (error) {
@@ -235,14 +266,25 @@ export class WebSocketService {
    */
   private scheduleReconnect(userId: string): void {
     this.reconnectAttempts++;
-    const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
+    const delay = NetworkUtils.calculateRetryDelay(this.reconnectAttempts, this.reconnectDelay, true);
     
-    console.log(`Scheduling reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
+    console.log(`Scheduling WebSocket reconnect attempt ${this.reconnectAttempts} in ${delay}ms`);
     
-    setTimeout(() => {
+    setTimeout(async () => {
       if (this.reconnectAttempts <= this.maxReconnectAttempts) {
+        // Check if we're still offline before attempting reconnection
+        if (offlineService.isOffline()) {
+          console.log('Still offline, waiting for network before reconnecting WebSocket');
+          try {
+            await offlineService.waitForOnline(30000); // Wait up to 30 seconds
+            console.log('Network is back, attempting WebSocket reconnection');
+          } catch (error) {
+            console.warn('Timeout waiting for network, will try reconnecting anyway');
+          }
+        }
+        
         this.connect(userId).catch(error => {
-          console.error('Reconnection failed:', error);
+          console.error('WebSocket reconnection failed:', error);
         });
       }
     }, delay);

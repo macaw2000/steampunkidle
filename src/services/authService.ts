@@ -10,6 +10,8 @@ import {
   resetPassword,
   confirmResetPassword
 } from 'aws-amplify/auth';
+import { NetworkUtils, NetworkError } from '../utils/networkUtils';
+import { offlineService } from './offlineService';
 
 // Check if we're in development mode without Cognito configured
 const isDevelopmentMode = () => {
@@ -296,23 +298,21 @@ class AuthService {
 
   // Refresh access token
   async refreshToken(refreshToken: string): Promise<AuthTokens> {
+    // Check if offline
+    if (offlineService.isOffline()) {
+      throw NetworkUtils.createNetworkError('Cannot refresh token while offline', { isOffline: true });
+    }
+
     try {
-      const response = await fetch(`${this.apiUrl}/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          refreshToken,
-          clientId: process.env.REACT_APP_USER_POOL_CLIENT_ID,
-        }),
+      const data = await NetworkUtils.postJson(`${this.apiUrl}/auth/refresh`, {
+        refreshToken,
+        clientId: process.env.REACT_APP_USER_POOL_CLIENT_ID,
+      }, {
+        timeout: 15000, // 15 seconds for auth operations
+        retries: 2,
+        exponentialBackoff: true,
       });
 
-      if (!response.ok) {
-        throw new Error('Token refresh failed');
-      }
-
-      const data = await response.json();
       return {
         accessToken: data.accessToken,
         idToken: data.idToken,
@@ -320,8 +320,17 @@ class AuthService {
         expiresIn: data.expiresIn,
         tokenType: 'Bearer',
       };
-    } catch (error) {
-      throw new Error(`Token refresh failed: ${error}`);
+    } catch (error: any) {
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot refresh token while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('Token refresh timed out - please check your connection', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error during token refresh - please try again', { statusCode: error.statusCode });
+        }
+      }
+      throw new Error(`Token refresh failed: ${error.message || error}`);
     }
   }
 
@@ -336,21 +345,32 @@ class AuthService {
     }
 
     try {
-      // Call our backend logout endpoint
-      await fetch(`${this.apiUrl}/auth/logout`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ accessToken }),
-      });
+      // Call our backend logout endpoint with network resilience
+      await NetworkUtils.postJson(`${this.apiUrl}/auth/logout`, 
+        { accessToken },
+        {
+          timeout: 10000, // 10 seconds
+          retries: 1, // Only retry once for logout
+          exponentialBackoff: false,
+        }
+      );
 
       // Sign out from Cognito
       await signOut();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Logout error:', error);
+      
       // Even if backend call fails, still sign out locally
-      await signOut();
+      // This ensures user is logged out even if network is unavailable
+      try {
+        await signOut();
+      } catch (signOutError) {
+        console.error('Local sign out also failed:', signOutError);
+        // Clear local storage as fallback
+        if (typeof window !== 'undefined' && window.localStorage) {
+          localStorage.removeItem('mockAuthSession');
+        }
+      }
     }
   }
 
@@ -374,23 +394,29 @@ class AuthService {
 
   // Sync user data with our backend
   private async syncUserWithBackend(accessToken: string): Promise<User> {
-    const response = await fetch(`${this.apiUrl}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
+    try {
+      const data = await NetworkUtils.postJson(`${this.apiUrl}/auth/login`, {
         accessToken,
         userPoolId: process.env.REACT_APP_USER_POOL_ID,
-      }),
-    });
+      }, {
+        timeout: 15000, // 15 seconds for auth operations
+        retries: 2,
+        exponentialBackoff: true,
+      });
 
-    if (!response.ok) {
-      throw new Error('Failed to sync user with backend');
+      return data.user;
+    } catch (error: any) {
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          throw NetworkUtils.createNetworkError('Cannot sync user data while offline', { isOffline: true });
+        } else if (error.isTimeout) {
+          throw NetworkUtils.createNetworkError('User sync timed out - please check your connection', { isTimeout: true });
+        } else {
+          throw NetworkUtils.createNetworkError('Network error during user sync - please try again', { statusCode: error.statusCode });
+        }
+      }
+      throw new Error(`Failed to sync user with backend: ${error.message || error}`);
     }
-
-    const data = await response.json();
-    return data.user;
   }
 
   // Check if token is expired

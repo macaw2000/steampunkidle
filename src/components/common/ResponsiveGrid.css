@@ -1,0 +1,206 @@
+/* Responsive Grid Styles */
+
+.responsive-grid {
+  display: grid;
+  width: 100%;
+}
+
+/* Gap Sizes */
+.responsive-grid.gap-xs {
+  gap: var(--steampunk-spacing-xs);
+}
+
+.responsive-grid.gap-sm {
+  gap: var(--steampunk-spacing-sm);
+}
+
+.responsive-grid.gap-md {
+  gap: var(--steampunk-spacing-md);
+}
+
+.responsive-grid.gap-lg {
+  gap: var(--steampunk-spacing-lg);
+}
+
+.responsive-grid.gap-xl {
+  gap: var(--steampunk-spacing-xl);
+}
+
+/* Auto-fit Grid */
+.responsive-grid.auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(var(--min-item-width, 250px), 1fr));
+}
+
+/* Fixed Columns Grid */
+.responsive-grid.fixed-columns {
+  grid-template-columns: repeat(var(--columns-xs, 1), 1fr);
+}
+
+/* Equal Height Items */
+.responsive-grid.equal-height > * {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Responsive Breakpoints for Fixed Columns */
+
+/* Small devices (576px and up) */
+@media (min-width: 576px) {
+  .responsive-grid.fixed-columns {
+    grid-template-columns: repeat(var(--columns-sm, 2), 1fr);
+  }
+}
+
+/* Medium devices (768px and up) */
+@media (min-width: 768px) {
+  .responsive-grid.fixed-columns {
+    grid-template-columns: repeat(var(--columns-md, 3), 1fr);
+  }
+}
+
+/* Large devices (1024px and up) */
+@media (min-width: 1024px) {
+  .responsive-grid.fixed-columns {
+    grid-template-columns: repeat(var(--columns-lg, 4), 1fr);
+  }
+}
+
+/* Extra large devices (1200px and up) */
+@media (min-width: 1200px) {
+  .responsive-grid.fixed-columns {
+    grid-template-columns: repeat(var(--columns-xl, 5), 1fr);
+  }
+}
+
+/* Auto-fit responsive adjustments */
+@media (max-width: 575.98px) {
+  .responsive-grid.auto-fit {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .responsive-grid.auto-fit {
+    grid-template-columns: repeat(auto-fit, minmax(min(var(--min-item-width, 250px), 100%), 1fr));
+  }
+}
+
+/* Utility Classes for Common Grid Patterns */
+
+/* Two Column Grid */
+.grid-2-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--steampunk-spacing-md);
+}
+
+/* Three Column Grid */
+.grid-3-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--steampunk-spacing-md);
+}
+
+/* Four Column Grid */
+.grid-4-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--steampunk-spacing-md);
+}
+
+/* Sidebar Layout Grid */
+.grid-sidebar {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: var(--steampunk-spacing-lg);
+}
+
+/* Main-Aside Layout Grid */
+.grid-main-aside {
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: var(--steampunk-spacing-lg);
+}
+
+/* Responsive adjustments for utility grids */
+@media (max-width: 767.98px) {
+  .grid-2-col,
+  .grid-3-col,
+  .grid-4-col {
+    grid-template-columns: 1fr;
+  }
+  
+  .grid-sidebar,
+  .grid-main-aside {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .grid-3-col,
+  .grid-4-col {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .grid-sidebar {
+    grid-template-columns: 240px 1fr;
+  }
+  
+  .grid-main-aside {
+    grid-template-columns: 1fr 240px;
+  }
+}
+
+/* Masonry-like Grid (for cards with varying heights) */
+.grid-masonry {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-auto-rows: min-content;
+  gap: var(--steampunk-spacing-md);
+}
+
+/* Dense Grid (fills gaps) */
+.grid-dense {
+  grid-auto-flow: dense;
+}
+
+/* Centered Grid */
+.grid-centered {
+  justify-content: center;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Full Width Grid */
+.grid-full-width {
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+/* Responsive spacing adjustments */
+@media (max-width: 575.98px) {
+  .responsive-grid.gap-md {
+    gap: var(--steampunk-spacing-sm);
+  }
+  
+  .responsive-grid.gap-lg {
+    gap: var(--steampunk-spacing-md);
+  }
+  
+  .responsive-grid.gap-xl {
+    gap: var(--steampunk-spacing-lg);
+  }
+}
+
+/* Print styles */
+@media print {
+  .responsive-grid {
+    display: block;
+  }
+  
+  .responsive-grid > * {
+    break-inside: avoid;
+    margin-bottom: 1rem;
+  }
+}

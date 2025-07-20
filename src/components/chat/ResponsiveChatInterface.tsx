@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import './ChatInterface.css';
+import './ResponsiveChatInterface.css';
 
 interface ChatMessage {
   id: string;
@@ -14,20 +14,45 @@ interface ChatMessage {
 
 type ChatChannel = 'global' | 'guild' | 'trade' | 'help';
 
-const ChatInterface: React.FC = () => {
+const ResponsiveChatInterface: React.FC = () => {
   const { character } = useSelector((state: RootState) => state.game);
   const [activeChannel, setActiveChannel] = useState<ChatChannel>('global');
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputMessage, setInputMessage] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number>(0);
+  const touchStartY = useRef<number>(0);
 
-  // Mock messages for development - Extended history for scrolling
+  // Check device type and sidebar state
+  useEffect(() => {
+    const checkDeviceType = () => {
+      const width = window.innerWidth;
+      const mobile = width < 768;
+      const desktop = width >= 1024;
+      
+      setIsMobile(mobile);
+      setIsDesktop(desktop);
+      
+      // Auto-collapse on mobile initially
+      if (mobile && !isCollapsed) {
+        setIsCollapsed(true);
+      }
+    };
+
+    checkDeviceType();
+    window.addEventListener('resize', checkDeviceType);
+    return () => window.removeEventListener('resize', checkDeviceType);
+  }, [isCollapsed]);
+
+  // Mock messages for development
   const generateMockMessages = (): ChatMessage[] => {
     const mockMessages: ChatMessage[] = [];
     const now = Date.now();
     
-    // Generate more messages for better scrolling experience
     const globalMessages = [
       { sender: 'System', content: 'Welcome to the Steam Telegraph Network!', type: 'system' as const, time: 1800000 },
       { sender: 'VictorianEngineer', content: 'Good morning, fellow inventors!', type: 'user' as const, time: 1740000 },
@@ -37,102 +62,42 @@ const ChatInterface: React.FC = () => {
       { sender: 'System', content: 'ClockworkTinker reached level 15!', type: 'achievement' as const, time: 1500000 },
       { sender: 'GearMaster', content: 'Anyone know where to find Steam Crystals?', type: 'user' as const, time: 1440000 },
       { sender: 'ClockworkQueen', content: 'Try the mining zones in the eastern districts!', type: 'user' as const, time: 1380000 },
-      { sender: 'VictorianEngineer', content: 'The northern mines have better quality crystals', type: 'user' as const, time: 1320000 },
-      { sender: 'SteamMaster', content: 'Thanks for the tips everyone!', type: 'user' as const, time: 1260000 },
-      { sender: 'System', content: 'SteamPunk87 reached level 20!', type: 'achievement' as const, time: 1200000 },
-      { sender: 'BrassFoundry', content: 'Congratulations SteamPunk87!', type: 'user' as const, time: 1140000 },
-      { sender: 'ClockworkTinker', content: 'Well done! What build are you using?', type: 'user' as const, time: 1080000 },
-      { sender: 'GearMaster', content: 'The harvesting rates seem improved today', type: 'user' as const, time: 1020000 },
-      { sender: 'ClockworkQueen', content: 'I noticed that too! Found 3 rare items already', type: 'user' as const, time: 960000 },
-      { sender: 'VictorianEngineer', content: 'Lucky! I\'ve been searching all morning', type: 'user' as const, time: 900000 },
-      { sender: 'SteamMaster', content: 'Patience is key with rare finds', type: 'user' as const, time: 840000 },
-      { sender: 'BrassFoundry', content: 'Anyone interested in forming a guild?', type: 'user' as const, time: 780000 },
-      { sender: 'ClockworkTinker', content: 'I\'d be interested! What focus?', type: 'user' as const, time: 720000 },
-      { sender: 'GearMaster', content: 'Count me in if it\'s crafting focused', type: 'user' as const, time: 660000 },
-      { sender: 'ClockworkQueen', content: 'We could specialize in mechanical engineering', type: 'user' as const, time: 600000 },
-      { sender: 'VictorianEngineer', content: 'That sounds perfect!', type: 'user' as const, time: 540000 },
-      { sender: 'System', content: 'Guild "Clockwork Collective" has been formed!', type: 'system' as const, time: 480000 },
-      { sender: 'BrassFoundry', content: 'Excellent! Welcome to the guild everyone', type: 'user' as const, time: 420000 },
-      { sender: 'SteamMaster', content: 'The new update looks promising', type: 'user' as const, time: 360000 },
-      { sender: 'ClockworkTinker', content: 'What changes did they make?', type: 'user' as const, time: 300000 },
-      { sender: 'GearMaster', content: 'Improved harvesting rewards and new exotic items', type: 'user' as const, time: 240000 },
-      { sender: 'ClockworkQueen', content: 'Ooh, I love finding exotic treasures!', type: 'user' as const, time: 180000 },
-      { sender: 'VictorianEngineer', content: 'The skill bonuses for exotic discovery are nice', type: 'user' as const, time: 120000 },
-      { sender: 'BrassFoundry', content: 'Time to get back to harvesting then!', type: 'user' as const, time: 60000 }
     ];
 
     const tradeMessages = [
       { sender: 'BrassBuilder', content: 'WTS: Clockwork Gears x10 - 50 coins each', type: 'user' as const, time: 1500000 },
       { sender: 'SteamTrader', content: 'WTB: Steam Crystals - paying premium', type: 'user' as const, time: 1200000 },
       { sender: 'GearMerchant', content: 'Selling rare mechanical parts, PM me', type: 'user' as const, time: 900000 },
-      { sender: 'ClockworkDealer', content: 'WTS: Precision Bearings x5 - 75 coins each', type: 'user' as const, time: 600000 },
-      { sender: 'BrassBuilder', content: 'Still have gears available!', type: 'user' as const, time: 300000 }
     ];
 
     const guildMessages = [
       { sender: 'GuildLeader', content: 'Welcome to the Clockwork Collective!', type: 'user' as const, time: 1800000 },
       { sender: 'GuildOfficer', content: 'Remember to contribute to guild projects', type: 'user' as const, time: 1200000 },
       { sender: 'GuildMember1', content: 'Working on the steam engine upgrade', type: 'user' as const, time: 600000 },
-      { sender: 'GuildMember2', content: 'Great work everyone!', type: 'user' as const, time: 300000 }
     ];
 
     const helpMessages = [
       { sender: 'Helper', content: 'Welcome! Ask any questions here', type: 'user' as const, time: 1800000 },
       { sender: 'Newbie', content: 'How do I start harvesting?', type: 'user' as const, time: 1200000 },
       { sender: 'Veteran', content: 'Click Resource Harvesting in the left sidebar', type: 'user' as const, time: 1100000 },
-      { sender: 'Helper', content: 'Choose an activity and set your rounds, then click Start', type: 'user' as const, time: 1000000 },
-      { sender: 'Newbie', content: 'Thanks! That helped a lot', type: 'user' as const, time: 900000 },
-      { sender: 'AnotherNewbie', content: 'What are exotic items?', type: 'user' as const, time: 600000 },
-      { sender: 'Veteran', content: 'Very rare treasures you can find while harvesting', type: 'user' as const, time: 500000 },
-      { sender: 'Helper', content: 'Your skill level improves the chance to find them', type: 'user' as const, time: 400000 },
-      { sender: 'AnotherNewbie', content: 'Cool! I\'ll keep harvesting then', type: 'user' as const, time: 300000 }
     ];
 
-    // Add global messages
-    globalMessages.forEach((msg, index) => {
-      mockMessages.push({
-        id: `global-${index}`,
-        sender: msg.sender,
-        content: msg.content,
-        timestamp: new Date(now - msg.time),
-        channel: 'global',
-        type: msg.type
-      });
-    });
-
-    // Add trade messages
-    tradeMessages.forEach((msg, index) => {
-      mockMessages.push({
-        id: `trade-${index}`,
-        sender: msg.sender,
-        content: msg.content,
-        timestamp: new Date(now - msg.time),
-        channel: 'trade',
-        type: msg.type
-      });
-    });
-
-    // Add guild messages
-    guildMessages.forEach((msg, index) => {
-      mockMessages.push({
-        id: `guild-${index}`,
-        sender: msg.sender,
-        content: msg.content,
-        timestamp: new Date(now - msg.time),
-        channel: 'guild',
-        type: msg.type
-      });
-    });
-
-    // Add help messages
-    helpMessages.forEach((msg, index) => {
-      mockMessages.push({
-        id: `help-${index}`,
-        sender: msg.sender,
-        content: msg.content,
-        timestamp: new Date(now - msg.time),
-        channel: 'help',
-        type: msg.type
+    // Add messages for each channel
+    [
+      { messages: globalMessages, channel: 'global' },
+      { messages: tradeMessages, channel: 'trade' },
+      { messages: guildMessages, channel: 'guild' },
+      { messages: helpMessages, channel: 'help' }
+    ].forEach(({ messages: channelMessages, channel }) => {
+      channelMessages.forEach((msg, index) => {
+        mockMessages.push({
+          id: `${channel}-${index}`,
+          sender: msg.sender,
+          content: msg.content,
+          timestamp: new Date(now - msg.time),
+          channel,
+          type: msg.type
+        });
       });
     });
 
@@ -146,8 +111,42 @@ const ChatInterface: React.FC = () => {
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (!isCollapsed) {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [messages, isCollapsed]);
+
+  // Touch gesture handlers for swipe
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    if (!touchStartX.current || !touchStartY.current) return;
+
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaX = touchStartX.current - touchEndX;
+    const deltaY = touchStartY.current - touchEndY;
+
+    // Only handle horizontal swipes (ignore vertical scrolling)
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+      const channels: ChatChannel[] = ['global', 'guild', 'trade', 'help'];
+      const currentIndex = channels.indexOf(activeChannel);
+      
+      if (deltaX > 0 && currentIndex < channels.length - 1) {
+        // Swipe left - next channel
+        setActiveChannel(channels[currentIndex + 1]);
+      } else if (deltaX < 0 && currentIndex > 0) {
+        // Swipe right - previous channel
+        setActiveChannel(channels[currentIndex - 1]);
+      }
+    }
+
+    touchStartX.current = 0;
+    touchStartY.current = 0;
+  }, [activeChannel]);
 
   // Handle sending messages
   const handleSendMessage = () => {
@@ -164,30 +163,6 @@ const ChatInterface: React.FC = () => {
 
     setMessages(prev => [...prev, newMessage]);
     setInputMessage('');
-
-    // Simulate other players responding (for demo)
-    if (Math.random() < 0.3) {
-      setTimeout(() => {
-        const responses = [
-          'Nice one!',
-          'Agreed!',
-          'Thanks for the info!',
-          'Good point!',
-          'I see what you mean.',
-        ];
-        
-        const responseMessage: ChatMessage = {
-          id: (Date.now() + 1).toString(),
-          sender: 'MechMaster',
-          content: responses[Math.floor(Math.random() * responses.length)],
-          timestamp: new Date(),
-          channel: activeChannel,
-          type: 'user'
-        };
-        
-        setMessages(prev => [...prev, responseMessage]);
-      }, 1000 + Math.random() * 2000);
-    }
   };
 
   // Handle key press
@@ -201,9 +176,13 @@ const ChatInterface: React.FC = () => {
   // Filter messages by active channel
   const filteredMessages = messages.filter(msg => msg.channel === activeChannel);
 
-  // Format timestamp with seconds
+  // Format timestamp
   const formatTime = (date: Date): string => {
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    return date.toLocaleTimeString([], { 
+      hour: '2-digit', 
+      minute: '2-digit',
+      ...(isMobile ? {} : { second: '2-digit' })
+    });
   };
 
   // Get channel info
@@ -217,16 +196,46 @@ const ChatInterface: React.FC = () => {
     return channelData[channel];
   };
 
+  const toggleCollapse = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
-    <div className="chat-interface expanded">
-      {/* Chat Content - Always Visible */}
+    <div 
+      ref={chatRef}
+      className={`responsive-chat-interface ${isCollapsed ? 'collapsed' : 'expanded'} ${isMobile ? 'mobile' : isDesktop ? 'desktop sidebar-expanded' : 'tablet'}`}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+    >
+      {/* Collapse/Expand Button */}
+      <button 
+        className="chat-toggle-button"
+        onClick={toggleCollapse}
+        aria-label={isCollapsed ? 'Expand chat' : 'Collapse chat'}
+      >
+        <span className="toggle-icon">
+          {isCollapsed ? '⬆️' : '⬇️'}
+        </span>
+        <span className="toggle-text">
+          {isCollapsed ? 'Show Chat' : 'Hide Chat'}
+        </span>
+      </button>
+
+      {/* Chat Content */}
       <div className="chat-content">
-        {/* Compact Channel Tabs */}
-        <div className="chat-channels">
+        {/* Channel Header */}
+        <div className="chat-header">
           <div className="chat-title">
             <span className="chat-icon">💬</span>
-            <span>Steam Telegraph</span>
+            <span className="title-text">Steam Telegraph</span>
+            {process.env.NODE_ENV === 'development' && (
+              <span className="debug-info">
+                {isDesktop ? '(Desktop)' : isMobile ? '(Mobile)' : '(Tablet)'}
+              </span>
+            )}
           </div>
+          
+          {/* Channel Tabs */}
           <div className="channel-tabs">
             {(['global', 'guild', 'trade', 'help'] as ChatChannel[]).map(channel => {
               const info = getChannelInfo(channel);
@@ -239,6 +248,7 @@ const ChatInterface: React.FC = () => {
                   title={info.name}
                 >
                   <span className="channel-icon">{info.icon}</span>
+                  {!isMobile && <span className="channel-name">{info.name}</span>}
                 </button>
               );
             })}
@@ -278,18 +288,28 @@ const ChatInterface: React.FC = () => {
               onClick={handleSendMessage}
               disabled={!inputMessage.trim()}
               className="send-button"
+              aria-label="Send message"
             >
               📤
             </button>
           </div>
-          <div className="input-info">
-            <span className="char-count">{inputMessage.length}/200</span>
-            <span className="input-hint">Press Enter to send</span>
-          </div>
+          
+          {!isMobile && (
+            <div className="input-info">
+              <span className="char-count">{inputMessage.length}/200</span>
+              <span className="input-hint">Press Enter to send • Swipe to change channels</span>
+            </div>
+          )}
+          
+          {isMobile && (
+            <div className="mobile-input-info">
+              <span className="swipe-hint">← Swipe to change channels →</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default ChatInterface;
+export default ResponsiveChatInterface;

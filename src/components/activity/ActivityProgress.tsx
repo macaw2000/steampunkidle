@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../../store/store';
 import { ActivityService, ActivityProgress as ActivityProgressType } from '../../services/activityService';
+import { ActivityReward } from '../../types/character';
 import { setActivityProgress, setError } from '../../store/slices/gameSlice';
 import RealTimeProgressTracker from '../progress/RealTimeProgressTracker';
 import './ActivityProgress.css';
@@ -146,7 +147,7 @@ const ActivityProgress: React.FC = () => {
           <div className="activity-progress__rewards">
             <h4 className="activity-progress__rewards-title">Current Rewards</h4>
             <div className="activity-progress__rewards-list">
-              {activityProgress.potentialRewards.map((reward, index) => (
+              {activityProgress.potentialRewards.map((reward: ActivityReward, index: number) => (
                 <div key={index} className="activity-progress__reward">
                   <span className="activity-progress__reward-icon">
                     {reward.type === 'experience' ? '⭐' : 

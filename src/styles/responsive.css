@@ -1,0 +1,295 @@
+/* Responsive Design System for Steampunk Idle Game */
+
+/* Breakpoint Variables */
+:root {
+  /* Breakpoints */
+  --breakpoint-xs: 320px;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-xxl: 1400px;
+  
+  /* Container Max Widths */
+  --container-sm: 540px;
+  --container-md: 720px;
+  --container-lg: 960px;
+  --container-xl: 1140px;
+  --container-xxl: 1320px;
+  
+  /* Touch Target Sizes */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+  --touch-target-large: 56px;
+  
+  /* Responsive Spacing */
+  --spacing-responsive-xs: clamp(2px, 1vw, 4px);
+  --spacing-responsive-sm: clamp(4px, 2vw, 8px);
+  --spacing-responsive-md: clamp(8px, 3vw, 16px);
+  --spacing-responsive-lg: clamp(16px, 4vw, 24px);
+  --spacing-responsive-xl: clamp(24px, 5vw, 32px);
+  
+  /* Responsive Font Sizes */
+  --font-size-xs: clamp(0.75rem, 2vw, 0.875rem);
+  --font-size-sm: clamp(0.875rem, 2.5vw, 1rem);
+  --font-size-base: clamp(1rem, 3vw, 1.125rem);
+  --font-size-lg: clamp(1.125rem, 3.5vw, 1.25rem);
+  --font-size-xl: clamp(1.25rem, 4vw, 1.5rem);
+  --font-size-2xl: clamp(1.5rem, 5vw, 2rem);
+  --font-size-3xl: clamp(2rem, 6vw, 2.5rem);
+}
+
+/* Container System */
+.container {
+  width: 100%;
+  padding-left: var(--spacing-responsive-md);
+  padding-right: var(--spacing-responsive-md);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.container-sm { max-width: var(--container-sm); }
+.container-md { max-width: var(--container-md); }
+.container-lg { max-width: var(--container-lg); }
+.container-xl { max-width: var(--container-xl); }
+.container-xxl { max-width: var(--container-xxl); }
+
+/* Responsive Grid System */
+.grid-responsive {
+  display: grid;
+  gap: var(--spacing-responsive-md);
+}
+
+.grid-auto-fit {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+}
+
+.grid-auto-fill {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+/* Responsive Flexbox Utilities */
+.flex-responsive {
+  display: flex;
+  gap: var(--spacing-responsive-md);
+}
+
+.flex-wrap-responsive {
+  flex-wrap: wrap;
+}
+
+.flex-column-mobile {
+  flex-direction: column;
+}
+
+@media (min-width: 768px) {
+  .flex-column-mobile {
+    flex-direction: row;
+  }
+}
+
+/* Touch-Friendly Interactive Elements */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-target-comfortable {
+  min-height: var(--touch-target-comfortable);
+  min-width: var(--touch-target-comfortable);
+}
+
+.touch-target-large {
+  min-height: var(--touch-target-large);
+  min-width: var(--touch-target-large);
+}
+
+/* Responsive Typography */
+.text-responsive-xs { font-size: var(--font-size-xs); }
+.text-responsive-sm { font-size: var(--font-size-sm); }
+.text-responsive-base { font-size: var(--font-size-base); }
+.text-responsive-lg { font-size: var(--font-size-lg); }
+.text-responsive-xl { font-size: var(--font-size-xl); }
+.text-responsive-2xl { font-size: var(--font-size-2xl); }
+.text-responsive-3xl { font-size: var(--font-size-3xl); }
+
+/* Responsive Spacing Utilities */
+.p-responsive-xs { padding: var(--spacing-responsive-xs); }
+.p-responsive-sm { padding: var(--spacing-responsive-sm); }
+.p-responsive-md { padding: var(--spacing-responsive-md); }
+.p-responsive-lg { padding: var(--spacing-responsive-lg); }
+.p-responsive-xl { padding: var(--spacing-responsive-xl); }
+
+.m-responsive-xs { margin: var(--spacing-responsive-xs); }
+.m-responsive-sm { margin: var(--spacing-responsive-sm); }
+.m-responsive-md { margin: var(--spacing-responsive-md); }
+.m-responsive-lg { margin: var(--spacing-responsive-lg); }
+.m-responsive-xl { margin: var(--spacing-responsive-xl); }
+
+/* Responsive Visibility Utilities */
+.hidden-xs { display: none; }
+.hidden-sm { display: none; }
+.hidden-md { display: none; }
+.hidden-lg { display: none; }
+.hidden-xl { display: none; }
+
+@media (min-width: 576px) {
+  .hidden-xs { display: initial; }
+  .visible-xs-only { display: none; }
+}
+
+@media (min-width: 768px) {
+  .hidden-sm { display: initial; }
+  .visible-sm-only { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .hidden-md { display: initial; }
+  .visible-md-only { display: none; }
+}
+
+@media (min-width: 1200px) {
+  .hidden-lg { display: initial; }
+  .visible-lg-only { display: none; }
+}
+
+@media (min-width: 1400px) {
+  .hidden-xl { display: initial; }
+  .visible-xl-only { display: none; }
+}
+
+/* Mobile-First Responsive Breakpoints */
+
+/* Extra Small devices (phones, less than 576px) */
+@media (max-width: 575.98px) {
+  .container {
+    padding-left: var(--steampunk-spacing-sm);
+    padding-right: var(--steampunk-spacing-sm);
+  }
+  
+  .steampunk-btn {
+    padding: 8px 16px;
+    font-size: 0.875rem;
+    min-height: var(--touch-target-min);
+  }
+  
+  .steampunk-card {
+    padding: var(--steampunk-spacing-sm);
+    margin: var(--steampunk-spacing-xs);
+  }
+  
+  .steampunk-grid-2,
+  .steampunk-grid-3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small devices (landscape phones, 576px and up) */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .steampunk-btn {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
+  
+  .steampunk-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Medium devices (tablets, 768px and up) */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .steampunk-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .steampunk-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Large devices (desktops, 1024px and up) */
+@media (min-width: 1024px) {
+  .steampunk-grid-2 {
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  }
+  
+  .steampunk-grid-3 {
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  }
+}
+
+/* Performance Optimizations for Different Hardware */
+
+/* Reduce animations on low-end devices */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .steampunk-card {
+    border-width: 3px;
+  }
+  
+  .steampunk-btn {
+    border-width: 3px;
+  }
+}
+
+/* Dark mode preference (already dark themed, but ensure consistency) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --steampunk-text-primary: #f4e4bc;
+    --steampunk-bg-primary: #1a0f08;
+  }
+}
+
+/* Print styles */
+@media print {
+  .chat-interface,
+  .steampunk-btn,
+  .game-features-sidebar {
+    display: none !important;
+  }
+  
+  .steampunk-card {
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+  }
+}
+
+/* Landscape orientation adjustments for mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .chat-interface {
+    height: 200px;
+  }
+  
+  .app-header {
+    padding: var(--steampunk-spacing-sm);
+  }
+  
+  .header-title h1 {
+    font-size: 1.5rem;
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .steampunk-card {
+    border-width: 1px;
+  }
+  
+  .steampunk-btn {
+    border-width: 1px;
+  }
+}

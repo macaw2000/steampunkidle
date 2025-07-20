@@ -7,6 +7,8 @@
 import { Task, TaskType, TaskProgress, TaskCompletionResult, TaskReward } from '../types/taskQueue';
 import { HarvestingActivity } from '../types/harvesting';
 import { taskQueueService } from './taskQueueService';
+import { NetworkUtils } from '../utils/networkUtils';
+
 
 interface ServerTaskQueue {
   currentTask: Task | null;
@@ -42,22 +44,15 @@ class ServerTaskQueueService {
     try {
       console.log('ServerTaskQueueService: Syncing with server for player:', playerId);
       
-      const response = await fetch(`${this.apiUrl}/task-queue/sync`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'sync',
-          playerId,
-        }),
+      const data = await NetworkUtils.postJson(`${this.apiUrl}/task-queue/sync`, {
+        action: 'sync',
+        playerId,
+      }, {
+        timeout: 8000, // 8 seconds for sync operations
+        retries: 2,
+        exponentialBackoff: true,
       });
 
-      if (!response.ok) {
-        throw new Error(`Server sync failed: ${response.status}`);
-      }
-
-      const data = await response.json();
       console.log('ServerTaskQueueService: Server sync response:', data);
 
       // Update local state
@@ -68,10 +63,22 @@ class ServerTaskQueueService {
         this.startRealTimeSync(playerId);
       }
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('ServerTaskQueueService: Failed to sync with server:', error);
+      
       // Fall back to local processing if server is unavailable
-      console.warn('ServerTaskQueueService: Falling back to local task processing');
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          console.warn('ServerTaskQueueService: Device is offline, using local fallback');
+        } else if (error.isTimeout) {
+          console.warn('ServerTaskQueueService: Server sync timed out, using local fallback');
+        } else {
+          console.warn('ServerTaskQueueService: Network error during sync, using local fallback');
+        }
+      } else {
+        console.warn('ServerTaskQueueService: Server error during sync, using local fallback');
+      }
+      
       this.useLocalFallback = true;
       
       // Initialize local task queue service
@@ -100,18 +107,11 @@ class ServerTaskQueueService {
    */
   private async fetchServerStatus(playerId: string): Promise<void> {
     try {
-      const response = await fetch(`${this.apiUrl}/task-queue/${playerId}`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+      const data = await NetworkUtils.fetchJson(`${this.apiUrl}/task-queue/${playerId}`, {}, {
+        timeout: 5000, // 5 seconds for status checks
+        retries: 1, // Only retry once for frequent status checks
+        exponentialBackoff: false,
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch server status: ${response.status}`);
-      }
-
-      const data = await response.json();
       const serverQueue: ServerTaskQueue = data.queue;
       const currentProgress: ServerTaskProgress | null = data.currentProgress;
 
@@ -236,31 +236,37 @@ class ServerTaskQueueService {
     };
 
     try {
-      const response = await fetch(`${this.apiUrl}/task-queue/add-task`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'addTask',
-          playerId,
-          task,
-        }),
+      await NetworkUtils.postJson(`${this.apiUrl}/task-queue/add-task`, {
+        action: 'addTask',
+        playerId,
+        task,
+      }, {
+        timeout: 8000, // 8 seconds
+        retries: 2,
+        exponentialBackoff: true,
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to add task to server: ${response.status}`);
-      }
 
       console.log('ServerTaskQueueService: Task added to server queue:', task.id);
       
       // Immediately sync to get updated state
       await this.syncWithServer(playerId);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('ServerTaskQueueService: Failed to add task to server:', error);
+      
       // Fall back to local processing
-      console.warn('ServerTaskQueueService: Falling back to local task processing');
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          console.warn('ServerTaskQueueService: Device is offline, using local fallback for task');
+        } else if (error.isTimeout) {
+          console.warn('ServerTaskQueueService: Server timeout, using local fallback for task');
+        } else {
+          console.warn('ServerTaskQueueService: Network error, using local fallback for task');
+        }
+      } else {
+        console.warn('ServerTaskQueueService: Server error, using local fallback for task');
+      }
+      
       this.useLocalFallback = true;
       return taskQueueService.addHarvestingTask(playerId, activity, playerStats);
     }
@@ -309,30 +315,36 @@ class ServerTaskQueueService {
     }
 
     try {
-      const response = await fetch(`${this.apiUrl}/task-queue/stop-tasks`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'stopTasks',
-          playerId,
-        }),
+      await NetworkUtils.postJson(`${this.apiUrl}/task-queue/stop-tasks`, {
+        action: 'stopTasks',
+        playerId,
+      }, {
+        timeout: 6000, // 6 seconds
+        retries: 1, // Only retry once for stop operations
+        exponentialBackoff: false,
       });
-
-      if (!response.ok) {
-        throw new Error(`Failed to stop tasks on server: ${response.status}`);
-      }
 
       console.log('ServerTaskQueueService: All tasks stopped on server');
       
       // Immediately sync to get updated state
       await this.syncWithServer(playerId);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error('ServerTaskQueueService: Failed to stop tasks on server:', error);
+      
       // Fall back to local processing
-      console.warn('ServerTaskQueueService: Falling back to local task processing');
+      if (error.isNetworkError) {
+        if (error.isOffline) {
+          console.warn('ServerTaskQueueService: Device is offline, using local fallback for stop');
+        } else if (error.isTimeout) {
+          console.warn('ServerTaskQueueService: Server timeout, using local fallback for stop');
+        } else {
+          console.warn('ServerTaskQueueService: Network error, using local fallback for stop');
+        }
+      } else {
+        console.warn('ServerTaskQueueService: Server error, using local fallback for stop');
+      }
+      
       this.useLocalFallback = true;
       return taskQueueService.stopAllTasks(playerId);
     }

@@ -4,7 +4,7 @@
 
 import { HarvestingService } from '../harvestingService';
 import { Character } from '../../types';
-import { HARVESTING_NODES } from '../../data/harvestingData';
+import { HARVESTING_ACTIVITIES } from '../../data/harvestingActivities';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -268,25 +268,25 @@ describe('HarvestingService', () => {
   });
 
   describe('calculateExperienceGain', () => {
-    it('should calculate experience based on node and resources', () => {
-      const node = HARVESTING_NODES[0]; // Copper vein
+    it('should calculate experience based on activity and resources', () => {
+      const activity = HARVESTING_ACTIVITIES[0]; // First activity
       const resources = [
-        { resourceId: 'copper-ore', name: 'Copper Ore', quantity: 3, rarity: 'common' as const, dropChance: 1.0 },
-        { resourceId: 'rare-ore', name: 'Rare Ore', quantity: 1, rarity: 'rare' as const, dropChance: 0.1 },
+        { resourceId: 'book_page', name: 'Book Page', quantity: 3, rarity: 'common' as const, dropChance: 1.0 },
+        { resourceId: 'ink_vial', name: 'Ink Vial', quantity: 1, rarity: 'rare' as const, dropChance: 0.1 },
       ];
 
-      const experience = HarvestingService.calculateExperienceGain(node, resources, 5);
+      const experience = HarvestingService.calculateExperienceGain(activity, resources, 5);
       expect(experience).toBeGreaterThan(0);
       
       // Higher skill level should give bonus experience
-      const experienceWithBonus = HarvestingService.calculateExperienceGain(node, resources, 10);
+      const experienceWithBonus = HarvestingService.calculateExperienceGain(activity, resources, 10);
       expect(experienceWithBonus).toBeGreaterThan(experience);
     });
   });
 
-  describe('isNodeAvailable', () => {
-    it('should return true for nodes without harvest history', () => {
-      const available = HarvestingService.isNodeAvailable('copper-vein-basic');
+  describe('isActivityAvailable', () => {
+    it('should return true for activities without harvest history', () => {
+      const available = HarvestingService.isActivityAvailable('read_jules_verne');
       expect(available).toBe(true);
     });
 

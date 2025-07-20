@@ -1,0 +1,335 @@
+/* Responsive Card Styles */
+
+.responsive-card {
+  background: rgba(139, 69, 19, 0.9);
+  border: 2px solid var(--steampunk-primary);
+  border-radius: var(--steampunk-radius-large);
+  color: var(--steampunk-text-primary);
+  box-shadow: var(--steampunk-shadow-medium);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Card Sizes */
+.responsive-card.size-small {
+  padding: var(--steampunk-spacing-sm);
+  min-height: 120px;
+}
+
+.responsive-card.size-medium {
+  padding: var(--steampunk-spacing-md);
+  min-height: 180px;
+}
+
+.responsive-card.size-large {
+  padding: var(--steampunk-spacing-lg);
+  min-height: 240px;
+}
+
+.responsive-card.size-full {
+  padding: var(--steampunk-spacing-lg);
+  height: 100%;
+}
+
+/* Elevated Cards */
+.responsive-card.elevated {
+  box-shadow: var(--steampunk-shadow-large), var(--steampunk-shadow-glow);
+  transform: translateY(-2px);
+}
+
+/* Interactive Cards */
+.responsive-card.interactive {
+  cursor: pointer;
+  user-select: none;
+}
+
+.responsive-card.interactive:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--steampunk-shadow-large), var(--steampunk-shadow-glow);
+  border-color: var(--steampunk-secondary);
+}
+
+.responsive-card.interactive:active {
+  transform: translateY(-2px);
+  box-shadow: var(--steampunk-shadow-medium);
+}
+
+.responsive-card.interactive:focus {
+  outline: none;
+  border-color: var(--steampunk-secondary);
+  box-shadow: 0 0 0 3px rgba(218, 165, 32, 0.3);
+}
+
+/* Loading State */
+.responsive-card.loading {
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.card-loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--steampunk-spacing-sm);
+  z-index: 10;
+  backdrop-filter: blur(2px);
+}
+
+.loading-spinner {
+  font-size: 2rem;
+  animation: rotate 2s linear infinite;
+}
+
+.loading-text {
+  color: var(--steampunk-text-primary);
+  font-weight: bold;
+  font-family: var(--steampunk-font-primary);
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Error State */
+.responsive-card.error {
+  border-color: var(--steampunk-error);
+  background: rgba(220, 20, 60, 0.1);
+}
+
+.card-error {
+  display: flex;
+  align-items: center;
+  gap: var(--steampunk-spacing-sm);
+  padding: var(--steampunk-spacing-sm);
+  background: rgba(220, 20, 60, 0.2);
+  border-radius: var(--steampunk-radius-medium);
+  margin-bottom: var(--steampunk-spacing-md);
+}
+
+.error-icon {
+  font-size: 1.2rem;
+  color: var(--steampunk-error);
+}
+
+.error-message {
+  color: var(--steampunk-error);
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+/* Card Header */
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--steampunk-spacing-sm);
+  margin-bottom: var(--steampunk-spacing-md);
+  padding-bottom: var(--steampunk-spacing-sm);
+  border-bottom: 1px solid rgba(139, 69, 19, 0.3);
+}
+
+.card-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.card-title-group {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-title {
+  margin: 0 0 var(--steampunk-spacing-xs) 0;
+  color: var(--steampunk-secondary-light);
+  font-family: var(--steampunk-font-primary);
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+  word-wrap: break-word;
+}
+
+.card-subtitle {
+  margin: 0;
+  color: var(--steampunk-text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  word-wrap: break-word;
+}
+
+/* Card Content */
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* Interactive Indicator */
+.interactive-indicator {
+  position: absolute;
+  top: var(--steampunk-spacing-sm);
+  right: var(--steampunk-spacing-sm);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.responsive-card.interactive:hover .interactive-indicator {
+  opacity: 1;
+}
+
+.indicator-arrow {
+  color: var(--steampunk-secondary);
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+
+/* Mobile Phones */
+@media (max-width: 575.98px) {
+  .responsive-card.size-small {
+    padding: var(--steampunk-spacing-xs);
+    min-height: 100px;
+  }
+  
+  .responsive-card.size-medium {
+    padding: var(--steampunk-spacing-sm);
+    min-height: 140px;
+  }
+  
+  .responsive-card.size-large {
+    padding: var(--steampunk-spacing-md);
+    min-height: 180px;
+  }
+  
+  .card-title {
+    font-size: 1rem;
+  }
+  
+  .card-subtitle {
+    font-size: 0.8rem;
+  }
+  
+  .card-icon {
+    font-size: 1.2rem;
+  }
+  
+  .card-header {
+    margin-bottom: var(--steampunk-spacing-sm);
+    padding-bottom: var(--steampunk-spacing-xs);
+  }
+}
+
+/* Tablets */
+@media (min-width: 576px) and (max-width: 767.98px) {
+  .responsive-card.size-small {
+    min-height: 110px;
+  }
+  
+  .responsive-card.size-medium {
+    min-height: 160px;
+  }
+  
+  .responsive-card.size-large {
+    min-height: 220px;
+  }
+}
+
+/* Large screens */
+@media (min-width: 1200px) {
+  .responsive-card.size-small {
+    padding: var(--steampunk-spacing-md);
+    min-height: 140px;
+  }
+  
+  .responsive-card.size-medium {
+    padding: var(--steampunk-spacing-lg);
+    min-height: 200px;
+  }
+  
+  .responsive-card.size-large {
+    padding: var(--steampunk-spacing-xl);
+    min-height: 280px;
+  }
+  
+  .card-title {
+    font-size: 1.4rem;
+  }
+  
+  .card-subtitle {
+    font-size: 1rem;
+  }
+  
+  .card-icon {
+    font-size: 1.8rem;
+  }
+}
+
+/* Touch-friendly adjustments */
+@media (hover: none) and (pointer: coarse) {
+  .responsive-card.interactive {
+    min-height: var(--touch-target-large);
+  }
+  
+  .responsive-card.interactive:hover {
+    transform: none;
+  }
+  
+  .responsive-card.interactive:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+}
+
+/* High contrast mode */
+@media (prefers-contrast: high) {
+  .responsive-card {
+    border-width: 3px;
+  }
+  
+  .card-header {
+    border-bottom-width: 2px;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .responsive-card,
+  .interactive-indicator,
+  .loading-spinner {
+    transition: none;
+    animation: none;
+  }
+  
+  .responsive-card.interactive:hover {
+    transform: none;
+  }
+}
+
+/* Print styles */
+@media print {
+  .responsive-card {
+    border: 2px solid #000;
+    background: #fff;
+    color: #000;
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  
+  .card-loading-overlay,
+  .interactive-indicator {
+    display: none;
+  }
+}
