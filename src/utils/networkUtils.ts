@@ -9,6 +9,7 @@ export interface NetworkRequestOptions {
   retryDelay?: number;
   exponentialBackoff?: boolean;
   abortSignal?: AbortSignal;
+  headers?: Record<string, string>;
 }
 
 export interface NetworkError extends Error {
@@ -236,11 +237,14 @@ export class NetworkUtils {
     data: any,
     options: NetworkRequestOptions = {}
   ): Promise<T> {
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+    
     return this.fetchJson<T>(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(data),
     }, options);
   }

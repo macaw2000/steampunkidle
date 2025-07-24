@@ -104,6 +104,8 @@ export const TABLE_NAMES = {
   CURRENCY_TRANSACTIONS: process.env.CURRENCY_TRANSACTIONS_TABLE || 'steampunk-idle-game-currency-transactions',
   CRAFTING_SESSIONS: process.env.CRAFTING_SESSIONS_TABLE || 'steampunk-idle-game-crafting-sessions',
   TASK_QUEUES: process.env.TASK_QUEUES_TABLE || 'steampunk-idle-game-task-queues',
+  WEBSOCKET_CONNECTIONS: process.env.WEBSOCKET_CONNECTIONS_TABLE || 'steampunk-idle-game-websocket-connections',
+  NOTIFICATIONS: process.env.NOTIFICATIONS_TABLE || 'steampunk-idle-game-notifications',
 };
 
 // Retry configuration

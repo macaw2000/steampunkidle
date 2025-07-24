@@ -12,17 +12,12 @@ import {
 } from 'aws-amplify/auth';
 import { NetworkUtils, NetworkError } from '../utils/networkUtils';
 import { offlineService } from './offlineService';
-
-// Check if we're in development mode without Cognito configured
-const isDevelopmentMode = () => {
-  return !process.env.REACT_APP_USER_POOL_ID || 
-         process.env.REACT_APP_USER_POOL_ID === '' ||
-         process.env.REACT_APP_ENV === 'local';
-};
+import { EnvironmentService } from './environmentService';
 
 // Configure Amplify with Cognito settings
 const configureAmplify = () => {
-  if (isDevelopmentMode()) {
+  const envInfo = EnvironmentService.getEnvironmentInfo();
+  if (envInfo.enableMockAuth) {
     console.log('Running in development mode - using mock authentication');
     return;
   }
@@ -74,7 +69,8 @@ class AuthService {
 
   // Initialize authentication on app start
   async initializeAuth(): Promise<{ user: User; tokens: AuthTokens } | null> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       // Check if localStorage is available
       if (typeof window === 'undefined' || !window.localStorage) {
         return null;
@@ -153,7 +149,8 @@ class AuthService {
 
   // Email/password login
   async loginWithEmail(email: string, password: string): Promise<{ user: User; tokens: AuthTokens }> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       return this.mockEmailLogin(email, password);
     }
 
@@ -188,7 +185,8 @@ class AuthService {
 
   // Email registration
   async registerWithEmail(email: string, password: string): Promise<{ requiresConfirmation: boolean }> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       return this.mockEmailRegister(email, password);
     }
 

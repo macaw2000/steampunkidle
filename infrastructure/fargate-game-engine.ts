@@ -48,7 +48,7 @@ export class FargateGameEngine extends Construct {
     });
 
     // Add DynamoDB permissions to task role
-    taskDefinition.taskRole.addToPolicy(
+    (taskDefinition.taskRole as iam.Role).addToPolicy(
       new iam.PolicyStatement({
         effect: iam.Effect.ALLOW,
         actions: [

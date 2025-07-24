@@ -8,7 +8,10 @@ import { NetworkUtils } from '../utils/networkUtils';
 import { offlineService } from './offlineService';
 
 export interface BaseWebSocketMessage {
-  type: 'progress_update' | 'notification' | 'achievement' | 'level_up' | 'connection_status';
+  type: 'progress_update' | 'notification' | 'achievement' | 'level_up' | 'connection_status' | 
+        'sync_request' | 'sync_response' | 'delta_update' | 'conflict_resolution' | 
+        'heartbeat' | 'heartbeat_response' | 'task_started' | 'task_progress' | 
+        'task_completed' | 'task_failed' | 'queue_updated';
   data: any;
   timestamp: Date;
 }
@@ -60,12 +63,46 @@ export interface ConnectionStatusMessage extends BaseWebSocketMessage {
 }
 
 export type WebSocketMessage = BaseWebSocketMessage;
+export interface TaskSyncMessage extends BaseWebSocketMessage {
+  type: 'sync_request' | 'sync_response' | 'delta_update' | 'conflict_resolution';
+  data: {
+    playerId: string;
+    messageId: string;
+    payload: any;
+  };
+}
+
+export interface HeartbeatMessage extends BaseWebSocketMessage {
+  type: 'heartbeat' | 'heartbeat_response';
+  data: {
+    playerId: string;
+    timestamp: number;
+    queueVersion?: number;
+    connectionId?: string;
+  };
+}
+
+export interface TaskEventMessage extends BaseWebSocketMessage {
+  type: 'task_started' | 'task_progress' | 'task_completed' | 'task_failed' | 'queue_updated';
+  data: {
+    playerId: string;
+    taskId?: string;
+    progress?: number;
+    rewards?: any[];
+    error?: string;
+    queueState?: any;
+  };
+}
+
 export type GameWebSocketMessage = 
   | ProgressUpdateMessage 
   | NotificationMessage 
   | AchievementMessage 
   | LevelUpMessage
-  | ConnectionStatusMessage;
+  | ConnectionStatusMessage
+  | TaskSyncMessage
+  | HeartbeatMessage
+  | TaskEventMessage;
 
 export class WebSocketService {
   private static instance: WebSocketService;
@@ -76,6 +113,20 @@ export class WebSocketService {
   private isConnecting = false;
   private messageHandlers: Map<string, (message: WebSocketMessage) => void> = new Map();
   private connectionStatusHandlers: Set<(connected: boolean) => void> = new Set();
+  
+  // Enhanced connection management
+  private heartbeatInterval: NodeJS.Timeout | null = null;
+  private heartbeatFrequency = 30000; // 30 seconds
+  private lastHeartbeat = 0;
+  private connectionId: string | null = null;
+  private playerId: string | null = null;
+  private messageQueue: any[] = [];
+  private maxQueueSize = 100;
+  
+  // Delta synchronization
+  private lastSyncTimestamp = 0;
+  private pendingAcks: Map<string, { timestamp: number; resolve: Function; reject: Function }> = new Map();
+  private ackTimeout = 10000; // 10 seconds
 
   private constructor() {}
 
@@ -143,6 +194,15 @@ export class WebSocketService {
           console.log('WebSocket connected');
           this.isConnecting = false;
           this.reconnectAttempts = 0;
+          this.playerId = userId;
+          this.connectionId = this.generateConnectionId();
+          
+          // Start heartbeat
+          this.startHeartbeat();
+          
+          // Process queued messages
+          this.processMessageQueue();
+          
           this.notifyConnectionStatus(true);
           resolve();
         };
@@ -150,6 +210,17 @@ export class WebSocketService {
         this.socket.onmessage = (event) => {
           try {
             const message: WebSocketMessage = JSON.parse(event.data);
+            
+            // Update last heartbeat time for any message
+            this.lastHeartbeat = Date.now();
+            
+            // Handle acknowledgments
+            if (message.data?.messageId && this.pendingAcks.has(message.data.messageId)) {
+              const ack = this.pendingAcks.get(message.data.messageId)!;
+              ack.resolve(message);
+              this.pendingAcks.delete(message.data.messageId);
+            }
+            
             this.handleMessage(message);
           } catch (error) {
             console.error('Failed to parse WebSocket message:', error);
@@ -160,6 +231,14 @@ export class WebSocketService {
           clearTimeout(connectionTimeout);
           console.log('WebSocket disconnected:', event.code, event.reason);
           this.isConnecting = false;
+          
+          // Stop heartbeat
+          this.stopHeartbeat();
+          
+          // Clear connection info
+          this.connectionId = null;
+          this.playerId = null;
+          
           this.notifyConnectionStatus(false);
           
           // Attempt to reconnect if not a clean close and not offline
@@ -195,11 +274,19 @@ export class WebSocketService {
    * Disconnect from WebSocket server
    */
   disconnect(): void {
+    this.stopHeartbeat();
+    
     if (this.socket) {
       this.socket.close(1000, 'Client disconnect');
       this.socket = null;
     }
+    
     this.reconnectAttempts = this.maxReconnectAttempts; // Prevent reconnection
+    this.connectionId = null;
+    this.playerId = null;
+    this.messageQueue = [];
+    this.pendingAcks.clear();
+    
     this.notifyConnectionStatus(false);
   }
 
@@ -217,8 +304,55 @@ export class WebSocketService {
     if (this.socket?.readyState === WebSocket.OPEN) {
       this.socket.send(JSON.stringify(message));
     } else {
-      console.warn('WebSocket not connected, cannot send message');
+      console.warn('WebSocket not connected, queueing message');
+      this.queueMessage(message);
     }
+  }
+
+  /**
+   * Send message with acknowledgment
+   */
+  sendWithAck(message: any): Promise<WebSocketMessage> {
+    return new Promise((resolve, reject) => {
+      const messageId = this.generateMessageId();
+      const messageWithId = { ...message, messageId };
+      
+      // Store acknowledgment handler
+      this.pendingAcks.set(messageId, { 
+        timestamp: Date.now(), 
+        resolve, 
+        reject 
+      });
+      
+      // Set timeout for acknowledgment
+      setTimeout(() => {
+        if (this.pendingAcks.has(messageId)) {
+          this.pendingAcks.delete(messageId);
+          reject(new Error('Message acknowledgment timeout'));
+        }
+      }, this.ackTimeout);
+      
+      this.send(messageWithId);
+    });
+  }
+
+  /**
+   * Send delta update efficiently
+   */
+  sendDeltaUpdate(type: string, data: any): void {
+    const deltaMessage = {
+      type: 'delta_update',
+      data: {
+        type,
+        playerId: this.playerId,
+        data,
+        timestamp: Date.now(),
+        version: this.getNextVersion()
+      },
+      timestamp: new Date()
+    };
+    
+    this.send(deltaMessage);
   }
 
   /**
@@ -301,6 +435,195 @@ export class WebSocketService {
         console.error('Error in connection status handler:', error);
       }
     });
+  }
+
+  /**
+   * Start heartbeat mechanism
+   */
+  private startHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+    }
+
+    this.heartbeatInterval = setInterval(() => {
+      this.sendHeartbeat();
+      this.checkConnectionHealth();
+      this.cleanupPendingAcks();
+    }, this.heartbeatFrequency);
+
+    // Send initial heartbeat
+    this.sendHeartbeat();
+  }
+
+  /**
+   * Stop heartbeat mechanism
+   */
+  private stopHeartbeat(): void {
+    if (this.heartbeatInterval) {
+      clearInterval(this.heartbeatInterval);
+      this.heartbeatInterval = null;
+    }
+  }
+
+  /**
+   * Send heartbeat to server
+   */
+  private sendHeartbeat(): void {
+    if (!this.isConnected() || !this.playerId) {
+      return;
+    }
+
+    const heartbeatMessage: HeartbeatMessage = {
+      type: 'heartbeat',
+      data: {
+        playerId: this.playerId,
+        timestamp: Date.now(),
+        queueVersion: this.getQueueVersion(),
+        connectionId: this.connectionId || ''
+      },
+      timestamp: new Date()
+    };
+
+    this.send(heartbeatMessage);
+  }
+
+  /**
+   * Check connection health based on heartbeat
+   */
+  private checkConnectionHealth(): void {
+    const now = Date.now();
+    const timeSinceLastHeartbeat = now - this.lastHeartbeat;
+    
+    // If no heartbeat response in 2x frequency, consider connection unhealthy
+    if (timeSinceLastHeartbeat > this.heartbeatFrequency * 2) {
+      console.warn('Connection appears unhealthy, no heartbeat response');
+      
+      // If no response in 3x frequency, force reconnection
+      if (timeSinceLastHeartbeat > this.heartbeatFrequency * 3) {
+        console.error('Connection lost, forcing reconnection');
+        this.forceReconnect();
+      }
+    }
+  }
+
+  /**
+   * Force reconnection
+   */
+  private forceReconnect(): void {
+    if (this.socket) {
+      this.socket.close(1006, 'Connection health check failed');
+    }
+  }
+
+  /**
+   * Queue message for later sending
+   */
+  private queueMessage(message: any): void {
+    if (this.messageQueue.length >= this.maxQueueSize) {
+      // Remove oldest message
+      this.messageQueue.shift();
+    }
+    
+    this.messageQueue.push({
+      ...message,
+      queuedAt: Date.now()
+    });
+  }
+
+  /**
+   * Process queued messages when connection is restored
+   */
+  private processMessageQueue(): void {
+    if (this.messageQueue.length === 0) {
+      return;
+    }
+
+    console.log(`Processing ${this.messageQueue.length} queued messages`);
+    
+    const messages = [...this.messageQueue];
+    this.messageQueue = [];
+    
+    messages.forEach(message => {
+      // Remove queued timestamp before sending
+      const { queuedAt, ...cleanMessage } = message;
+      this.send(cleanMessage);
+    });
+  }
+
+  /**
+   * Clean up expired pending acknowledgments
+   */
+  private cleanupPendingAcks(): void {
+    const now = Date.now();
+    
+    for (const [messageId, ack] of this.pendingAcks.entries()) {
+      if (now - ack.timestamp > this.ackTimeout) {
+        ack.reject(new Error('Acknowledgment timeout'));
+        this.pendingAcks.delete(messageId);
+      }
+    }
+  }
+
+  /**
+   * Generate unique connection ID
+   */
+  private generateConnectionId(): string {
+    return 'conn-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
+   * Generate unique message ID
+   */
+  private generateMessageId(): string {
+    return 'msg-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
+   * Get current queue version (placeholder)
+   */
+  private getQueueVersion(): number {
+    // This would integrate with your queue state management
+    return 1;
+  }
+
+  /**
+   * Get next version number for delta updates
+   */
+  private getNextVersion(): number {
+    return Date.now(); // Simple versioning based on timestamp
+  }
+
+  /**
+   * Get connection statistics
+   */
+  getConnectionStats(): {
+    isConnected: boolean;
+    connectionId: string | null;
+    lastHeartbeat: number;
+    queuedMessages: number;
+    pendingAcks: number;
+    reconnectAttempts: number;
+  } {
+    return {
+      isConnected: this.isConnected(),
+      connectionId: this.connectionId,
+      lastHeartbeat: this.lastHeartbeat,
+      queuedMessages: this.messageQueue.length,
+      pendingAcks: this.pendingAcks.size,
+      reconnectAttempts: this.reconnectAttempts
+    };
+  }
+
+  /**
+   * Cleanup resources when service is destroyed
+   */
+  destroy(): void {
+    this.stopHeartbeat();
+    this.disconnect();
+    this.messageQueue = [];
+    this.pendingAcks.clear();
+    this.connectionStatusHandlers.clear();
+    this.messageHandlers.clear();
   }
 }
 

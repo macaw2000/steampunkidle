@@ -5,6 +5,7 @@
 import { Character, CharacterStats, CraftingSkillSet, HarvestingSkillSet, CombatSkillSet, CreateCharacterRequest, UpdateCharacterRequest } from '../types/character';
 import { SpecializationService } from './specializationService';
 import { NetworkUtils } from '../utils/networkUtils';
+import { EnvironmentService } from './environmentService';
 
 import { v4 as uuidv4 } from 'uuid';
 
@@ -102,8 +103,9 @@ export class CharacterService {
    * Create a new character
    */
   static async createCharacter(request: CreateCharacterRequest): Promise<Character> {
-    // In development mode, create mock character data
-    if (process.env.NODE_ENV === 'development') {
+    // Use localStorage when no backend API is available
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.useLocalStorage) {
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 1000));
 

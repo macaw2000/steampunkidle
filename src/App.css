@@ -1314,4 +1314,127 @@ ued-tasks {
   .stat-item {
     border-bottom-width: 2px;
   }
+}/* 
+Task Queue Display in Main Content Area */
+.main-content-area {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  min-height: 500px;
+}
+
+.main-task-queue {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Responsive adjustments for task queue */
+@media (max-width: 1024px) {
+  .main-content-area {
+    padding: 15px;
+  }
+  
+  .main-task-queue {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content-area {
+    padding: 10px;
+  }
+}
+
+/* Game Dashboard Layout Adjustments */
+.game-dashboard .responsive-layout {
+  min-height: calc(100vh - 40px);
+}
+
+.game-dashboard .layout-main {
+  background: transparent;
+  padding: 0;
+}
+
+/* Sidebar styling for game features */
+.game-features-sidebar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  height: 100%;
+}
+
+.player-info-section {
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  border: 2px solid #8b4513;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 
+    0 4px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.player-name-display,
+.player-level-display,
+.online-players-display {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #f4e4bc;
+  font-size: 0.9rem;
+}
+
+.player-name-display:last-child,
+.player-level-display:last-child,
+.online-players-display:last-child {
+  margin-bottom: 0;
+}
+
+.player-icon,
+.level-icon,
+.online-icon {
+  font-size: 1rem;
+  color: #d4af37;
+}
+
+.sidebar-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sidebar-nav-button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 15px;
+  background: linear-gradient(135deg, #1a0f08 0%, #2d1a0f 100%);
+  border: 1px solid #654321;
+  border-radius: 8px;
+  color: #f4e4bc;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-family: 'Georgia', serif;
+  font-size: 0.9rem;
+}
+
+.sidebar-nav-button:hover {
+  border-color: #d4af37;
+  background: linear-gradient(135deg, #2d1a0f 0%, #3d2817 100%);
+  transform: translateX(5px);
+}
+
+.sidebar-nav-button .nav-icon {
+  font-size: 1.2rem;
+  color: #d4af37;
+  min-width: 20px;
+}
+
+.sidebar-nav-button .nav-label {
+  flex: 1;
+  text-align: left;
 }

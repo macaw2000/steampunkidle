@@ -302,7 +302,7 @@ class GameEngine {
       id: `${originalTask.type}-${Date.now()}`,
       startTime: 0, // Will be set when task starts
       completed: false,
-      rewards: undefined,
+      rewards: [],
     };
   }
 }

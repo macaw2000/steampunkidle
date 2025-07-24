@@ -1,226 +1,190 @@
-import * as cdk from 'aws-cdk-lib';
-import * as codedeploy from 'aws-cdk-lib/aws-codedeploy';
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import * as cloudwatch from 'aws-cdk-lib/aws-cloudwatch';
-import * as sns from 'aws-cdk-lib/aws-sns';
-import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
-import { Construct } from 'constructs';
+// Deployment Configuration for Task Queue System Production Deployment
 
-export interface DeploymentConfigProps {
+export interface DeploymentConfig {
   environment: string;
-  lambdaFunctions: lambda.Function[];
-  notificationEmail?: string;
+  region: string;
+  account: string;
+  version: string;
+  activeEnvironment: 'blue' | 'green';
+  domain?: {
+    name: string;
+    hostedZoneId: string;
+    certificateArn: string;
+  };
+  monitoring: {
+    alertEmail?: string;
+    slackWebhookUrl?: string;
+    retentionDays: number;
+  };
+  scaling: {
+    minCapacity: number;
+    maxCapacity: number;
+    targetCpuUtilization: number;
+    targetMemoryUtilization: number;
+  };
+  resources: {
+    taskCpu: number;
+    taskMemory: number;
+    desiredCount: number;
+  };
+  security: {
+    enableWaf: boolean;
+    enableVpcFlowLogs: boolean;
+    enableGuardDuty: boolean;
+  };
 }
 
-export class DeploymentConfig extends Construct {
-  public readonly deploymentGroup: codedeploy.LambdaDeploymentGroup;
-  public readonly alarmTopic: sns.Topic;
+export const productionConfig: DeploymentConfig = {
+  environment: 'production',
+  region: process.env.AWS_REGION || 'us-east-1',
+  account: process.env.AWS_ACCOUNT_ID || '',
+  version: process.env.VERSION || 'latest',
+  activeEnvironment: (process.env.ACTIVE_ENVIRONMENT as 'blue' | 'green') || 'blue',
+  domain: {
+    name: process.env.DOMAIN_NAME || '',
+    hostedZoneId: process.env.HOSTED_ZONE_ID || '',
+    certificateArn: process.env.CERTIFICATE_ARN || '',
+  },
+  monitoring: {
+    alertEmail: process.env.ALERT_EMAIL,
+    slackWebhookUrl: process.env.SLACK_WEBHOOK_URL,
+    retentionDays: 30,
+  },
+  scaling: {
+    minCapacity: 2,
+    maxCapacity: 20,
+    targetCpuUtilization: 70,
+    targetMemoryUtilization: 80,
+  },
+  resources: {
+    taskCpu: 1024,
+    taskMemory: 2048,
+    desiredCount: 3,
+  },
+  security: {
+    enableWaf: true,
+    enableVpcFlowLogs: true,
+    enableGuardDuty: true,
+  },
+};
 
-  constructor(scope: Construct, id: string, props: DeploymentConfigProps) {
-    super(scope, id);
+export const stagingConfig: DeploymentConfig = {
+  ...productionConfig,
+  environment: 'staging',
+  scaling: {
+    minCapacity: 1,
+    maxCapacity: 5,
+    targetCpuUtilization: 70,
+    targetMemoryUtilization: 80,
+  },
+  resources: {
+    taskCpu: 512,
+    taskMemory: 1024,
+    desiredCount: 1,
+  },
+  security: {
+    enableWaf: false,
+    enableVpcFlowLogs: false,
+    enableGuardDuty: false,
+  },
+};
 
-    // SNS Topic for deployment notifications
-    this.alarmTopic = new sns.Topic(this, 'DeploymentAlarmTopic', {
-      displayName: `Steampunk Idle Game ${props.environment} Deployment Alerts`,
-    });
+export const developmentConfig: DeploymentConfig = {
+  ...stagingConfig,
+  environment: 'development',
+  monitoring: {
+    ...stagingConfig.monitoring,
+    retentionDays: 7,
+  },
+};
 
-    if (props.notificationEmail) {
-      this.alarmTopic.addSubscription(
-        new subscriptions.EmailSubscription(props.notificationEmail)
-      );
+export function getConfig(environment: string): DeploymentConfig {
+  switch (environment.toLowerCase()) {
+    case 'production':
+    case 'prod':
+      return productionConfig;
+    case 'staging':
+    case 'stage':
+      return stagingConfig;
+    case 'development':
+    case 'dev':
+      return developmentConfig;
+    default:
+      throw new Error(`Unknown environment: ${environment}`);
+  }
+}
+
+export function validateConfig(config: DeploymentConfig): void {
+  const errors: string[] = [];
+
+  if (!config.account) {
+    errors.push('AWS Account ID is required');
+  }
+
+  if (!config.region) {
+    errors.push('AWS Region is required');
+  }
+
+  if (!config.version) {
+    errors.push('Version is required');
+  }
+
+  if (config.environment === 'production') {
+    if (!config.monitoring.alertEmail && !config.monitoring.slackWebhookUrl) {
+      errors.push('Production environment requires at least one alerting method (email or Slack)');
     }
 
-    // CloudWatch Alarms for deployment monitoring
-    const errorAlarms: cloudwatch.Alarm[] = [];
-    const durationAlarms: cloudwatch.Alarm[] = [];
+    if (config.resources.desiredCount < 2) {
+      errors.push('Production environment requires at least 2 instances for high availability');
+    }
 
-    props.lambdaFunctions.forEach((func, index) => {
-      // Error rate alarm
-      const errorAlarm = new cloudwatch.Alarm(this, `ErrorAlarm${index}`, {
-        metric: func.metricErrors({
-          period: cdk.Duration.minutes(1),
-        }),
-        threshold: 5,
-        evaluationPeriods: 2,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-        alarmDescription: `Error rate too high for ${func.functionName}`,
-      });
-
-      errorAlarm.addAlarmAction(
-        new cdk.aws_cloudwatch_actions.SnsAction(this.alarmTopic)
-      );
-
-      errorAlarms.push(errorAlarm);
-
-      // Duration alarm
-      const durationAlarm = new cloudwatch.Alarm(this, `DurationAlarm${index}`, {
-        metric: func.metricDuration({
-          period: cdk.Duration.minutes(1),
-        }),
-        threshold: 10000, // 10 seconds
-        evaluationPeriods: 3,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
-        alarmDescription: `Duration too high for ${func.functionName}`,
-      });
-
-      durationAlarm.addAlarmAction(
-        new cdk.aws_cloudwatch_actions.SnsAction(this.alarmTopic)
-      );
-
-      durationAlarms.push(durationAlarm);
-    });
-
-    // CodeDeploy Application
-    const application = new codedeploy.LambdaApplication(this, 'DeploymentApplication', {
-      applicationName: `steampunk-idle-game-${props.environment}`,
-    });
-
-    // Deployment Configuration based on environment
-    const deploymentConfig = props.environment === 'production'
-      ? codedeploy.LambdaDeploymentConfig.CANARY_10PERCENT_5MINUTES
-      : codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE;
-
-    // Create deployment group for Lambda functions
-    this.deploymentGroup = new codedeploy.LambdaDeploymentGroup(this, 'DeploymentGroup', {
-      application,
-      deploymentGroupName: `steampunk-idle-game-${props.environment}-deployment-group`,
-      deploymentConfig,
-      alarms: [...errorAlarms, ...durationAlarms],
-      autoRollback: {
-        failedDeployment: true,
-        stoppedDeployment: true,
-        deploymentInAlarm: true,
-      },
-      preHook: this.createPreDeploymentHook(),
-      postHook: this.createPostDeploymentHook(),
-    });
+    if (config.scaling.minCapacity < 2) {
+      errors.push('Production environment requires minimum capacity of at least 2');
+    }
   }
 
-  private createPreDeploymentHook(): lambda.Function {
-    return new lambda.Function(this, 'PreDeploymentHook', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        const { CodeDeployClient, PutLifecycleEventHookExecutionStatusCommand } = require('@aws-sdk/client-codedeploy');
-        const { CloudWatchClient, PutMetricDataCommand } = require('@aws-sdk/client-cloudwatch');
-
-        const codedeploy = new CodeDeployClient({});
-        const cloudwatch = new CloudWatchClient({});
-
-        exports.handler = async (event) => {
-          console.log('Pre-deployment hook triggered:', JSON.stringify(event, null, 2));
-          
-          const { DeploymentId, LifecycleEventHookExecutionId } = event;
-          
-          try {
-            // Record deployment start metric
-            await cloudwatch.send(new PutMetricDataCommand({
-              Namespace: 'SteampunkIdleGame/Deployment',
-              MetricData: [{
-                MetricName: 'DeploymentStarted',
-                Value: 1,
-                Unit: 'Count',
-                Dimensions: [{
-                  Name: 'Environment',
-                  Value: process.env.ENVIRONMENT || 'unknown'
-                }]
-              }]
-            }));
-
-            // Perform pre-deployment checks
-            console.log('Running pre-deployment health checks...');
-            
-            // Add any pre-deployment validation logic here
-            // For example: check database connectivity, validate configuration, etc.
-            
-            await codedeploy.send(new PutLifecycleEventHookExecutionStatusCommand({
-              deploymentId: DeploymentId,
-              lifecycleEventHookExecutionId: LifecycleEventHookExecutionId,
-              status: 'Succeeded'
-            }));
-            
-            return { statusCode: 200, body: 'Pre-deployment hook completed successfully' };
-          } catch (error) {
-            console.error('Pre-deployment hook failed:', error);
-            
-            await codedeploy.send(new PutLifecycleEventHookExecutionStatusCommand({
-              deploymentId: DeploymentId,
-              lifecycleEventHookExecutionId: LifecycleEventHookExecutionId,
-              status: 'Failed'
-            }));
-            
-            throw error;
-          }
-        };
-      `),
-      timeout: cdk.Duration.minutes(5),
-      environment: {
-        ENVIRONMENT: this.node.tryGetContext('environment') || 'development',
-      },
-    });
+  if (config.resources.taskCpu < 256) {
+    errors.push('Task CPU must be at least 256');
   }
 
-  private createPostDeploymentHook(): lambda.Function {
-    return new lambda.Function(this, 'PostDeploymentHook', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'index.handler',
-      code: lambda.Code.fromInline(`
-        const { CodeDeployClient, PutLifecycleEventHookExecutionStatusCommand } = require('@aws-sdk/client-codedeploy');
-        const { CloudWatchClient, PutMetricDataCommand } = require('@aws-sdk/client-cloudwatch');
-
-        const codedeploy = new CodeDeployClient({});
-        const cloudwatch = new CloudWatchClient({});
-
-        exports.handler = async (event) => {
-          console.log('Post-deployment hook triggered:', JSON.stringify(event, null, 2));
-          
-          const { DeploymentId, LifecycleEventHookExecutionId } = event;
-          
-          try {
-            // Record deployment completion metric
-            await cloudwatch.send(new PutMetricDataCommand({
-              Namespace: 'SteampunkIdleGame/Deployment',
-              MetricData: [{
-                MetricName: 'DeploymentCompleted',
-                Value: 1,
-                Unit: 'Count',
-                Dimensions: [{
-                  Name: 'Environment',
-                  Value: process.env.ENVIRONMENT || 'unknown'
-                }]
-              }]
-            }));
-
-            // Perform post-deployment validation
-            console.log('Running post-deployment validation...');
-            
-            // Add post-deployment validation logic here
-            // For example: smoke tests, health checks, etc.
-            
-            await codedeploy.send(new PutLifecycleEventHookExecutionStatusCommand({
-              deploymentId: DeploymentId,
-              lifecycleEventHookExecutionId: LifecycleEventHookExecutionId,
-              status: 'Succeeded'
-            }));
-            
-            return { statusCode: 200, body: 'Post-deployment hook completed successfully' };
-          } catch (error) {
-            console.error('Post-deployment hook failed:', error);
-            
-            await codedeploy.send(new PutLifecycleEventHookExecutionStatusCommand({
-              deploymentId: DeploymentId,
-              lifecycleEventHookExecutionId: LifecycleEventHookExecutionId,
-              status: 'Failed'
-            }));
-            
-            throw error;
-          }
-        };
-      `),
-      timeout: cdk.Duration.minutes(5),
-      environment: {
-        ENVIRONMENT: this.node.tryGetContext('environment') || 'development',
-      },
-    });
+  if (config.resources.taskMemory < 512) {
+    errors.push('Task memory must be at least 512 MB');
   }
+
+  if (config.scaling.maxCapacity <= config.scaling.minCapacity) {
+    errors.push('Max capacity must be greater than min capacity');
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Configuration validation failed:\n${errors.join('\n')}`);
+  }
+}
+
+// Environment-specific overrides
+export const environmentOverrides = {
+  production: {
+    // Production-specific settings
+    enableDetailedMonitoring: true,
+    enableXRayTracing: true,
+    backupRetentionDays: 30,
+    multiAzDeployment: true,
+  },
+  staging: {
+    // Staging-specific settings
+    enableDetailedMonitoring: true,
+    enableXRayTracing: false,
+    backupRetentionDays: 7,
+    multiAzDeployment: false,
+  },
+  development: {
+    // Development-specific settings
+    enableDetailedMonitoring: false,
+    enableXRayTracing: false,
+    backupRetentionDays: 3,
+    multiAzDeployment: false,
+  },
+};
+
+export function getEnvironmentOverrides(environment: string) {
+  return environmentOverrides[environment.toLowerCase() as keyof typeof environmentOverrides] || {};
 }

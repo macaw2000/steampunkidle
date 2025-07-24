@@ -55,6 +55,37 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
     setHarvestingStats(stats);
   };
 
+  const createFullPlayerStats = () => ({
+    strength: playerStats.strength,
+    dexterity: playerStats.dexterity,
+    intelligence: playerStats.intelligence,
+    vitality: playerStats.perception, // Use perception as vitality
+    craftingSkills: {
+      clockmaking: 1,
+      engineering: 1,
+      alchemy: 1,
+      steamcraft: 1,
+      level: 1,
+      experience: 0
+    },
+    harvestingSkills: {
+      mining: 1,
+      foraging: 1,
+      salvaging: 1,
+      crystal_extraction: 1,
+      level: 1,
+      experience: 0
+    },
+    combatSkills: {
+      melee: 1,
+      ranged: 1,
+      defense: 1,
+      tactics: 1,
+      level: 1,
+      experience: 0
+    }
+  });
+
   const startHarvesting = (activity: HarvestingActivity, rounds: number | 'infinite' = 'infinite') => {
     try {
       // Start task immediately, replacing any current task
@@ -63,7 +94,8 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         rounds: rounds,
         metadata: { rounds }
       };
-      serverTaskQueueService.startHarvestingTask(playerId, taskData, playerStats);
+      const fullPlayerStats = createFullPlayerStats();
+      serverTaskQueueService.startHarvestingTask(playerId, taskData, fullPlayerStats);
       
       console.log(`Started ${activity.name} immediately with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       
@@ -85,7 +117,8 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         rounds: rounds,
         metadata: { rounds, queued: true }
       };
-      serverTaskQueueService.queueHarvestingTask(playerId, taskData, playerStats);
+      const fullPlayerStats = createFullPlayerStats();
+      serverTaskQueueService.queueHarvestingTask(playerId, taskData, fullPlayerStats);
       
       console.log(`Added ${activity.name} to queue with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       

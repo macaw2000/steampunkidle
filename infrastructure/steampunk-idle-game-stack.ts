@@ -5,6 +5,7 @@ import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
 import * as ec2 from 'aws-cdk-lib/aws-ec2';
 
 import * as apigateway from 'aws-cdk-lib/aws-apigateway';
+import * as apigatewayv2 from 'aws-cdk-lib/aws-apigatewayv2';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
@@ -13,6 +14,8 @@ import * as events from 'aws-cdk-lib/aws-events';
 import * as targets from 'aws-cdk-lib/aws-events-targets';
 import { Construct } from 'constructs';
 import { FargateGameEngine } from './fargate-game-engine';
+import { TaskQueuePersistenceSchema } from './task-queue-persistence-schema';
+import { RedisCacheInfrastructure } from './redis-cache-infrastructure';
 
 export class SteampunkIdleGameStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -429,21 +432,15 @@ export class SteampunkIdleGameStack extends cdk.Stack {
       sortKey: { name: 'status', type: dynamodb.AttributeType.STRING },
     });
 
-    // Task Queues Table (for Fargate game engine)
-    const taskQueuesTable = new dynamodb.Table(this, 'TaskQueuesTable', {
-      tableName: 'steampunk-idle-game-task-queues',
-      partitionKey: { name: 'playerId', type: dynamodb.AttributeType.STRING },
-      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
+    // Enhanced Task Queue Persistence Schema
+    const taskQueuePersistence = new TaskQueuePersistenceSchema(this, 'TaskQueuePersistence', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       pointInTimeRecovery: true,
+      billingMode: dynamodb.BillingMode.PAY_PER_REQUEST
     });
 
-    // Add GSI for active task queues
-    taskQueuesTable.addGlobalSecondaryIndex({
-      indexName: 'running-status-index',
-      partitionKey: { name: 'isRunning', type: dynamodb.AttributeType.STRING },
-      sortKey: { name: 'lastProcessed', type: dynamodb.AttributeType.STRING },
-    });
+    // Legacy table reference for backward compatibility
+    const taskQueuesTable = taskQueuePersistence.taskQueuesTable;
 
     // API Gateway for REST API
     const api = new apigateway.RestApi(this, 'SteampunkIdleGameApi', {
@@ -489,7 +486,10 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     zoneInstancesTable.grantReadWriteData(lambdaExecutionRole);
     currencyTransactionsTable.grantReadWriteData(lambdaExecutionRole);
     craftingSessionsTable.grantReadWriteData(lambdaExecutionRole);
-    taskQueuesTable.grantReadWriteData(lambdaExecutionRole);
+    
+    // Grant permissions for enhanced task queue persistence
+    taskQueuePersistence.grantReadWriteData(lambdaExecutionRole);
+    taskQueuePersistence.grantStreamRead(lambdaExecutionRole);
 
     // Create VPC for Fargate service
     const vpc = new ec2.Vpc(this, 'GameEngineVpc', {
@@ -509,11 +509,27 @@ export class SteampunkIdleGameStack extends cdk.Stack {
       ],
     });
 
+    // Create Redis Cache Infrastructure for Performance Optimization
+    const redisCache = new RedisCacheInfrastructure(this, 'RedisCache', {
+      vpc,
+      nodeType: 'cache.t3.micro', // Start small, can scale up
+      numCacheNodes: 2, // Multi-AZ for high availability
+      engineVersion: '7.0',
+      enableBackup: true,
+      backupRetentionLimit: 5,
+      enableMultiAz: true,
+      enableTransitEncryption: true,
+      enableAtRestEncryption: true,
+    });
+
+    // Create monitoring alarms for Redis
+    redisCache.createMonitoringAlarms();
+
     // Create Fargate Game Engine Service
     const gameEngine = new FargateGameEngine(this, 'GameEngine', {
       vpc,
       tableNames: {
-        taskQueues: taskQueuesTable.tableName,
+        taskQueues: taskQueuePersistence.getTableNames().taskQueues,
         characters: charactersTable.tableName,
         users: usersTable.tableName,
       },
@@ -1183,47 +1199,47 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     }));
 
     // WebSocket API Gateway for real-time chat
-    const webSocketApi = new apigateway.CfnApi(this, 'ChatWebSocketApi', {
+    const webSocketApi = new apigatewayv2.CfnApi(this, 'ChatWebSocketApi', {
       name: 'steampunk-idle-game-chat-websocket',
       protocolType: 'WEBSOCKET',
       routeSelectionExpression: '$request.body.action',
     });
 
     // WebSocket API Stage
-    const webSocketStage = new apigateway.CfnStage(this, 'ChatWebSocketStage', {
+    const webSocketStage = new apigatewayv2.CfnStage(this, 'ChatWebSocketStage', {
       apiId: webSocketApi.ref,
       stageName: 'prod',
       autoDeploy: true,
     });
 
     // WebSocket Routes
-    const connectRoute = new apigateway.CfnRoute(this, 'ConnectRoute', {
+    const connectRoute = new apigatewayv2.CfnRoute(this, 'ConnectRoute', {
       apiId: webSocketApi.ref,
       routeKey: '$connect',
       authorizationType: 'NONE',
-      target: `integrations/${new apigateway.CfnIntegration(this, 'ConnectIntegration', {
+      target: `integrations/${new apigatewayv2.CfnIntegration(this, 'ConnectIntegration', {
         apiId: webSocketApi.ref,
         integrationType: 'AWS_PROXY',
         integrationUri: `arn:aws:apigateway:${this.region}:lambda:path/2015-03-31/functions/${chatConnectFunction.functionArn}/invocations`,
       }).ref}`,
     });
 
-    const disconnectRoute = new apigateway.CfnRoute(this, 'DisconnectRoute', {
+    const disconnectRoute = new apigatewayv2.CfnRoute(this, 'DisconnectRoute', {
       apiId: webSocketApi.ref,
       routeKey: '$disconnect',
       authorizationType: 'NONE',
-      target: `integrations/${new apigateway.CfnIntegration(this, 'DisconnectIntegration', {
+      target: `integrations/${new apigatewayv2.CfnIntegration(this, 'DisconnectIntegration', {
         apiId: webSocketApi.ref,
         integrationType: 'AWS_PROXY',
         integrationUri: `arn:aws:apigateway:${this.region}:lambda:path/2015-03-31/functions/${chatDisconnectFunction.functionArn}/invocations`,
       }).ref}`,
     });
 
-    const sendMessageRoute = new apigateway.CfnRoute(this, 'SendMessageRoute', {
+    const sendMessageRoute = new apigatewayv2.CfnRoute(this, 'SendMessageRoute', {
       apiId: webSocketApi.ref,
       routeKey: 'sendMessage',
       authorizationType: 'NONE',
-      target: `integrations/${new apigateway.CfnIntegration(this, 'SendMessageIntegration', {
+      target: `integrations/${new apigatewayv2.CfnIntegration(this, 'SendMessageIntegration', {
         apiId: webSocketApi.ref,
         integrationType: 'AWS_PROXY',
         integrationUri: `arn:aws:apigateway:${this.region}:lambda:path/2015-03-31/functions/${chatSendMessageFunction.functionArn}/invocations`,
@@ -1466,18 +1482,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     characterResource.addMethod('PUT', new apigateway.LambdaIntegration(updateCharacterFunction)); // Update character
     characterResource.addMethod('DELETE', new apigateway.LambdaIntegration(deleteCharacterFunction)); // Delete character
 
-    // Activity API Routes
-    const activityResource = api.root.addResource('activity');
-    
-    // Activity management
-    const switchResource = activityResource.addResource('switch');
-    switchResource.addMethod('POST', new apigateway.LambdaIntegration(switchActivityFunction)); // Switch activity
-    
-    const progressResource = activityResource.addResource('progress');
-    progressResource.addMethod('GET', new apigateway.LambdaIntegration(getActivityProgressFunction)); // Get activity progress
-    
-    const offlineProgressResource = activityResource.addResource('offline-progress');
-    offlineProgressResource.addMethod('POST', new apigateway.LambdaIntegration(calculateOfflineProgressFunction)); // Calculate offline progress
+    // Additional activity endpoints (already defined above, removing duplicates)
 
     // Currency API Routes
     const currencyResource = api.root.addResource('currency');
@@ -1529,8 +1534,8 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     const joinResource = partyIdResource.addResource('join');
     joinResource.addMethod('POST', new apigateway.LambdaIntegration(joinPartyFunction)); // Join party
     
-    const leaveResource = partyIdResource.addResource('leave');
-    leaveResource.addMethod('POST', new apigateway.LambdaIntegration(leavePartyFunction)); // Leave party
+    const partyLeaveResource = partyIdResource.addResource('leave');
+    partyLeaveResource.addMethod('POST', new apigateway.LambdaIntegration(leavePartyFunction)); // Leave party
     
     const userPartyResource = partyResource.addResource('user');
     const userIdPartyResource = userPartyResource.addResource('{userId}');
@@ -1551,8 +1556,8 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     const chatResource = api.root.addResource('chat');
     
     // Message history endpoints
-    const historyResource = chatResource.addResource('history');
-    historyResource.addMethod('GET', new apigateway.LambdaIntegration(chatGetMessageHistoryFunction)); // Get message history
+    const chatHistoryResource = chatResource.addResource('history');
+    chatHistoryResource.addMethod('GET', new apigateway.LambdaIntegration(chatGetMessageHistoryFunction)); // Get message history
     
     const privateMessagesResource = chatResource.addResource('private-messages');
     privateMessagesResource.addMethod('GET', new apigateway.LambdaIntegration(chatGetPrivateMessagesFunction)); // Get private messages
@@ -1571,8 +1576,8 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     const attackResource = instanceIdResource.addResource('attack');
     attackResource.addMethod('POST', new apigateway.LambdaIntegration(attackMonsterFunction)); // Attack monster
     
-    const leaveResource = instanceIdResource.addResource('leave');
-    leaveResource.addMethod('POST', new apigateway.LambdaIntegration(leaveZoneInstanceFunction)); // Leave zone instance
+    const zoneLeaveResource = instanceIdResource.addResource('leave');
+    zoneLeaveResource.addMethod('POST', new apigateway.LambdaIntegration(leaveZoneInstanceFunction)); // Leave zone instance
 
     // Leaderboard API Routes
     const leaderboardResource = api.root.addResource('leaderboard');

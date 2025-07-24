@@ -1,0 +1,628 @@
+.task-queue-support-tools {
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.support-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.support-header h2 {
+  margin: 0;
+  color: #333;
+  font-size: 24px;
+}
+
+.tab-navigation {
+  display: flex;
+  gap: 5px;
+}
+
+.tab-navigation button {
+  padding: 10px 20px;
+  border: 1px solid #ddd;
+  background-color: #f8f9fa;
+  color: #495057;
+  cursor: pointer;
+  border-radius: 4px 4px 0 0;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.tab-navigation button:hover {
+  background-color: #e9ecef;
+}
+
+.tab-navigation button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-message button {
+  background: none;
+  border: none;
+  color: #721c24;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+}
+
+/* Tickets Section */
+.tickets-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.tickets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.tickets-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 18px;
+}
+
+.tickets-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  height: 600px;
+}
+
+.tickets-list {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow-y: auto;
+}
+
+.ticket-item {
+  padding: 15px;
+  border-bottom: 1px solid #f0f0f0;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.ticket-item:hover {
+  background-color: #f8f9fa;
+}
+
+.ticket-item.selected {
+  background-color: #e3f2fd;
+  border-left: 4px solid #2196f3;
+}
+
+.ticket-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.ticket-id {
+  font-family: monospace;
+  font-size: 12px;
+  color: #666;
+}
+
+.priority-badge,
+.status-badge,
+.health-badge,
+.severity-badge {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+}
+
+.status-badge.open {
+  background-color: #28a745;
+}
+
+.status-badge.in_progress {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.status-badge.resolved {
+  background-color: #17a2b8;
+}
+
+.status-badge.closed {
+  background-color: #6c757d;
+}
+
+.ticket-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.ticket-info strong {
+  color: #333;
+}
+
+.issue-type {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.ticket-description {
+  font-size: 13px;
+  color: #495057;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.ticket-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: #666;
+}
+
+.ticket-details {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  overflow-y: auto;
+}
+
+.no-ticket-selected {
+  text-align: center;
+  color: #666;
+  padding: 40px;
+}
+
+.ticket-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.ticket-detail-header h4 {
+  margin: 0;
+  color: #333;
+}
+
+.ticket-actions select {
+  padding: 6px 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row label {
+  font-weight: bold;
+  color: #495057;
+}
+
+.detail-row span {
+  color: #333;
+}
+
+.description-section,
+.resolution-section {
+  margin-top: 20px;
+}
+
+.description-section label,
+.resolution-section label {
+  font-weight: bold;
+  color: #495057;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.description-content,
+.resolution-content {
+  background-color: white;
+  padding: 12px;
+  border-radius: 4px;
+  border: 1px solid #e0e0e0;
+  line-height: 1.5;
+}
+
+.quick-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  padding: 8px 16px;
+  border: 1px solid #007bff;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.action-btn:hover {
+  background-color: #0056b3;
+}
+
+/* Diagnostics Section */
+.diagnostics-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.diagnostics-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.player-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 200px;
+  font-family: monospace;
+}
+
+.player-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.diagnostic-results {
+  margin-top: 20px;
+}
+
+.diagnostic-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.diagnostic-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.health-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.issues-section,
+.recommendations-section {
+  margin-bottom: 30px;
+}
+
+.issues-section h4,
+.recommendations-section h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.issues-list,
+.recommendations-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.issue-item,
+.recommendation-item {
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.issue-header,
+.recommendation-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.issue-type {
+  font-weight: bold;
+  color: #333;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.auto-fixable,
+.automated {
+  background-color: #28a745;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.impact {
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+.impact.low {
+  background-color: #28a745;
+  color: white;
+}
+
+.impact.medium {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.impact.high {
+  background-color: #dc3545;
+  color: white;
+}
+
+.issue-description,
+.recommendation-description {
+  color: #495057;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
+
+.affected-tasks,
+.possible-causes {
+  font-size: 12px;
+  color: #666;
+}
+
+.possible-causes ul {
+  margin: 5px 0 0 0;
+  padding-left: 20px;
+}
+
+.support-report {
+  margin-top: 30px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.support-report h3 {
+  margin: 0 0 20px 0;
+  color: #333;
+}
+
+.report-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.report-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 15px;
+}
+
+.report-section h4 {
+  margin: 0 0 10px 0;
+  color: #333;
+  font-size: 14px;
+}
+
+.report-section pre {
+  font-size: 11px;
+  background-color: #f1f3f4;
+  padding: 10px;
+  border-radius: 4px;
+  overflow-x: auto;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.queue-summary {
+  font-size: 13px;
+}
+
+.queue-summary div {
+  padding: 5px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.queue-summary div:last-child {
+  border-bottom: none;
+}
+
+/* Tools Section */
+.tools-section {
+  background-color: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.tools-header {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.tool-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+.tool-group {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 20px;
+  background-color: #f8f9fa;
+}
+
+.tool-group h4 {
+  margin: 0 0 15px 0;
+  color: #333;
+  font-size: 16px;
+}
+
+.tool-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tool-btn {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.tool-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tool-btn.resolve {
+  background-color: #28a745;
+  color: white;
+}
+
+.tool-btn.resolve:hover:not(:disabled) {
+  background-color: #218838;
+}
+
+.tool-btn.reset {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.tool-btn.reset:hover:not(:disabled) {
+  background-color: #e0a800;
+}
+
+.tool-btn.reset-all {
+  background-color: #dc3545;
+  color: white;
+}
+
+.tool-btn.reset-all:hover:not(:disabled) {
+  background-color: #c82333;
+}
+
+.tool-btn.sync {
+  background-color: #17a2b8;
+  color: white;
+}
+
+.tool-btn.sync:hover:not(:disabled) {
+  background-color: #138496;
+}
+
+.tool-btn.backup {
+  background-color: #6c757d;
+  color: white;
+}
+
+.tool-btn.backup:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+@media (max-width: 1200px) {
+  .tickets-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: 300px 1fr;
+  }
+  
+  .report-sections {
+    grid-template-columns: 1fr;
+  }
+  
+  .tool-groups {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .support-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+  
+  .tab-navigation {
+    justify-content: center;
+  }
+  
+  .diagnostics-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .player-input {
+    width: 100%;
+  }
+  
+  .quick-actions {
+    flex-direction: column;
+  }
+}

@@ -7,6 +7,7 @@ import { Task, TaskType, TaskQueue, TaskProgress, TaskCompletionResult, TaskRewa
 import { harvestingService } from './harvestingService';
 import { HarvestingActivity, HarvestingReward } from '../types/harvesting';
 import { DatabaseService, TABLE_NAMES } from './databaseService';
+import { TaskUtils } from '../utils/taskUtils';
 
 class TaskQueueService {
   private queues: Map<string, TaskQueue> = new Map();
@@ -19,13 +20,51 @@ class TaskQueueService {
    */
   getQueue(playerId: string): TaskQueue {
     if (!this.queues.has(playerId)) {
+      const now = Date.now();
       this.queues.set(playerId, {
         playerId,
         currentTask: null,
         queuedTasks: [],
         isRunning: false,
+        isPaused: false,
+        pauseReason: undefined,
+        canResume: true,
         totalTasksCompleted: 0,
-        totalTimeSpent: 0
+        totalTimeSpent: 0,
+        totalRewardsEarned: [],
+        averageTaskDuration: 0,
+        taskCompletionRate: 0,
+        queueEfficiencyScore: 0,
+        totalPauseTime: 0,
+        config: {
+          maxQueueSize: 50,
+          maxTaskDuration: 86400000, // 24 hours in milliseconds
+          maxTotalQueueDuration: 604800000, // 7 days in milliseconds
+          autoStart: true,
+          priorityHandling: true,
+          retryEnabled: true,
+          maxRetries: 3,
+          validationEnabled: true,
+          syncInterval: 5000,
+          offlineProcessingEnabled: true,
+          pauseOnError: true,
+          resumeOnResourceAvailable: true,
+          persistenceInterval: 60000, // 1 minute in milliseconds
+          integrityCheckInterval: 300000, // 5 minutes in milliseconds
+          maxHistorySize: 100
+        },
+        lastProcessed: new Date().toISOString(),
+        lastSaved: now,
+        lastUpdated: now,
+        lastSynced: now,
+        createdAt: now,
+        pausedAt: undefined,
+        resumedAt: undefined,
+        version: 1,
+        checksum: "initial",
+        lastValidated: now,
+        stateHistory: [],
+        maxHistorySize: 10
       });
     }
     return this.queues.get(playerId)!;
@@ -175,19 +214,9 @@ class TaskQueueService {
    * Add a harvesting task to the queue
    */
   addHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Task {
-    const task: Task = {
-      id: `harvesting-${activity.id}-${Date.now()}`,
-      type: TaskType.HARVESTING,
-      name: activity.name,
-      description: activity.description,
-      icon: activity.icon,
-      duration: 15000, // 15 seconds
-      startTime: 0,
-      playerId,
-      activityData: { activity, playerStats },
-      completed: false
-    };
-
+    // Use TaskUtils to create a properly structured task
+    const task = TaskUtils.createHarvestingTask(playerId, activity, playerStats, 15); // Assuming level 15
+    
     this.addTaskToQueue(playerId, task);
     return task;
   }
@@ -196,18 +225,8 @@ class TaskQueueService {
    * Start a harvesting task immediately (replaces current task)
    */
   startHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Task {
-    const task: Task = {
-      id: `harvesting-${activity.id}-${Date.now()}`,
-      type: TaskType.HARVESTING,
-      name: activity.name,
-      description: activity.description,
-      icon: activity.icon,
-      duration: 15000, // 15 seconds
-      startTime: 0,
-      playerId,
-      activityData: { activity, playerStats },
-      completed: false
-    };
+    // Use TaskUtils to create a properly structured task
+    const task = TaskUtils.createHarvestingTask(playerId, activity, playerStats, 15); // Assuming level 15
 
     // Stop current task and start this one immediately
     this.stopCurrentTask(playerId);
@@ -219,18 +238,8 @@ class TaskQueueService {
    * Queue a harvesting task (adds to queue without interrupting current task)
    */
   queueHarvestingTask(playerId: string, activity: HarvestingActivity, playerStats: any): Task {
-    const task: Task = {
-      id: `harvesting-${activity.id}-${Date.now()}`,
-      type: TaskType.HARVESTING,
-      name: activity.name,
-      description: activity.description,
-      icon: activity.icon,
-      duration: 15000, // 15 seconds
-      startTime: 0,
-      playerId,
-      activityData: { activity, playerStats },
-      completed: false
-    };
+    // Use TaskUtils to create a properly structured task
+    const task = TaskUtils.createHarvestingTask(playerId, activity, playerStats, 15); // Assuming level 15
 
     // Always add to queue, never start immediately
     const queue = this.getQueue(playerId);
@@ -246,6 +255,7 @@ class TaskQueueService {
    * Add a combat task to the queue
    */
   addCombatTask(playerId: string, enemyName: string, enemyData: any): Task {
+    // Create a temporary combat task structure for backward compatibility
     const task: Task = {
       id: `combat-${enemyName}-${Date.now()}`,
       type: TaskType.COMBAT,
@@ -255,8 +265,25 @@ class TaskQueueService {
       duration: 15000, // 15 seconds
       startTime: 0,
       playerId,
-      activityData: { enemyName, enemyData },
-      completed: false
+      activityData: {
+        enemy: { enemyId: enemyName, name: enemyName, ...enemyData },
+        playerLevel: 15,
+        playerStats: { health: 100, maxHealth: 100, attack: 20, defense: 10, speed: 15, abilities: [] },
+        equipment: [],
+        combatStrategy: { strategyId: 'balanced', name: 'Balanced', description: 'Balanced approach', modifiers: [] },
+        estimatedOutcome: { winProbability: 0.7, estimatedDuration: 15, expectedRewards: [], riskLevel: 'medium' as const }
+      },
+      prerequisites: [],
+      resourceRequirements: [],
+      progress: 0,
+      completed: false,
+      rewards: [],
+      priority: 5,
+      estimatedCompletion: Date.now() + 15000,
+      retryCount: 0,
+      maxRetries: 1,
+      isValid: true,
+      validationErrors: []
     };
 
     this.addTaskToQueue(playerId, task);
@@ -267,6 +294,7 @@ class TaskQueueService {
    * Add a crafting task to the queue
    */
   addCraftingTask(playerId: string, recipeName: string, recipeData: any): Task {
+    // Create a temporary crafting task structure for backward compatibility
     const task: Task = {
       id: `crafting-${recipeName}-${Date.now()}`,
       type: TaskType.CRAFTING,
@@ -276,8 +304,25 @@ class TaskQueueService {
       duration: 15000, // 15 seconds
       startTime: 0,
       playerId,
-      activityData: { recipeName, recipeData },
-      completed: false
+      activityData: {
+        recipe: { recipeId: recipeName, name: recipeName, ...recipeData },
+        materials: [],
+        craftingStation: undefined,
+        playerSkillLevel: 5,
+        qualityModifier: 1.0,
+        expectedOutputs: []
+      },
+      prerequisites: [],
+      resourceRequirements: [],
+      progress: 0,
+      completed: false,
+      rewards: [],
+      priority: 5,
+      estimatedCompletion: Date.now() + 15000,
+      retryCount: 0,
+      maxRetries: 2,
+      isValid: true,
+      validationErrors: []
     };
 
     this.addTaskToQueue(playerId, task);
@@ -460,7 +505,7 @@ class TaskQueueService {
       id: `${originalTask.type}-${Date.now()}`,
       startTime: 0, // Will be set properly by startTask
       completed: false,
-      rewards: undefined
+      rewards: []
     };
   }
 
@@ -484,7 +529,13 @@ class TaskQueueService {
    * Generate harvesting rewards using enhanced system
    */
   private generateHarvestingRewards(task: Task): TaskReward[] {
-    const { activity } = task.activityData;
+    // Type guard to ensure we have harvesting data
+    if (task.type !== TaskType.HARVESTING) {
+      return [];
+    }
+    
+    const harvestingData = task.activityData as any; // Temporary type assertion for backward compatibility
+    const activity = harvestingData.activity || harvestingData;
     
     try {
       // Use the new enhanced reward system
@@ -659,6 +710,28 @@ class TaskQueueService {
       isRunning: queue.isRunning,
       totalCompleted: queue.totalTasksCompleted
     };
+  }
+
+  /**
+   * Remove a task from the queue
+   */
+  async removeTask(playerId: string, taskId: string): Promise<void> {
+    const queue = this.getQueue(playerId);
+    
+    // Check if it's the current task
+    if (queue.currentTask?.id === taskId) {
+      queue.currentTask = null;
+      queue.isRunning = false;
+    } else {
+      // Remove from queued tasks
+      queue.queuedTasks = queue.queuedTasks.filter(task => task.id !== taskId);
+    }
+    
+    // Start next task if needed
+    if (!queue.currentTask && queue.queuedTasks.length > 0 && !queue.isPaused) {
+      queue.currentTask = queue.queuedTasks.shift() || null;
+      queue.isRunning = !!queue.currentTask;
+    }
   }
 }
 

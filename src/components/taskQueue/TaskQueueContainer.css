@@ -1,0 +1,76 @@
+/**
+ * Task Queue Container Styles
+ * Container for switching between display and management modes
+ */
+
+.task-queue-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Mode Toggle */
+.queue-mode-toggle {
+  display: flex;
+  gap: 5px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid #654321;
+  border-radius: 8px;
+  padding: 5px;
+  align-self: flex-start;
+}
+
+.mode-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: #b8860b;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Georgia', serif;
+}
+
+.mode-btn:hover {
+  color: #d4af37;
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.mode-btn.active {
+  color: #f4e4bc;
+  background: linear-gradient(135deg, #654321 0%, #8b4513 100%);
+  border-color: #d4af37;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Queue Component */
+.queue-component {
+  flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .queue-mode-toggle {
+    align-self: stretch;
+    justify-content: center;
+  }
+  
+  .mode-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .mode-btn {
+    padding: 8px 6px;
+    font-size: 0.7rem;
+  }
+}

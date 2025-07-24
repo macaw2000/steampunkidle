@@ -24,6 +24,7 @@ interface GameService {
 interface TaskQueueService {
   getCurrentProgress: () => Promise<any>;
   syncWithServer: () => Promise<void>;
+  removeTask: (playerId: string, taskId: string) => Promise<void>;
 }
 
 // These would normally be imported from your services

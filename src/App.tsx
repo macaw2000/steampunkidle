@@ -3,11 +3,11 @@ import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { store } from './store/store';
 import AuthProvider from './components/auth/AuthProvider';
-import GameDashboard from './components/GameDashboard';
+import GameDashboard from './components/GameDashboardDebug';
 import AuthCallback from './components/auth/AuthCallback';
 import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import AppHeader from './components/common/AppHeader';
+import AppHeader from './components/common/AppHeaderDebug';
 import './App.css';
 
 // Conditionally import test user setup only in development

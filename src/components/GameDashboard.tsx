@@ -16,6 +16,8 @@ import LeaderboardHub from './leaderboard/LeaderboardHub';
 import CharacterPanel from './character/CharacterPanel';
 import HarvestingRewards from './harvesting/HarvestingRewards';
 import HarvestingHub from './harvesting/HarvestingHub';
+import TaskQueueContainer from './taskQueue/TaskQueueContainer';
+import DevelopmentIndicator from './common/DevelopmentIndicator';
 
 import GuildManager from './guild/GuildManager';
 import { serverTaskQueueService } from '../services/serverTaskQueueService';
@@ -169,10 +171,19 @@ const GameDashboard: React.FC = () => {
       const response = await fetch('/api/players/online');
       if (response.ok) {
         const players = await response.json();
-        setOnlinePlayerCount(players.length);
+        console.log('Online players response:', players);
+        // Ensure at least 1 if the current player is authenticated and has a character
+        const count = Math.max(players.length, (isAuthenticated && character) ? 1 : 0);
+        setOnlinePlayerCount(count);
+      } else {
+        console.warn('Failed to fetch online players, status:', response.status);
+        // Fallback: show at least 1 if current player is online
+        setOnlinePlayerCount((isAuthenticated && character) ? 1 : 0);
       }
     } catch (error) {
       console.error('Failed to fetch online player count:', error);
+      // Fallback: show at least 1 if current player is online
+      setOnlinePlayerCount((isAuthenticated && character) ? 1 : 0);
     }
   };
 
@@ -222,6 +233,11 @@ const GameDashboard: React.FC = () => {
     };
   }, [dispatch, character]);
 
+  // Update online player count when auth/character status changes
+  useEffect(() => {
+    fetchOnlinePlayerCount();
+  }, [isAuthenticated, character]);
+
   // Update queue status periodically
   useEffect(() => {
     if (!character) return;
@@ -259,6 +275,7 @@ const GameDashboard: React.FC = () => {
   if (hasCharacter === false) {
     return (
       <div className="game-dashboard">
+        <DevelopmentIndicator />
         <ErrorBoundary fallback={<div>Character creation failed to load</div>}>
           <CharacterCreation 
             onCharacterCreated={() => {
@@ -285,7 +302,9 @@ const GameDashboard: React.FC = () => {
 
   // Show main game interface if user has a character
   return (
-    <ResponsiveLayout
+    <>
+      <DevelopmentIndicator />
+      <ResponsiveLayout
       sidebar={
         <div className="game-features-sidebar-content">
           {/* Player Information Section */}
@@ -324,43 +343,14 @@ const GameDashboard: React.FC = () => {
       }
       className="game-dashboard"
     >
-      {/* Main Content - Focus on Current Operations Only */}
-      {activeTab === 'dashboard' && (
-        <div className="main-operations-area">
-          <ResponsiveCard
-            title="Current Operations"
-            icon="🔧"
-            size="large"
-            className="operations-card"
-          >
-            {queueStatus && queueStatus.currentTask ? (
-              <div className="current-operations">
-                <div className="current-task-info">
-                  <h4>{queueStatus.currentTask.icon} {queueStatus.currentTask.name}</h4>
-                  <p>{queueStatus.currentTask.description}</p>
-                </div>
-                <div className="queue-summary-compact">
-                  <div className="queue-stat">
-                    <span className="stat-icon">📋</span>
-                    <span>Queued: {queueStatus.queueLength}</span>
-                  </div>
-                  <div className="queue-stat">
-                    <span className="stat-icon">✅</span>
-                    <span>Completed: {queueStatus.totalCompleted}</span>
-                  </div>
-                  <div className={`queue-stat status ${queueStatus.isRunning ? 'running' : 'idle'}`}>
-                    <span className="stat-icon">{queueStatus.isRunning ? '🟢' : '⏸️'}</span>
-                    <span>{queueStatus.isRunning ? 'Active' : 'Idle'}</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="no-operations">
-                <p>No active tasks</p>
-                <p><em>Start an activity to see live progress</em></p>
-              </div>
-            )}
-          </ResponsiveCard>
+      {/* Main Content - Task Queue Display */}
+      {activeTab === 'dashboard' && character && (
+        <div className="main-content-area">
+          <TaskQueueContainer 
+            playerId={character.characterId}
+            className="main-task-queue"
+            defaultMode="management"
+          />
         </div>
       )}
 
@@ -392,6 +382,7 @@ const GameDashboard: React.FC = () => {
         onClose={closeRewards}
       />
     </ResponsiveLayout>
+    </>
   );
 };
 
