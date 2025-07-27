@@ -1,8 +1,10 @@
 import { TestDataGenerator, Player } from '../utils/TestDataGenerator';
 import { PerformanceTestResults, PerformanceScenarioResult } from '../UserAcceptanceTestSuite';
 import { serverTaskQueueService } from '../../../services/serverTaskQueueService';
+import { HarvestingCategory } from '../../../types/harvesting';
 import { LoadTestFramework } from '../../loadTesting/LoadTestFramework';
 import { PerformanceBenchmark } from '../../loadTesting/PerformanceBenchmark';
+import { TaskType } from '../../../types/taskQueue';
 
 /**
  * Tests queue performance under realistic load conditions
@@ -17,7 +19,7 @@ export class PerformanceValidationTests {
   constructor(testDataGenerator: TestDataGenerator) {
     this.testDataGenerator = testDataGenerator;
     this.serverTaskQueueService = serverTaskQueueService;
-    this.loadTestFramework = new LoadTestFramework();
+    this.loadTestFramework = new LoadTestFramework(serverTaskQueueService);
     this.performanceBenchmark = new PerformanceBenchmark();
   }
 
@@ -73,27 +75,31 @@ export class PerformanceValidationTests {
       
       // Prepare load test configuration
       const loadTestConfig = {
-        concurrentUsers: concurrentPlayers,
-        testDuration: 30000, // 30 seconds
-        rampUpTime: 5000, // 5 seconds
-        operations: [
-          { name: 'addTask', weight: 40 },
-          { name: 'getQueueStatus', weight: 30 },
-          { name: 'removeTask', weight: 20 },
-          { name: 'reorderTasks', weight: 10 }
-        ]
+        concurrentPlayers: concurrentPlayers,
+        testDurationMs: 30000, // 30 seconds
+        tasksPerPlayer: 5,
+        taskTypeDistribution: {
+          harvesting: 40,
+          crafting: 30,
+          combat: 30
+        },
+        maxResponseTimeMs: 1000,
+        maxErrorRate: 0.05,
+        maxMemoryUsageMB: 500,
+        rampUpTimeMs: 5000, // 5 seconds
+        rampDownTimeMs: 2000 // 2 seconds
       };
       
       // Run concurrent load test
       const loadTestStartTime = Date.now();
-      const loadTestResults = await this.loadTestFramework.runLoadTest(loadTestConfig);
+      const loadTestResults = await this.loadTestFramework.executeLoadTest(loadTestConfig);
       const loadTestDuration = Date.now() - loadTestStartTime;
       
       // Analyze results
       const avgResponseTime = loadTestResults.averageResponseTime;
-      const maxResponseTime = loadTestResults.maxResponseTime;
-      const errorRate = loadTestResults.errorRate;
-      const throughput = loadTestResults.throughput;
+      const maxResponseTime = loadTestResults.p99ResponseTime;
+      const errorRate = loadTestResults.failedRequests / loadTestResults.totalRequests;
+      const throughput = loadTestResults.taskProcessingRate;
       
       // Performance criteria
       const responseTimeThreshold = 100; // 100ms
@@ -129,7 +135,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -160,7 +166,7 @@ export class PerformanceValidationTests {
         // Add all tasks
         const addStartTime = Date.now();
         for (const task of tasks) {
-          await this.serverTaskQueueService.addTask(player.id, task);
+          await this.addTaskToService(player.id, task);
         }
         const addDuration = Date.now() - addStartTime;
         
@@ -232,7 +238,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -266,7 +272,7 @@ export class PerformanceValidationTests {
         // Add batch of tasks
         const batchStartTime = Date.now();
         for (const task of batch) {
-          await this.serverTaskQueueService.addTask(player.id, task);
+          await this.addTaskToService(player.id, task);
         }
         
         // Simulate UI update (queue status fetch + render time)
@@ -329,7 +335,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -364,7 +370,7 @@ export class PerformanceValidationTests {
         const task = this.testDataGenerator.generateTask(
           ['HARVESTING', 'CRAFTING', 'COMBAT'][operationCount % 3] as any
         );
-        await this.serverTaskQueueService.addTask(player.id, task);
+        await this.addTaskToService(player.id, task);
         
         // Get status
         await this.serverTaskQueueService.getQueueStatus(player.id);
@@ -426,7 +432,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -443,18 +449,18 @@ export class PerformanceValidationTests {
       
       // Test database operations
       const dbOperationTimes = {
-        writes: [],
-        reads: [],
-        updates: [],
-        deletes: []
+        writes: [] as number[],
+        reads: [] as number[],
+        updates: [] as number[],
+        deletes: [] as number[]
       };
       
       // Test write performance
       for (const player of players) {
-        const task = this.testDataGenerator.generateTask('HARVESTING');
+        const task = this.testDataGenerator.generateTask(TaskType.HARVESTING);
         
         const writeStartTime = Date.now();
-        await this.serverTaskQueueService.addTask(player.id, task);
+        await this.addTaskToService(player.id, task);
         const writeDuration = Date.now() - writeStartTime;
         
         dbOperationTimes.writes.push(writeDuration);
@@ -537,7 +543,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -565,8 +571,8 @@ export class PerformanceValidationTests {
           const operationStartTime = Date.now();
           
           // Add a task
-          const task = this.testDataGenerator.generateTask('HARVESTING');
-          await this.serverTaskQueueService.addTask(player.id, task);
+          const task = this.testDataGenerator.generateTask(TaskType.HARVESTING);
+          await this.addTaskToService(player.id, task);
           
           // Get status
           await this.serverTaskQueueService.getQueueStatus(player.id);
@@ -600,7 +606,7 @@ export class PerformanceValidationTests {
             loadTestDuration: Date.now() - loadTestStartTime,
             successfulOperations: 0,
             throughput: 0,
-            error: error.message
+            error: (error as Error).message
           });
         }
       }
@@ -633,7 +639,7 @@ export class PerformanceValidationTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${(error as Error).message}`
       };
     }
   }
@@ -675,5 +681,121 @@ export class PerformanceValidationTests {
     if (responseTimeIncrease < 2) return 'MINIMAL';
     if (responseTimeIncrease < 5) return 'MODERATE';
     return 'SIGNIFICANT';
+  }
+
+  /**
+   * Helper method to add a task using the appropriate service method
+   */
+  private async addTaskToService(playerId: string, task: any): Promise<void> {
+    const mockStats = this.createMockStats();
+    
+    switch (task.type) {
+      case 'HARVESTING':
+        const harvestingActivity = {
+          id: 'test-activity',
+          name: 'Test Activity',
+          description: 'Test harvesting activity',
+          category: HarvestingCategory.MECHANICAL,
+          icon: '⛏️',
+          baseTime: 30,
+          energyCost: 10,
+          requiredLevel: 1,
+          statBonuses: { experience: 25 },
+          dropTable: {
+            guaranteed: [],
+            common: [],
+            uncommon: [],
+            rare: [],
+            legendary: []
+          }
+        };
+        await this.serverTaskQueueService.addHarvestingTask(playerId, harvestingActivity, mockStats);
+        break;
+      case 'CRAFTING':
+        const craftingRecipe = {
+          recipeId: 'test-recipe',
+          name: 'Test Recipe',
+          description: 'Test crafting recipe',
+          category: 'materials' as const,
+          requiredSkill: 'clockmaking' as const,
+          requiredLevel: 1,
+          craftingTime: 60,
+          materials: [],
+          outputs: [],
+          experienceGain: 50,
+          steampunkTheme: {
+            flavorText: 'A test recipe',
+            visualDescription: 'Test crafting'
+          }
+        };
+        await this.serverTaskQueueService.addCraftingTask(playerId, craftingRecipe, mockStats, 10, {});
+        break;
+      case 'COMBAT':
+        const enemy = {
+          enemyId: 'test-enemy',
+          name: 'Test Enemy',
+          description: 'Test combat enemy',
+          type: 'automaton' as const,
+          level: 1,
+          stats: {
+            health: 100,
+            attack: 10,
+            defense: 5,
+            speed: 8,
+            resistances: {},
+            abilities: []
+          },
+          lootTable: [],
+          experienceReward: 100,
+          steampunkTheme: {
+            appearance: 'Test automaton',
+            backstory: 'Test enemy',
+            combatStyle: 'Basic'
+          }
+        };
+        const combatStats = { 
+          health: 100, 
+          maxHealth: 100, 
+          attack: 10, 
+          defense: 5, 
+          speed: 8, 
+          abilities: [] 
+        };
+        await this.serverTaskQueueService.addCombatTask(playerId, enemy, mockStats, 10, combatStats);
+        break;
+    }
+  }
+
+  private createMockStats() {
+    return {
+      strength: 10,
+      dexterity: 10,
+      intelligence: 10,
+      vitality: 10,
+      craftingSkills: {
+        clockmaking: 5,
+        engineering: 5,
+        alchemy: 5,
+        steamcraft: 5,
+        level: 5,
+        experience: 1000
+      },
+      harvestingSkills: {
+        mining: 5,
+        foraging: 5,
+        salvaging: 5,
+        crystal_extraction: 5,
+        level: 5,
+        experience: 1000
+      },
+      combatSkills: {
+        melee: 5,
+        ranged: 5,
+        defense: 5,
+        tactics: 5,
+        level: 5,
+        experience: 1000
+      }
+    };
   }
 }

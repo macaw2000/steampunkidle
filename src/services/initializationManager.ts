@@ -269,11 +269,38 @@ class InitializationManager {
       
       if (result) {
         console.log('Authentication initialized with existing session');
+        // Dispatch the authentication data to Redux store
+        const { loginSuccess } = await import('../store/slices/authSlice');
+        store.dispatch(loginSuccess(result));
+        
+        // After successful authentication, try to load the user's character
+        await this.loadUserCharacter(result.user.userId);
       } else {
         console.log('Authentication initialized without existing session');
       }
     } catch (error) {
       throw new Error(`Authentication initialization failed: ${error}`);
+    }
+  }
+
+  private async loadUserCharacter(userId: string): Promise<void> {
+    try {
+      const { CharacterService } = await import('./characterService');
+      const character = await CharacterService.getCharacter(userId);
+      
+      if (character) {
+        console.log('Character loaded for user:', userId);
+        const { setCharacter } = await import('../store/slices/gameSlice');
+        store.dispatch(setCharacter(character));
+      } else {
+        console.log('No character found for user:', userId);
+        // Set hasCharacter to false so the UI shows character creation
+        const { setLoading } = await import('../store/slices/gameSlice');
+        store.dispatch(setLoading(false));
+      }
+    } catch (error) {
+      console.error('Failed to load character:', error);
+      // Don't throw error here as character loading is not critical for auth
     }
   }
 

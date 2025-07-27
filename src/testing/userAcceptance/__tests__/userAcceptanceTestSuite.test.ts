@@ -4,6 +4,7 @@
  */
 
 import { UserAcceptanceTestSuite } from '../UserAcceptanceTestSuite';
+import { TaskType } from '../../../types/taskQueue';
 
 describe('User Acceptance Test Suite', () => {
   let testSuite: UserAcceptanceTestSuite;
@@ -172,16 +173,16 @@ describe('User Acceptance Test Suite', () => {
       expect(hardcorePlayer.level).toBeGreaterThan(casualPlayer.level);
       
       // Test task generation
-      const harvestingTask = testDataGenerator.generateTask('HARVESTING');
+      const harvestingTask = testDataGenerator.generateTask(TaskType.HARVESTING);
       expect(harvestingTask).toBeDefined();
-      expect(harvestingTask.type).toBe('HARVESTING');
+      expect(harvestingTask.type).toBe(TaskType.HARVESTING);
       expect(harvestingTask.duration).toBeGreaterThan(0);
       
-      const craftingTask = testDataGenerator.generateTask('CRAFTING');
-      expect(craftingTask.type).toBe('CRAFTING');
+      const craftingTask = testDataGenerator.generateTask(TaskType.CRAFTING);
+      expect(craftingTask.type).toBe(TaskType.CRAFTING);
       
-      const combatTask = testDataGenerator.generateTask('COMBAT');
-      expect(combatTask.type).toBe('COMBAT');
+      const combatTask = testDataGenerator.generateTask(TaskType.COMBAT);
+      expect(combatTask.type).toBe(TaskType.COMBAT);
       
       // Test queue generation
       const testQueue = testDataGenerator.generateTestTaskQueue('test-player', 'MIXED');

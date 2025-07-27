@@ -1,4 +1,4 @@
-import { Task, TaskType, TaskQueue, Player } from '../../../types/taskQueue';
+import { Task, TaskType, TaskQueue } from '../../../types/taskQueue';
 import { HarvestingActivity } from '../../../types/harvesting';
 import { CraftingRecipe } from '../../../types/crafting';
 import { Enemy } from '../../../types/combat';
@@ -96,14 +96,38 @@ export class TestDataGenerator {
       queuedTasks: tasks.slice(1),
       isRunning: true,
       isPaused: false,
+      canResume: true,
       totalTasksCompleted: Math.floor(Math.random() * 100),
       totalTimeSpent: Math.floor(Math.random() * 86400000), // Up to 24 hours
       totalRewardsEarned: [],
-      maxQueueSize: 50,
-      autoStart: true,
+      averageTaskDuration: 60000,
+      taskCompletionRate: 0.95,
+      queueEfficiencyScore: 0.85,
+      config: {
+        maxQueueSize: 50,
+        maxTaskDuration: 3600000,
+        maxTotalQueueDuration: 86400000,
+        autoStart: true,
+        priorityHandling: false,
+        retryEnabled: true,
+        maxRetries: 3,
+        validationEnabled: true,
+        syncInterval: 30000,
+        offlineProcessingEnabled: true,
+        pauseOnError: false,
+        resumeOnResourceAvailable: true,
+        persistenceInterval: 60000,
+        integrityCheckInterval: 300000,
+        maxHistorySize: 100
+      },
       lastUpdated: Date.now(),
       lastSynced: Date.now() - Math.floor(Math.random() * 60000), // Within last minute
-      createdAt: Date.now() - Math.floor(Math.random() * 2592000000) // Within last 30 days
+      createdAt: Date.now() - Math.floor(Math.random() * 2592000000), // Within last 30 days
+      version: 1,
+      checksum: 'test-checksum',
+      lastValidated: Date.now(),
+      stateHistory: [],
+      maxHistorySize: 100
     };
   }
 
@@ -118,17 +142,17 @@ export class TestDataGenerator {
       
       switch (queueType) {
         case 'HARVESTING_ONLY':
-          taskType = 'HARVESTING';
+          taskType = TaskType.HARVESTING;
           break;
         case 'CRAFTING_ONLY':
-          taskType = 'CRAFTING';
+          taskType = TaskType.CRAFTING;
           break;
         case 'COMBAT_ONLY':
-          taskType = 'COMBAT';
+          taskType = TaskType.COMBAT;
           break;
         case 'MIXED':
         default:
-          const types: TaskType[] = ['HARVESTING', 'CRAFTING', 'COMBAT'];
+          const types: TaskType[] = [TaskType.HARVESTING, TaskType.CRAFTING, TaskType.COMBAT];
           taskType = types[Math.floor(Math.random() * types.length)];
           break;
       }
@@ -161,34 +185,40 @@ export class TestDataGenerator {
     };
 
     switch (type) {
-      case 'HARVESTING':
+      case TaskType.HARVESTING:
         return {
           ...baseTask,
           name: 'Harvest Wood',
           description: 'Gather wood from the forest',
           icon: '🌲',
           duration: 30000 + Math.floor(Math.random() * 120000), // 30s to 2.5min
-          activityData: this.generateHarvestingData()
+          activityData: this.generateHarvestingData(),
+          isValid: true,
+          validationErrors: []
         };
       
-      case 'CRAFTING':
+      case TaskType.CRAFTING:
         return {
           ...baseTask,
           name: 'Craft Iron Sword',
           description: 'Forge a basic iron sword',
           icon: '⚔️',
           duration: 60000 + Math.floor(Math.random() * 300000), // 1min to 5min
-          activityData: this.generateCraftingData()
+          activityData: this.generateCraftingData(),
+          isValid: true,
+          validationErrors: []
         };
       
-      case 'COMBAT':
+      case TaskType.COMBAT:
         return {
           ...baseTask,
           name: 'Fight Goblin',
           description: 'Battle a goblin warrior',
           icon: '👹',
           duration: 45000 + Math.floor(Math.random() * 180000), // 45s to 3min
-          activityData: this.generateCombatData()
+          activityData: this.generateCombatData(),
+          isValid: true,
+          validationErrors: []
         };
       
       default:

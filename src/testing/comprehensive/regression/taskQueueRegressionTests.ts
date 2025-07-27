@@ -11,8 +11,7 @@ import { serverTaskQueueService } from '../../../services/serverTaskQueueService
 import { 
   Task, 
   TaskType, 
-  TaskQueue,
-  QueueStatus
+  TaskQueue
 } from '../../../types/taskQueue';
 
 export class TaskQueueRegressionTests {
@@ -673,7 +672,7 @@ export class TaskQueueRegressionTests {
     // Regression test for legacy task format support
     await this.runTest('Legacy task format support', async () => {
       // Create task with old format (missing some new properties)
-      const legacyTask = {
+      const legacyTask: Task = {
         id: 'legacy-task-123',
         type: TaskType.HARVESTING,
         name: 'Legacy Harvesting Task',
@@ -684,8 +683,23 @@ export class TaskQueueRegressionTests {
         playerId: 'legacy-player',
         progress: 0,
         completed: false,
-        rewards: []
-        // Missing: activityData, prerequisites, resourceRequirements, etc.
+        rewards: [],
+        // Required properties for Task interface
+        activityData: {
+          activity: { id: 'test-activity', name: 'Test Activity', type: 'harvesting' },
+          playerStats: this.createMockPlayerStats(),
+          location: undefined,
+          tools: [],
+          expectedYield: []
+        } as any,
+        prerequisites: [],
+        resourceRequirements: [],
+        priority: 1,
+        estimatedCompletion: Date.now() + 30000,
+        retryCount: 0,
+        maxRetries: 3,
+        isValid: true,
+        validationErrors: []
       };
       
       const mockStats = this.createMockPlayerStats();
@@ -693,7 +707,7 @@ export class TaskQueueRegressionTests {
       // Should handle legacy format gracefully
       try {
         const result = TaskValidationService.validateTask(
-          legacyTask as Task,
+          legacyTask,
           mockStats,
           15,
           {}
@@ -713,18 +727,49 @@ export class TaskQueueRegressionTests {
     // Regression test for legacy queue format support
     await this.runTest('Legacy queue format support', async () => {
       // Create queue with old format
-      const legacyQueue = {
+      const legacyQueue: TaskQueue = {
         playerId: 'legacy-queue-player',
         currentTask: null,
         queuedTasks: [],
         isRunning: false,
         totalTasksCompleted: 0,
-        lastUpdated: Date.now()
-        // Missing: many new properties
+        lastUpdated: Date.now(),
+        // Required properties for TaskQueue interface
+        isPaused: false,
+        canResume: true,
+        totalTimeSpent: 0,
+        totalRewardsEarned: [],
+        averageTaskDuration: 0,
+        taskCompletionRate: 0,
+        queueEfficiencyScore: 0,
+        config: {
+          maxQueueSize: 10,
+          maxTaskDuration: 3600000,
+          maxTotalQueueDuration: 86400000,
+          autoStart: true,
+          priorityHandling: false,
+          retryEnabled: true,
+          maxRetries: 3,
+          validationEnabled: true,
+          syncInterval: 5000,
+          offlineProcessingEnabled: true,
+          pauseOnError: false,
+          resumeOnResourceAvailable: true,
+          persistenceInterval: 10000,
+          integrityCheckInterval: 60000,
+          maxHistorySize: 100
+        },
+        lastSynced: Date.now(),
+        createdAt: Date.now(),
+        version: 1,
+        checksum: 'legacy-checksum',
+        lastValidated: Date.now(),
+        stateHistory: [],
+        maxHistorySize: 100
       };
       
       try {
-        const result = await queueStateManager.validateState(legacyQueue as TaskQueue);
+        const result = await queueStateManager.validateState(legacyQueue);
         
         // Should handle gracefully even if validation fails
         if (!result) {

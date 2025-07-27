@@ -330,6 +330,13 @@ class TaskQueueService {
   }
 
   /**
+   * Add a generic task to the queue
+   */
+  addTask(playerId: string, task: Task): void {
+    this.addTaskToQueue(playerId, task);
+  }
+
+  /**
    * Add task to queue and start processing if not already running
    */
   private addTaskToQueue(playerId: string, task: Task): void {

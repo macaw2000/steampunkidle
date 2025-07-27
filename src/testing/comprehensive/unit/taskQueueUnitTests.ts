@@ -12,8 +12,7 @@ import {
   Task, 
   TaskType, 
   TaskQueue,
-  TaskValidationResult,
-  QueueStatus
+  TaskValidationResult
 } from '../../../types/taskQueue';
 import { CharacterStats } from '../../../types/character';
 
@@ -351,7 +350,7 @@ export class TaskQueueUnitTests {
       queue.isRunning = true;
       
       // Calculate status (this would normally be done by a service)
-      const status: QueueStatus = {
+      const status = {
         currentTask: currentTask,
         queueLength: queue.queuedTasks.length,
         queuedTasks: queue.queuedTasks,

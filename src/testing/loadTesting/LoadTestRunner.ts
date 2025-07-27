@@ -7,7 +7,7 @@ import { LoadTestFramework, LoadTestConfig, LoadTestResult } from './LoadTestFra
 import { StressTestRunner, StressTestSuite, StressTestReport } from './StressTestRunner';
 import { PerformanceBenchmark, BenchmarkSuite, OptimizationValidation } from './PerformanceBenchmark';
 import { CapacityPlanner, CapacityPlan, GrowthScenario } from './CapacityPlanner';
-import { ServerTaskQueueService } from '../../services/serverTaskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 
 export interface LoadTestSuite {
   name: string;
@@ -51,7 +51,7 @@ export class LoadTestRunner {
   private capacityPlanner: CapacityPlanner;
   private isRunning = false;
 
-  constructor(taskQueueService: ServerTaskQueueService) {
+  constructor(taskQueueService: typeof serverTaskQueueService) {
     this.loadTestFramework = new LoadTestFramework(taskQueueService);
     this.stressTestRunner = new StressTestRunner(taskQueueService);
     this.performanceBenchmark = new PerformanceBenchmark();

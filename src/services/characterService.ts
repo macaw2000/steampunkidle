@@ -209,8 +209,9 @@ export class CharacterService {
    * Get character by user ID
    */
   static async getCharacter(userId: string): Promise<Character | null> {
-    // In development mode, check for test character data
-    if (process.env.NODE_ENV === 'development') {
+    // Use localStorage when no backend API is available
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.useLocalStorage) {
       const testCharacter = localStorage.getItem(`testCharacter-${userId}`);
       if (testCharacter) {
         return JSON.parse(testCharacter);

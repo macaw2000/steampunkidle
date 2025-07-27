@@ -93,7 +93,35 @@ class AuthService {
           localStorage.removeItem('mockAuthSession');
         }
       }
-      return null;
+
+      // Create a default mock session for development
+      console.log('Creating default mock authentication session');
+      const mockUser: User = {
+        userId: 'mock-user-123',
+        email: 'test@steampunkidle.com',
+        name: 'Test Player',
+        socialProviders: [],
+        lastLogin: new Date().toISOString(),
+      };
+
+      const mockTokens: AuthTokens = {
+        accessToken: 'mock-access-token',
+        idToken: 'mock-id-token',
+        refreshToken: 'mock-refresh-token',
+        expiresIn: 3600,
+        tokenType: 'Bearer',
+      };
+
+      const mockSessionData = {
+        user: mockUser,
+        tokens: mockTokens,
+        expiresAt: Date.now() + (3600 * 1000), // 1 hour from now
+      };
+
+      // Store the mock session
+      localStorage.setItem('mockAuthSession', JSON.stringify(mockSessionData));
+      
+      return { user: mockUser, tokens: mockTokens };
     }
 
     try {
@@ -218,7 +246,8 @@ class AuthService {
 
   // Confirm email verification
   async confirmEmail(email: string, confirmationCode: string): Promise<void> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       return this.mockConfirmEmail(email, confirmationCode);
     }
 
@@ -239,7 +268,8 @@ class AuthService {
 
   // Request password reset
   async requestPasswordReset(email: string): Promise<void> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       return this.mockRequestPasswordReset(email);
     }
 
@@ -257,7 +287,8 @@ class AuthService {
 
   // Confirm password reset
   async confirmPasswordReset(email: string, confirmationCode: string, newPassword: string): Promise<void> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       return this.mockConfirmPasswordReset(email, confirmationCode, newPassword);
     }
 
@@ -334,7 +365,8 @@ class AuthService {
 
   // Logout user
   async logout(accessToken: string): Promise<void> {
-    if (isDevelopmentMode()) {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.enableMockAuth) {
       // Clear mock session
       if (typeof window !== 'undefined' && window.localStorage) {
         localStorage.removeItem('mockAuthSession');

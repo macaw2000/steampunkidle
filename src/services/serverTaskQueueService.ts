@@ -1268,6 +1268,22 @@ class ServerTaskQueueService {
   }
 
   /**
+   * Store an operation for offline processing
+   */
+  private storeOfflineOperation(playerId: string, operation: string, data: any): void {
+    if (!this.pendingOperations.has(playerId)) {
+      this.pendingOperations.set(playerId, []);
+    }
+    
+    const operations = this.pendingOperations.get(playerId)!;
+    operations.push({
+      operation,
+      data,
+      timestamp: Date.now()
+    });
+  }
+
+  /**
    * Process pending operations when server becomes available
    */
   private async processPendingOperations(playerId: string): Promise<void> {
@@ -1330,6 +1346,60 @@ class ServerTaskQueueService {
     // Clear processed operations
     this.pendingOperations.delete(playerId);
     console.log(`ServerTaskQueueService: Completed processing pending operations for player ${playerId}. Success: ${successCount}, Failures: ${failureCount}`);
+  }
+
+  /**
+   * Add a generic task to the server queue
+   */
+  async addTask(playerId: string, task: Task): Promise<void> {
+    // Use local fallback if server is unavailable
+    if (this.useLocalFallback) {
+      await this.localAddTask(playerId, task);
+      return;
+    }
+
+    try {
+      await NetworkUtils.postJson(`${this.apiUrl}/task-queue/add-task`, {
+        action: 'addTask',
+        playerId,
+        task,
+        timestamp: Date.now()
+      });
+
+      // Update local cache
+      const currentState = this.lastKnownState.get(playerId);
+      if (currentState) {
+        currentState.queuedTasks.push(task);
+        currentState.queueLength = currentState.queuedTasks.length + (currentState.currentTask ? 1 : 0);
+        currentState.lastUpdated = Date.now();
+        this.lastKnownState.set(playerId, currentState);
+      }
+
+      console.log('ServerTaskQueueService: Task added successfully:', task.id);
+    } catch (error) {
+      console.error('ServerTaskQueueService: Failed to add task:', error);
+      
+      // Store operation for retry when server is available
+      this.storeOfflineOperation(playerId, 'addTask', { task });
+      
+      // Fall back to local processing
+      this.useLocalFallback = true;
+      await this.localAddTask(playerId, task);
+    }
+  }
+
+  /**
+   * Local fallback method for adding tasks
+   */
+  private async localAddTask(playerId: string, task: Task): Promise<void> {
+    try {
+      // For testing purposes, use the local taskQueueService directly
+      // This bypasses the server-specific validation and parameter requirements
+      await taskQueueService.addTask(playerId, task);
+    } catch (error) {
+      console.error('ServerTaskQueueService: Local add task failed:', error);
+      throw error;
+    }
   }
 
   /**

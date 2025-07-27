@@ -4,7 +4,7 @@
  */
 
 import { LoadTestFramework, LoadTestConfig, LoadTestResult } from './LoadTestFramework';
-import { ServerTaskQueueService } from '../../services/serverTaskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 
 export interface StressTestScenario {
   name: string;
@@ -46,7 +46,7 @@ export class StressTestRunner {
   private isRunning = false;
   private currentSuite: StressTestSuite | null = null;
 
-  constructor(taskQueueService: ServerTaskQueueService) {
+  constructor(taskQueueService: typeof serverTaskQueueService) {
     this.loadTestFramework = new LoadTestFramework(taskQueueService);
   }
 
@@ -360,7 +360,9 @@ export class StressTestRunner {
     const bottlenecks = new Set<string>();
     
     for (const result of results) {
-      bottlenecks.add(...result.bottleneckComponents);
+      if (Array.isArray(result.bottleneckComponents)) {
+        result.bottleneckComponents.forEach(component => bottlenecks.add(component));
+      }
     }
     
     // Add additional analysis

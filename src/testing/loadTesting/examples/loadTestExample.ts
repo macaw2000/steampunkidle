@@ -4,7 +4,7 @@
  */
 
 import { LoadTestRunner } from '../LoadTestRunner';
-import { ServerTaskQueueService } from '../../../services/serverTaskQueueService';
+import { serverTaskQueueService } from '../../../services/serverTaskQueueService';
 
 /**
  * Example: Basic Load Testing
@@ -12,7 +12,7 @@ import { ServerTaskQueueService } from '../../../services/serverTaskQueueService
 async function basicLoadTestExample() {
   console.log('=== Basic Load Test Example ===');
   
-  const taskQueueService = new ServerTaskQueueService();
+  const taskQueueService = serverTaskQueueService;
   const loadTestRunner = new LoadTestRunner(taskQueueService);
   
   // Create a simple test suite
@@ -99,7 +99,7 @@ async function basicLoadTestExample() {
 async function comprehensiveTestExample() {
   console.log('\n=== Comprehensive Performance Test Example ===');
   
-  const taskQueueService = new ServerTaskQueueService();
+  const taskQueueService = serverTaskQueueService;
   const loadTestRunner = new LoadTestRunner(taskQueueService);
   
   // Use the standard comprehensive test suite
@@ -147,7 +147,7 @@ async function comprehensiveTestExample() {
 async function optimizationValidationExample() {
   console.log('\n=== Optimization Validation Example ===');
   
-  const taskQueueService = new ServerTaskQueueService();
+  const taskQueueService = serverTaskQueueService;
   const loadTestRunner = new LoadTestRunner(taskQueueService);
   
   // Define "before" optimization test suite
@@ -288,7 +288,7 @@ async function optimizationValidationExample() {
 async function capacityPlanningExample() {
   console.log('\n=== Capacity Planning Example ===');
   
-  const taskQueueService = new ServerTaskQueueService();
+  const taskQueueService = serverTaskQueueService;
   const loadTestRunner = new LoadTestRunner(taskQueueService);
   
   // Get the capacity planner
@@ -326,14 +326,14 @@ async function capacityPlanningExample() {
     
     if (plan.milestones.length > 0) {
       console.log('\nKey Milestones:');
-      plan.milestones.slice(0, 3).forEach(milestone => {
+      plan.milestones.slice(0, 3).forEach((milestone: any) => {
         console.log(`  ${milestone.date}: ${milestone.action} ($${milestone.cost.toLocaleString()}/month)`);
       });
     }
     
     if (plan.riskAssessment.technicalRisks.length > 0) {
       console.log('\nTechnical Risks:');
-      plan.riskAssessment.technicalRisks.slice(0, 2).forEach(risk => {
+      plan.riskAssessment.technicalRisks.slice(0, 2).forEach((risk: any) => {
         console.log(`  - ${risk}`);
       });
     }

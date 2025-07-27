@@ -1,6 +1,7 @@
 import { TestDataGenerator, Player } from '../utils/TestDataGenerator';
 import { UsabilityTestResults, UsabilityScenarioResult } from '../UserAcceptanceTestSuite';
 import { serverTaskQueueService } from '../../../services/serverTaskQueueService';
+import { TaskType } from '../../../types/taskQueue';
 
 /**
  * Tests usability of the queue management interface
@@ -66,11 +67,11 @@ export class UsabilityTests {
       
       // Create a realistic queue
       const tasks = [
-        this.testDataGenerator.generateTask('HARVESTING'),
-        this.testDataGenerator.generateTask('CRAFTING'),
-        this.testDataGenerator.generateTask('COMBAT'),
-        this.testDataGenerator.generateTask('HARVESTING'),
-        this.testDataGenerator.generateTask('CRAFTING')
+        this.testDataGenerator.generateTask(TaskType.HARVESTING),
+        this.testDataGenerator.generateTask(TaskType.CRAFTING),
+        this.testDataGenerator.generateTask(TaskType.COMBAT),
+        this.testDataGenerator.generateTask(TaskType.HARVESTING),
+        this.testDataGenerator.generateTask(TaskType.CRAFTING)
       ];
       
       for (const task of tasks) {
@@ -135,7 +136,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -155,7 +156,7 @@ export class UsabilityTests {
       
       // Test 1: Single task addition speed
       const singleTaskStartTime = Date.now();
-      const harvestingTask = this.testDataGenerator.generateTask('HARVESTING');
+      const harvestingTask = this.testDataGenerator.generateTask(TaskType.HARVESTING);
       await this.serverTaskQueueService.addTask(player.id, harvestingTask);
       const singleTaskTime = Date.now() - singleTaskStartTime;
       
@@ -168,9 +169,9 @@ export class UsabilityTests {
       // Test 2: Batch task addition efficiency
       const batchStartTime = Date.now();
       const batchTasks = [
-        this.testDataGenerator.generateTask('CRAFTING'),
-        this.testDataGenerator.generateTask('COMBAT'),
-        this.testDataGenerator.generateTask('HARVESTING')
+        this.testDataGenerator.generateTask(TaskType.CRAFTING),
+        this.testDataGenerator.generateTask(TaskType.COMBAT),
+        this.testDataGenerator.generateTask(TaskType.HARVESTING)
       ];
       
       for (const task of batchTasks) {
@@ -187,9 +188,15 @@ export class UsabilityTests {
       });
       
       // Test 3: Task validation feedback speed
-      const invalidTask = { ...this.testDataGenerator.generateTask('CRAFTING') };
+      const invalidTask = { ...this.testDataGenerator.generateTask(TaskType.CRAFTING) };
       invalidTask.resourceRequirements = [
-        { resource: 'nonexistent-item', quantity: 999 }
+        { 
+          resourceId: 'nonexistent-item', 
+          resourceName: 'Nonexistent Item',
+          quantityRequired: 999,
+          quantityAvailable: 0,
+          isSufficient: false
+        }
       ];
       
       const validationStartTime = Date.now();
@@ -230,7 +237,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -304,7 +311,7 @@ export class UsabilityTests {
       // Test 3: Reorder responsiveness with large queue
       const largeQueueTasks = [];
       for (let i = 0; i < 20; i++) {
-        largeQueueTasks.push(this.testDataGenerator.generateTask('HARVESTING'));
+        largeQueueTasks.push(this.testDataGenerator.generateTask(TaskType.HARVESTING));
       }
       
       // Add large batch
@@ -348,7 +355,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -365,10 +372,10 @@ export class UsabilityTests {
       
       // Set up tasks with different progress states
       const tasks = [
-        { ...this.testDataGenerator.generateTask('HARVESTING'), progress: 0 },
-        { ...this.testDataGenerator.generateTask('CRAFTING'), progress: 0.3 },
-        { ...this.testDataGenerator.generateTask('COMBAT'), progress: 0.7 },
-        { ...this.testDataGenerator.generateTask('HARVESTING'), progress: 1.0, completed: true }
+        { ...this.testDataGenerator.generateTask(TaskType.HARVESTING), progress: 0 },
+        { ...this.testDataGenerator.generateTask(TaskType.CRAFTING), progress: 0.3 },
+        { ...this.testDataGenerator.generateTask(TaskType.COMBAT), progress: 0.7 },
+        { ...this.testDataGenerator.generateTask(TaskType.HARVESTING), progress: 1.0, completed: true }
       ];
       
       for (const task of tasks) {
@@ -437,7 +444,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -461,13 +468,13 @@ export class UsabilityTests {
       let invalidTaskErrorMessage = '';
       
       try {
-        const invalidTask = { ...this.testDataGenerator.generateTask('CRAFTING') };
+        const invalidTask = { ...this.testDataGenerator.generateTask(TaskType.CRAFTING) };
         delete (invalidTask as any).name; // Remove required field
         
         await this.serverTaskQueueService.addTask(player.id, invalidTask);
       } catch (error) {
         invalidTaskErrorHandled = true;
-        invalidTaskErrorMessage = error.message;
+        invalidTaskErrorMessage = error instanceof Error ? error.message : String(error);
       }
       
       const invalidTaskErrorTime = Date.now() - invalidTaskStartTime;
@@ -487,15 +494,21 @@ export class UsabilityTests {
       let resourceErrorMessage = '';
       
       try {
-        const resourceHeavyTask = this.testDataGenerator.generateTask('CRAFTING');
+        const resourceHeavyTask = this.testDataGenerator.generateTask(TaskType.CRAFTING);
         resourceHeavyTask.resourceRequirements = [
-          { resource: 'rare-material', quantity: 1000 }
+          { 
+            resourceId: 'rare-material', 
+            resourceName: 'Rare Material',
+            quantityRequired: 1000,
+            quantityAvailable: 0,
+            isSufficient: false
+          }
         ];
         
         await this.serverTaskQueueService.addTask(player.id, resourceHeavyTask);
       } catch (error) {
         resourceErrorHandled = true;
-        resourceErrorMessage = error.message;
+        resourceErrorMessage = error instanceof Error ? error.message : String(error);
       }
       
       const resourceErrorTime = Date.now() - resourceShortageStartTime;
@@ -517,12 +530,12 @@ export class UsabilityTests {
       // Fill queue to limit
       try {
         for (let i = 0; i < 55; i++) { // Exceed typical limit of 50
-          const task = this.testDataGenerator.generateTask('HARVESTING');
+          const task = this.testDataGenerator.generateTask(TaskType.HARVESTING);
           await this.serverTaskQueueService.addTask(player.id, task);
         }
       } catch (error) {
         queueLimitErrorHandled = true;
-        queueLimitErrorMessage = error.message;
+        queueLimitErrorMessage = error instanceof Error ? error.message : String(error);
       }
       
       const queueLimitErrorTime = Date.now() - queueLimitStartTime;
@@ -557,7 +570,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -656,7 +669,7 @@ export class UsabilityTests {
         name: testName,
         status: 'FAILED',
         duration: Date.now() - startTime,
-        details: `Failed: ${error.message}`
+        details: `Failed: ${error instanceof Error ? error.message : String(error)}`
       };
     }
   }
@@ -691,7 +704,7 @@ export class UsabilityTests {
     
     try {
       // Test basic operations accessibility
-      const testTask = this.testDataGenerator.generateTask('HARVESTING');
+      const testTask = this.testDataGenerator.generateTask(TaskType.HARVESTING);
       
       // Test add operation
       const addStartTime = Date.now();

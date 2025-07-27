@@ -4,7 +4,7 @@
  */
 
 import { TaskQueue, Task, TaskType } from '../../types/taskQueue';
-import { ServerTaskQueueService } from '../../services/serverTaskQueueService';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 
 export interface LoadTestConfig {
   // Test parameters
@@ -75,12 +75,12 @@ export interface PlayerSimulator {
 }
 
 export class LoadTestFramework {
-  private taskQueueService: ServerTaskQueueService;
+  private taskQueueService: typeof serverTaskQueueService;
   private activeSimulators: Map<string, PlayerSimulator> = new Map();
   private testResults: LoadTestResult[] = [];
   private isRunning = false;
   
-  constructor(taskQueueService: ServerTaskQueueService) {
+  constructor(taskQueueService: typeof serverTaskQueueService) {
     this.taskQueueService = taskQueueService;
   }
 
@@ -229,14 +229,38 @@ export class LoadTestFramework {
         queuedTasks: [],
         isRunning: false,
         isPaused: false,
+        canResume: true,
         totalTasksCompleted: 0,
         totalTimeSpent: 0,
         totalRewardsEarned: [],
-        maxQueueSize: 50,
-        autoStart: true,
+        averageTaskDuration: 0,
+        taskCompletionRate: 0,
+        queueEfficiencyScore: 0,
+        config: {
+          maxQueueSize: 50,
+          maxTaskDuration: 86400000,
+          maxTotalQueueDuration: 604800000,
+          autoStart: true,
+          priorityHandling: false,
+          retryEnabled: true,
+          maxRetries: 3,
+          validationEnabled: true,
+          syncInterval: 5000,
+          offlineProcessingEnabled: true,
+          pauseOnError: false,
+          resumeOnResourceAvailable: true,
+          persistenceInterval: 30000,
+          integrityCheckInterval: 300000,
+          maxHistorySize: 10
+        },
         lastUpdated: Date.now(),
         lastSynced: Date.now(),
-        createdAt: Date.now()
+        createdAt: Date.now(),
+        version: 1,
+        checksum: 'test-checksum',
+        lastValidated: Date.now(),
+        stateHistory: [],
+        maxHistorySize: 10
       },
       isActive: true,
       requestCount: 0,
@@ -319,7 +343,7 @@ export class LoadTestFramework {
    * Simulate adding a task
    */
   private async simulateAddTask(simulator: PlayerSimulator, config: LoadTestConfig): Promise<void> {
-    if (simulator.taskQueue.queuedTasks.length >= simulator.taskQueue.maxQueueSize) {
+    if (simulator.taskQueue.queuedTasks.length >= simulator.taskQueue.config.maxQueueSize) {
       return; // Queue is full
     }
     
@@ -410,9 +434,9 @@ export class LoadTestFramework {
     const craftingCount = Math.floor((distribution.crafting / total) * count);
     const combatCount = count - harvestingCount - craftingCount;
     
-    for (let i = 0; i < harvestingCount; i++) types.push('harvesting');
-    for (let i = 0; i < craftingCount; i++) types.push('crafting');
-    for (let i = 0; i < combatCount; i++) types.push('combat');
+    for (let i = 0; i < harvestingCount; i++) types.push(TaskType.HARVESTING);
+    for (let i = 0; i < craftingCount; i++) types.push(TaskType.CRAFTING);
+    for (let i = 0; i < combatCount; i++) types.push(TaskType.COMBAT);
     
     return this.shuffleArray(types);
   }
@@ -439,7 +463,9 @@ export class LoadTestFramework {
       priority: Math.floor(Math.random() * 5),
       estimatedCompletion: 0,
       retryCount: 0,
-      maxRetries: 3
+      maxRetries: 3,
+      isValid: true,
+      validationErrors: []
     };
   }
 

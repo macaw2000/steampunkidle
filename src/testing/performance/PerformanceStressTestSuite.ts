@@ -1,5 +1,6 @@
-import { TaskQueue, Task, TaskType, PlayerStats } from '../../types/taskQueue';
-import { ServerTaskQueueService } from '../../services/serverTaskQueueService';
+import { TaskQueue, Task, TaskType } from '../../types/taskQueue';
+import { CharacterStats } from '../../types/character';
+import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 import { LoadTestFramework } from '../loadTesting/LoadTestFramework';
 import { StressTestRunner } from '../loadTesting/StressTestRunner';
 import { PerformanceBenchmark } from '../loadTesting/PerformanceBenchmark';
@@ -32,9 +33,85 @@ export class PerformanceStressTestSuite {
   private isRunning = false;
 
   constructor() {
-    this.loadTestFramework = new LoadTestFramework();
-    this.stressTestRunner = new StressTestRunner();
+    this.loadTestFramework = new LoadTestFramework(serverTaskQueueService);
+    this.stressTestRunner = new StressTestRunner(serverTaskQueueService);
     this.performanceBenchmark = new PerformanceBenchmark();
+  }
+
+  private createMockStats(): CharacterStats {
+    return {
+      strength: 10,
+      dexterity: 10,
+      intelligence: 10,
+      vitality: 10,
+      craftingSkills: {
+        clockmaking: 5,
+        engineering: 5,
+        alchemy: 5,
+        steamcraft: 5,
+        level: 5,
+        experience: 1000
+      },
+      harvestingSkills: {
+        mining: 5,
+        foraging: 5,
+        salvaging: 5,
+        crystal_extraction: 5,
+        level: 5,
+        experience: 1000
+      },
+      combatSkills: {
+        melee: 5,
+        ranged: 5,
+        defense: 5,
+        tactics: 5,
+        level: 5,
+        experience: 1000
+      }
+    };
+  }
+
+  private createMockActivityData(taskType: TaskType, stats: CharacterStats): any {
+    switch (taskType) {
+      case TaskType.HARVESTING:
+        return {
+          activity: { id: 'test-harvesting', name: 'Test Harvesting', type: 'harvesting' },
+          playerStats: stats,
+          location: undefined,
+          tools: [],
+          expectedYield: []
+        };
+      case TaskType.CRAFTING:
+        return {
+          recipe: { id: 'test-recipe', name: 'Test Recipe', materials: [] },
+          materials: [],
+          craftingStation: undefined,
+          playerSkillLevel: stats.craftingSkills.level,
+          qualityModifier: 1.0,
+          expectedOutputs: []
+        };
+      case TaskType.COMBAT:
+        return {
+          enemy: { id: 'test-enemy', name: 'Test Enemy', level: 1 },
+          playerLevel: stats.combatSkills.level,
+          playerStats: {
+            health: stats.vitality * 10,
+            attack: stats.strength * 2,
+            defense: stats.vitality,
+            speed: stats.dexterity
+          },
+          equipment: [],
+          combatStrategy: { strategyId: 'basic', name: 'Basic', description: 'Basic strategy', modifiers: [] },
+          estimatedOutcome: {
+            winProbability: 0.8,
+            estimatedDuration: 30000,
+            expectedRewards: [],
+            riskLevel: 'low' as const
+          }
+        };
+      default:
+        return {};
+    }
   }
 
   /**
@@ -330,17 +407,40 @@ export class PerformanceStressTestSuite {
     };
   }
 
-  private async createSimulatedUsers(count: number): Promise<Array<{ id: string; stats: PlayerStats }>> {
+  private async createSimulatedUsers(count: number): Promise<Array<{ id: string; stats: CharacterStats }>> {
     const users = [];
     for (let i = 0; i < count; i++) {
       users.push({
         id: `test-user-${i}`,
         stats: {
-          level: Math.floor(Math.random() * 50) + 1,
-          experience: Math.floor(Math.random() * 10000),
-          harvestingLevel: Math.floor(Math.random() * 20) + 1,
-          craftingLevel: Math.floor(Math.random() * 20) + 1,
-          combatLevel: Math.floor(Math.random() * 20) + 1
+          strength: Math.floor(Math.random() * 20) + 1,
+          dexterity: Math.floor(Math.random() * 20) + 1,
+          intelligence: Math.floor(Math.random() * 20) + 1,
+          vitality: Math.floor(Math.random() * 20) + 1,
+          craftingSkills: {
+            clockmaking: Math.floor(Math.random() * 20) + 1,
+            engineering: Math.floor(Math.random() * 20) + 1,
+            alchemy: Math.floor(Math.random() * 20) + 1,
+            steamcraft: Math.floor(Math.random() * 20) + 1,
+            level: Math.floor(Math.random() * 20) + 1,
+            experience: Math.floor(Math.random() * 5000)
+          },
+          harvestingSkills: {
+            mining: Math.floor(Math.random() * 20) + 1,
+            foraging: Math.floor(Math.random() * 20) + 1,
+            salvaging: Math.floor(Math.random() * 20) + 1,
+            crystal_extraction: Math.floor(Math.random() * 20) + 1,
+            level: Math.floor(Math.random() * 20) + 1,
+            experience: Math.floor(Math.random() * 5000)
+          },
+          combatSkills: {
+            melee: Math.floor(Math.random() * 20) + 1,
+            ranged: Math.floor(Math.random() * 20) + 1,
+            defense: Math.floor(Math.random() * 20) + 1,
+            tactics: Math.floor(Math.random() * 20) + 1,
+            level: Math.floor(Math.random() * 20) + 1,
+            experience: Math.floor(Math.random() * 5000)
+          }
         }
       });
     }
@@ -348,7 +448,7 @@ export class PerformanceStressTestSuite {
   }
 
   private async simulateUserActivity(
-    user: { id: string; stats: PlayerStats },
+    user: { id: string; stats: CharacterStats },
     config: StressTestConfig
   ): Promise<void> {
     while (this.isRunning) {
@@ -393,7 +493,7 @@ export class PerformanceStressTestSuite {
       duration: Math.floor(Math.random() * 300000) + 60000, // 1-5 minutes
       startTime: Date.now(),
       playerId: userId,
-      activityData: {},
+      activityData: this.createMockActivityData(taskType, this.createMockStats()),
       prerequisites: [],
       resourceRequirements: [],
       progress: 0,
@@ -402,7 +502,9 @@ export class PerformanceStressTestSuite {
       priority: 1,
       estimatedCompletion: Date.now() + 300000,
       retryCount: 0,
-      maxRetries: 3
+      maxRetries: 3,
+      isValid: true,
+      validationErrors: []
     };
 
     // This would normally call the actual service

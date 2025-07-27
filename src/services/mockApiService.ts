@@ -38,6 +38,7 @@ export class MockApiService {
   // Mock character data
   private getMockCharacter(userId: string): Character {
     return {
+      userId,
       characterId: `char-${userId}`,
       name: 'macaw',
       level: 15,
@@ -73,16 +74,23 @@ export class MockApiService {
           tactics: 1
         }
       },
-      inventory: {},
-      equipment: {},
-      currentActivity: null,
-      lastActiveAt: Date.now() - 300000, // 5 minutes ago
-      createdAt: Date.now() - 86400000 * 7, // 7 days ago
-      preferences: {
-        theme: 'steampunk',
-        notifications: true,
-        autoQueue: false
-      }
+      specialization: {
+        tankProgress: 0,
+        healerProgress: 0,
+        dpsProgress: 0,
+        primaryRole: null,
+        secondaryRole: null,
+        bonuses: []
+      },
+      currentActivity: {
+        type: 'crafting',
+        startedAt: new Date(Date.now() - 300000), // 5 minutes ago
+        progress: 0,
+        rewards: []
+      },
+      lastActiveAt: new Date(Date.now() - 300000), // 5 minutes ago
+      createdAt: new Date(Date.now() - 86400000 * 7), // 7 days ago
+      updatedAt: new Date(Date.now() - 300000) // 5 minutes ago
     };
   }
 
@@ -106,8 +114,9 @@ export class MockApiService {
     character.level = 1;
     character.experience = 0;
     character.currency = 100; // Starting currency
-    character.createdAt = Date.now();
-    character.lastActiveAt = Date.now();
+    character.createdAt = new Date();
+    character.lastActiveAt = new Date();
+    character.updatedAt = new Date();
     
     return character;
   }
@@ -117,7 +126,8 @@ export class MockApiService {
     this.throwErrorIfSimulating('Character update failed');
     
     console.log(`MockApiService: Updating character`, character);
-    character.lastActiveAt = Date.now();
+    character.lastActiveAt = new Date();
+    character.updatedAt = new Date();
     return character;
   }
 

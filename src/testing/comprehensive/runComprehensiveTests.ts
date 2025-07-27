@@ -13,7 +13,7 @@ async function main() {
   console.log('='.repeat(60));
   
   const args = process.argv.slice(2);
-  const categories = args.length > 0 ? args as TestCategory[] : ['unit', 'integration', 'e2e', 'regression'];
+  const categories: TestCategory[] = args.length > 0 ? args as TestCategory[] : ['unit', 'integration', 'e2e', 'regression'];
   
   try {
     let results;
