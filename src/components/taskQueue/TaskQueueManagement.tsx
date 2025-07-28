@@ -278,7 +278,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
 
   const allTasks = [
     ...(taskQueue.currentTask ? [taskQueue.currentTask] : []),
-    ...taskQueue.queuedTasks
+    ...(taskQueue.queuedTasks || [])
   ];
 
   const displayTasks = showAllTasks ? allTasks : allTasks.slice(0, 10);

@@ -4,7 +4,7 @@
 
 import { Character, CharacterStats, CraftingSkillSet, HarvestingSkillSet, CombatSkillSet, CreateCharacterRequest, UpdateCharacterRequest } from '../types/character';
 import { SpecializationService } from './specializationService';
-import { NetworkUtils } from '../utils/networkUtils';
+import { NetworkClient, NetworkFallbackError } from './networkClient';
 import { EnvironmentService } from './environmentService';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -184,24 +184,16 @@ export class CharacterService {
 
     // Production mode - call the actual API with network resilience
     try {
-      const result = await NetworkUtils.postJson('/api/character', request, {
-        timeout: 15000, // 15 seconds for character creation
-        retries: 2,
-        exponentialBackoff: true,
-      });
-      
-      return result.character;
+      const response = await NetworkClient.post<{ character: Character }>('/character', request);
+      return response.data.character;
     } catch (error: any) {
-      if (error.isNetworkError) {
-        if (error.isOffline) {
-          throw NetworkUtils.createNetworkError('Cannot create character while offline', { isOffline: true });
-        } else if (error.isTimeout) {
-          throw NetworkUtils.createNetworkError('Character creation timed out - please try again', { isTimeout: true });
-        } else {
-          throw NetworkUtils.createNetworkError('Network error during character creation', { statusCode: error.statusCode });
-        }
+      // If it's a network fallback error, let the AdaptiveCharacterService handle it
+      if (error instanceof NetworkFallbackError) {
+        throw error;
       }
-      throw new Error(error.error || error.message || 'Failed to create character');
+      
+      // For other errors, provide user-friendly messages
+      throw new Error(error.message || 'Failed to create character');
     }
   }
 
@@ -220,27 +212,17 @@ export class CharacterService {
     }
 
     try {
-      const result = await NetworkUtils.fetchJson(`/api/character?userId=${userId}`, {}, {
-        timeout: 10000, // 10 seconds
-        retries: 2,
-        exponentialBackoff: true,
-      });
-      
-      return result.character;
+      const response = await NetworkClient.get<{ character: Character }>(`/character?userId=${userId}`);
+      return response.data.character;
     } catch (error: any) {
       // Handle 404 as null (no character found)
       if (error.statusCode === 404) {
         return null;
       }
       
-      if (error.isNetworkError) {
-        if (error.isOffline) {
-          throw NetworkUtils.createNetworkError('Cannot load character while offline', { isOffline: true });
-        } else if (error.isTimeout) {
-          throw NetworkUtils.createNetworkError('Character loading timed out - please try again', { isTimeout: true });
-        } else {
-          throw NetworkUtils.createNetworkError('Network error loading character', { statusCode: error.statusCode });
-        }
+      // If it's a network fallback error, let the AdaptiveCharacterService handle it
+      if (error instanceof NetworkFallbackError) {
+        throw error;
       }
       
       console.error('Error getting character:', error);
@@ -266,24 +248,15 @@ export class CharacterService {
    */
   static async updateCharacter(userId: string, updates: UpdateCharacterRequest): Promise<Character> {
     try {
-      const result = await NetworkUtils.putJson(`/api/character/${userId}`, updates, {
-        timeout: 12000, // 12 seconds
-        retries: 2,
-        exponentialBackoff: true,
-      });
-      
-      return result.character;
+      const response = await NetworkClient.put<{ character: Character }>(`/character/${userId}`, updates);
+      return response.data.character;
     } catch (error: any) {
-      if (error.isNetworkError) {
-        if (error.isOffline) {
-          throw NetworkUtils.createNetworkError('Cannot update character while offline', { isOffline: true });
-        } else if (error.isTimeout) {
-          throw NetworkUtils.createNetworkError('Character update timed out - please try again', { isTimeout: true });
-        } else {
-          throw NetworkUtils.createNetworkError('Network error updating character', { statusCode: error.statusCode });
-        }
+      // If it's a network fallback error, let the AdaptiveCharacterService handle it
+      if (error instanceof NetworkFallbackError) {
+        throw error;
       }
-      throw new Error(error.error || error.message || 'Failed to update character');
+      
+      throw new Error(error.message || 'Failed to update character');
     }
   }
 
@@ -292,22 +265,14 @@ export class CharacterService {
    */
   static async deleteCharacter(userId: string): Promise<void> {
     try {
-      await NetworkUtils.delete(`/api/character/${userId}`, {
-        timeout: 10000, // 10 seconds
-        retries: 1, // Only retry once for delete operations
-        exponentialBackoff: false,
-      });
+      await NetworkClient.delete(`/character/${userId}`);
     } catch (error: any) {
-      if (error.isNetworkError) {
-        if (error.isOffline) {
-          throw NetworkUtils.createNetworkError('Cannot delete character while offline', { isOffline: true });
-        } else if (error.isTimeout) {
-          throw NetworkUtils.createNetworkError('Character deletion timed out - please try again', { isTimeout: true });
-        } else {
-          throw NetworkUtils.createNetworkError('Network error deleting character', { statusCode: error.statusCode });
-        }
+      // If it's a network fallback error, let the AdaptiveCharacterService handle it
+      if (error instanceof NetworkFallbackError) {
+        throw error;
       }
-      throw new Error(error.error || error.message || 'Failed to delete character');
+      
+      throw new Error(error.message || 'Failed to delete character');
     }
   }
 

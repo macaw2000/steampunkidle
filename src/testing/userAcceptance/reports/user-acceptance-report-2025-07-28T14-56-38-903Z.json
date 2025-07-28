@@ -1,0 +1,401 @@
+{
+  "playerUsagePatterns": {
+    "totalTests": 6,
+    "passedTests": 3,
+    "scenarios": [
+      {
+        "name": "Typical Queue Operations",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Failed: Tasks were not added correctly"
+      },
+      {
+        "name": "Multi-Activity Workflows",
+        "status": "FAILED",
+        "duration": 30079,
+        "details": "Multi-activity workflow processed 0/4 tasks",
+        "metrics": {
+          "workflowLength": 4,
+          "tasksProcessed": 0,
+          "processingTime": 30078,
+          "activityTypes": [
+            "HARVESTING",
+            "CRAFTING",
+            "COMBAT"
+          ]
+        }
+      },
+      {
+        "name": "Long-Running Session",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Casual Play Patterns",
+        "status": "PASSED",
+        "duration": 109,
+        "details": "Casual play session completed in 109ms (expected: 60000ms)",
+        "metrics": {
+          "sessionDuration": 109,
+          "tasksAdded": 2,
+          "expectedDuration": 60000,
+          "withinExpectedTime": true,
+          "statusChecks": 2
+        }
+      },
+      {
+        "name": "Queue Management Operations",
+        "status": "PASSED",
+        "duration": 0,
+        "details": "Queue management operations (stop, start) tested successfully",
+        "metrics": {
+          "stopStartSuccess": true,
+          "stopAllSuccess": true,
+          "operationsTested": 2
+        }
+      },
+      {
+        "name": "Resource Validation Scenarios",
+        "status": "PASSED",
+        "duration": 1,
+        "details": "Resource validation correctly handled insufficient resources and allowed valid tasks",
+        "metrics": {
+          "resourceValidationWorking": true,
+          "simpleTaskAdded": true,
+          "validationChecks": 2
+        }
+      }
+    ]
+  },
+  "offlineOnlineTransitions": {
+    "totalTests": 6,
+    "passedTests": 1,
+    "scenarios": [
+      {
+        "name": "Offline Task Processing",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Failed: Task validation failed: Need 50 Health, have 0"
+      },
+      {
+        "name": "Online Reconnection Sync",
+        "status": "PASSED",
+        "duration": 2,
+        "details": "Reconnection sync completed in 0ms with 0 conflicts resolved",
+        "syncMetrics": {
+          "syncDuration": 0,
+          "offlineTasksBeforeSync": 0,
+          "serverTasksBeforeSync": 2,
+          "finalTaskCount": 2,
+          "syncSuccessful": true,
+          "conflictsResolved": 0
+        }
+      },
+      {
+        "name": "Conflict Resolution",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Failed: Task validation failed: Need 50 Health, have 0"
+      },
+      {
+        "name": "Data Integrity During Transitions",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Failed: Task validation failed: Need 50 Health, have 0"
+      },
+      {
+        "name": "Incremental Synchronization",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Extended Offline Periods",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Failed: Task validation failed: Need 50 Health, have 0"
+      }
+    ]
+  },
+  "performanceValidation": {
+    "totalTests": 6,
+    "passedTests": 2,
+    "scenarios": [
+      {
+        "name": "Concurrent Player Load",
+        "status": "FAILED",
+        "duration": 36553,
+        "details": "Concurrent load test with 100 players: 0.0976649512251325ms avg response, 0% error rate, -0.000014847342069867702 ops/sec",
+        "performanceMetrics": {
+          "concurrentPlayers": 100,
+          "loadTestDuration": 36553,
+          "averageResponseTime": 0.0976649512251325,
+          "maxResponseTime": 0.195329902450265,
+          "errorRate": 0,
+          "throughput": -0.000014847342069867702,
+          "responseTimeAcceptable": true,
+          "errorRateAcceptable": true,
+          "throughputAcceptable": false
+        }
+      },
+      {
+        "name": "Queue Processing Speed",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "UI Responsiveness Under Load",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Memory Usage Patterns",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Database Performance",
+        "status": "PASSED",
+        "duration": 0,
+        "details": "DB performance: 0.0ms write, 0.0ms read, 0.0ms update",
+        "performanceMetrics": {
+          "playersCount": 20,
+          "averageWriteTime": 0,
+          "averageReadTime": 0,
+          "averageUpdateTime": 0,
+          "averageDeleteTime": 0,
+          "writePerformanceGood": true,
+          "readPerformanceGood": true,
+          "updatePerformanceGood": true,
+          "deletePerformanceGood": true
+        }
+      },
+      {
+        "name": "Scalability Limits",
+        "status": "PASSED",
+        "duration": 1,
+        "details": "Scalability: handled up to 100 concurrent users successfully",
+        "performanceMetrics": {
+          "loadLevelsTested": [
+            10,
+            25,
+            50,
+            100
+          ],
+          "maxSuccessfulLoad": 100,
+          "scalabilityResults": [
+            {
+              "loadLevel": 10,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 10,
+              "throughput": null
+            },
+            {
+              "loadLevel": 25,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 25,
+              "throughput": null
+            },
+            {
+              "loadLevel": 50,
+              "avgResponseTime": 0.14,
+              "maxResponseTime": 1,
+              "loadTestDuration": 1,
+              "successfulOperations": 50,
+              "throughput": 50000
+            },
+            {
+              "loadLevel": 100,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 100,
+              "throughput": null
+            }
+          ],
+          "linearScaling": false,
+          "performanceDegradation": "SIGNIFICANT",
+          "scalabilityGood": true
+        }
+      }
+    ]
+  },
+  "usabilityTesting": {
+    "totalTests": 6,
+    "passedTests": 1,
+    "scenarios": [
+      {
+        "name": "Queue Management Interface Usability",
+        "status": "PASSED",
+        "duration": 0,
+        "details": "Interface usability score: 100.0% - 4/4 tests passed",
+        "usabilityMetrics": {
+          "interfaceTests": [
+            {
+              "test": "Queue Status Display",
+              "duration": 0,
+              "acceptable": true
+            },
+            {
+              "test": "Task Information Clarity",
+              "score": 1,
+              "acceptable": true
+            },
+            {
+              "test": "Operations Accessibility",
+              "score": 1,
+              "acceptable": true
+            },
+            {
+              "test": "Visual Hierarchy",
+              "score": 1,
+              "acceptable": true
+            }
+          ],
+          "overallUsabilityScore": 1,
+          "allTestsPassed": true,
+          "statusDisplayTime": 0,
+          "queueSize": 5
+        }
+      },
+      {
+        "name": "Task Addition Workflow",
+        "status": "FAILED",
+        "duration": 1,
+        "details": "Task addition workflows: 2/3 acceptable, avg 0ms",
+        "usabilityMetrics": {
+          "workflowTests": [
+            {
+              "workflow": "Single Task Addition",
+              "duration": 0,
+              "acceptable": true
+            },
+            {
+              "workflow": "Batch Task Addition",
+              "duration": 1,
+              "averagePerTask": 0.3333333333333333,
+              "acceptable": true
+            },
+            {
+              "workflow": "Validation Feedback",
+              "duration": 0,
+              "feedbackReceived": false,
+              "acceptable": false
+            }
+          ],
+          "allWorkflowsAcceptable": false,
+          "averageTaskAdditionTime": 0.16666666666666666,
+          "validationResponsiveness": false
+        }
+      },
+      {
+        "name": "Queue Reordering Usability",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Progress Visualization Clarity",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Progress visualization: 81.3% clarity score, 2/4 aspects acceptable",
+        "usabilityMetrics": {
+          "visualizationTests": [
+            {
+              "aspect": "Progress Information Completeness",
+              "score": 0.75,
+              "details": "3/4 progress elements complete",
+              "acceptable": false
+            },
+            {
+              "aspect": "Time Estimation Accuracy",
+              "score": 1,
+              "details": "3/3 time estimations accurate",
+              "acceptable": true
+            },
+            {
+              "aspect": "Visual Progress Clarity",
+              "score": 1,
+              "details": "2/2 visual clarity elements present",
+              "acceptable": true
+            },
+            {
+              "aspect": "Queue Overview Comprehensiveness",
+              "score": 0.5,
+              "details": "2/4 overview elements present",
+              "acceptable": false
+            }
+          ],
+          "overallVisualizationScore": 0.8125,
+          "allVisualizationAcceptable": false,
+          "tasksWithProgress": 4,
+          "progressStatesRepresented": [
+            "not_started",
+            "in_progress",
+            "nearly_complete",
+            "completed"
+          ]
+        }
+      },
+      {
+        "name": "Error Handling User Experience",
+        "status": "FAILED",
+        "duration": 2,
+        "details": "Error handling: 0/3 scenarios handled properly, avg 1ms response",
+        "usabilityMetrics": {
+          "errorHandlingTests": [
+            {
+              "scenario": "Invalid Task Data",
+              "errorHandled": false,
+              "errorMessage": "",
+              "responseTime": 0,
+              "messageClarity": 0,
+              "acceptable": false
+            },
+            {
+              "scenario": "Resource Shortage",
+              "errorHandled": false,
+              "errorMessage": "",
+              "responseTime": 0,
+              "messageClarity": 0,
+              "acceptable": false
+            },
+            {
+              "scenario": "Queue Limit Exceeded",
+              "errorHandled": false,
+              "errorMessage": "",
+              "responseTime": 2,
+              "messageClarity": 0,
+              "acceptable": false
+            }
+          ],
+          "allErrorsHandledProperly": false,
+          "averageErrorResponseTime": 0.6666666666666666,
+          "errorMessageClarityScore": 0,
+          "userFriendlyErrorHandling": false
+        }
+      },
+      {
+        "name": "Mobile Responsiveness",
+        "status": "FAILED",
+        "duration": 1,
+        "details": "Failed: Unknown task type: HARVESTING"
+      }
+    ]
+  },
+  "summary": {
+    "totalTests": 24,
+    "passedTests": 7,
+    "failedTests": 17,
+    "duration": 66763,
+    "overallStatus": "FAILED"
+  }
+}

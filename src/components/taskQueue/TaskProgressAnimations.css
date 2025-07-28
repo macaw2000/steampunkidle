@@ -1,0 +1,591 @@
+/**
+ * Task Progress Animations Styles
+ * Steampunk-themed visual feedback for continuous task processing
+ */
+
+.task-progress-animations {
+  position: relative;
+  width: 100%;
+  height: 120px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border: 2px solid #8b6914;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.3),
+    0 2px 8px rgba(139, 105, 20, 0.2);
+}
+
+/* Progress Container */
+.progress-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+}
+
+/* Task-specific backgrounds */
+.progress-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+/* Harvesting Background */
+.mining-background {
+  background: linear-gradient(180deg, #8b4513 0%, #654321 50%, #2f1b14 100%);
+  position: relative;
+}
+
+.rock-layer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: 
+    radial-gradient(circle at 20% 80%, #696969 0%, transparent 30%),
+    radial-gradient(circle at 60% 90%, #808080 0%, transparent 25%),
+    radial-gradient(circle at 80% 85%, #a9a9a9 0%, transparent 20%);
+}
+
+.ore-veins {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, #ffd700 20%, #ffff00 40%, #ffd700 60%, transparent 100%);
+  animation: vein-glow 3s ease-in-out infinite;
+}
+
+@keyframes vein-glow {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.8; transform: scaleY(1.5); }
+}
+
+/* Crafting Background */
+.workshop-background {
+  background: linear-gradient(135deg, #2c1810 0%, #3d2817 100%);
+  position: relative;
+}
+
+.workbench {
+  position: absolute;
+  bottom: 20%;
+  left: 10%;
+  right: 10%;
+  height: 8px;
+  background: linear-gradient(90deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+  border-radius: 4px;
+}
+
+.gear-system {
+  position: absolute;
+  top: 20%;
+  right: 20%;
+  width: 60px;
+  height: 60px;
+}
+
+.gear {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #8b6914 0%, #b8860b 70%, #8b6914 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #2c1810;
+  font-weight: bold;
+}
+
+.gear::before {
+  content: '⚙️';
+  font-size: 0.8em;
+}
+
+.gear-large {
+  width: 40px;
+  height: 40px;
+  top: 0;
+  left: 0;
+}
+
+.gear-medium {
+  width: 28px;
+  height: 28px;
+  top: 15px;
+  left: 25px;
+}
+
+.gear-small {
+  width: 20px;
+  height: 20px;
+  top: 5px;
+  left: 35px;
+}
+
+.rotating {
+  animation: rotate 4s linear infinite;
+}
+
+.rotating-reverse {
+  animation: rotate-reverse 3s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes rotate-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* Combat Background */
+.combat-background {
+  background: linear-gradient(135deg, #1a0000 0%, #330000 50%, #1a0000 100%);
+  position: relative;
+}
+
+.battlefield {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30%;
+  background: 
+    linear-gradient(90deg, transparent 0%, #8b0000 50%, transparent 100%),
+    linear-gradient(180deg, transparent 0%, #2f0000 100%);
+}
+
+.energy-field {
+  position: absolute;
+  top: 30%;
+  left: 20%;
+  right: 20%;
+  height: 40%;
+  background: radial-gradient(ellipse, rgba(255, 0, 0, 0.3) 0%, transparent 70%);
+}
+
+.pulsing {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.1); }
+}
+
+/* Enhanced Progress Bar */
+.enhanced-progress-bar {
+  position: relative;
+  z-index: 2;
+  margin: 8px 0;
+}
+
+.progress-track {
+  width: 100%;
+  height: 16px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid #8b6914;
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 8px;
+  position: relative;
+  transition: width 0.3s ease;
+  box-shadow: 
+    0 0 10px rgba(255, 255, 255, 0.3),
+    inset 0 2px 4px rgba(255, 255, 255, 0.2);
+}
+
+.progress-shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+  animation: shine 2s ease-in-out infinite;
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.progress-markers {
+  position: absolute;
+  top: -2px;
+  left: 0;
+  right: 0;
+  height: 20px;
+  pointer-events: none;
+}
+
+.progress-marker {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+}
+
+.marker-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #8b6914;
+  border: 2px solid #2c1810;
+  transition: all 0.3s ease;
+}
+
+.progress-marker.completed .marker-dot {
+  background: #ffd700;
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+  transform: scale(1.2);
+}
+
+/* Task Visual Elements */
+.task-visual-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+/* Harvesting Tools */
+.harvesting-tools {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+}
+
+.pickaxe {
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+.swinging {
+  animation: swing 1.5s ease-in-out infinite;
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(10deg); }
+}
+
+.ore-chunks {
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  display: flex;
+  gap: 5px;
+}
+
+.ore-chunk {
+  font-size: 0.8rem;
+  animation: bounce 2s ease-in-out infinite;
+}
+
+.ore-chunk:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Crafting Tools */
+.crafting-tools {
+  position: absolute;
+  left: 30px;
+  top: 15px;
+}
+
+.hammer {
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+.hammering {
+  animation: hammer 1s ease-in-out infinite;
+}
+
+@keyframes hammer {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-15deg); }
+}
+
+.anvil {
+  position: absolute;
+  top: 25px;
+  left: 15px;
+  font-size: 1.2rem;
+}
+
+.sparks {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  gap: 3px;
+}
+
+.spark {
+  font-size: 0.6rem;
+  animation: sparkle 0.8s ease-in-out infinite;
+}
+
+.spark:nth-child(2) { animation-delay: 0.2s; }
+.spark:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Combat Effects */
+.combat-effects {
+  position: absolute;
+  left: 25px;
+  top: 20px;
+}
+
+.weapon {
+  font-size: 1.5rem;
+  display: inline-block;
+}
+
+.slashing {
+  animation: slash 1.2s ease-in-out infinite;
+}
+
+@keyframes slash {
+  0%, 100% { transform: rotate(-20deg) translateX(0); }
+  50% { transform: rotate(20deg) translateX(10px); }
+}
+
+.impact-effects {
+  position: absolute;
+  top: 15px;
+  left: 25px;
+  display: flex;
+  gap: 8px;
+}
+
+.impact {
+  font-size: 1rem;
+  animation: impact 1s ease-in-out infinite;
+}
+
+.impact:nth-child(2) { animation-delay: 0.3s; }
+
+@keyframes impact {
+  0%, 100% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 1; transform: scale(1.3); }
+}
+
+/* Particle System */
+.particle-system {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  font-size: 0.8rem;
+  animation: particle-float 2s ease-out forwards;
+}
+
+.particle-spark {
+  color: #ffd700;
+  text-shadow: 0 0 4px #ffd700;
+}
+
+.particle-steam {
+  color: #e0e0e0;
+  text-shadow: 0 0 4px #e0e0e0;
+}
+
+.particle-gear {
+  color: #8b6914;
+  animation: particle-float 2s ease-out forwards, particle-spin 1s linear infinite;
+}
+
+.particle-crystal {
+  color: #00ffff;
+  text-shadow: 0 0 6px #00ffff;
+}
+
+@keyframes particle-float {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-30px) scale(0.5); }
+}
+
+@keyframes particle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Progress Text Overlay */
+.progress-text-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 5;
+  color: #f4e4bc;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+.progress-percentage {
+  font-size: 1.4rem;
+  font-weight: bold;
+  margin-bottom: 4px;
+  color: #ffd700;
+}
+
+.progress-status {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Completion Celebration */
+.completion-celebration {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.8);
+  animation: celebration-appear 0.5s ease-out;
+}
+
+@keyframes celebration-appear {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.celebration-burst {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.celebration-particle {
+  font-size: 1.5rem;
+  animation: celebration-burst 1s ease-out infinite;
+}
+
+.celebration-particle:nth-child(2) { animation-delay: 0.2s; }
+.celebration-particle:nth-child(3) { animation-delay: 0.4s; }
+.celebration-particle:nth-child(4) { animation-delay: 0.6s; }
+
+@keyframes celebration-burst {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.3) rotate(180deg); }
+}
+
+.completion-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #ffd700;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  animation: completion-glow 1s ease-in-out infinite;
+}
+
+@keyframes completion-glow {
+  0%, 100% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8); }
+  50% { text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px #ffd700; }
+}
+
+/* Task-specific animation classes */
+.harvesting-animation {
+  background: linear-gradient(135deg, #1a1a0d 0%, #2d2d1a 100%);
+}
+
+.crafting-animation {
+  background: linear-gradient(135deg, #1a0d00 0%, #2d1a00 100%);
+}
+
+.combat-animation {
+  background: linear-gradient(135deg, #1a0000 0%, #2d0000 100%);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .task-progress-animations {
+    height: 100px;
+  }
+  
+  .progress-container {
+    padding: 12px;
+  }
+  
+  .progress-track {
+    height: 12px;
+  }
+  
+  .progress-percentage {
+    font-size: 1.2rem;
+  }
+  
+  .progress-status {
+    font-size: 0.8rem;
+  }
+  
+  .task-visual-elements {
+    transform: scale(0.8);
+  }
+}
+
+@media (max-width: 480px) {
+  .task-progress-animations {
+    height: 80px;
+  }
+  
+  .progress-container {
+    padding: 8px;
+  }
+  
+  .progress-track {
+    height: 10px;
+  }
+  
+  .progress-percentage {
+    font-size: 1rem;
+  }
+  
+  .task-visual-elements {
+    transform: scale(0.6);
+  }
+}

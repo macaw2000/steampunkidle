@@ -356,7 +356,7 @@ class AuthService {
         } else if (error.isTimeout) {
           throw NetworkUtils.createNetworkError('Token refresh timed out - please check your connection', { isTimeout: true });
         } else {
-          throw NetworkUtils.createNetworkError('Network error during token refresh - please try again', { statusCode: error.statusCode });
+          throw NetworkUtils.createNetworkError('Network error during token refresh - please try again', { status: error.statusCode });
         }
       }
       throw new Error(`Token refresh failed: ${error.message || error}`);
@@ -442,7 +442,7 @@ class AuthService {
         } else if (error.isTimeout) {
           throw NetworkUtils.createNetworkError('User sync timed out - please check your connection', { isTimeout: true });
         } else {
-          throw NetworkUtils.createNetworkError('Network error during user sync - please try again', { statusCode: error.statusCode });
+          throw NetworkUtils.createNetworkError('Network error during user sync - please try again', { status: error.statusCode });
         }
       }
       throw new Error(`Failed to sync user with backend: ${error.message || error}`);

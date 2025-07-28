@@ -95,20 +95,20 @@ export class RedisCacheInfrastructure extends Construct {
 
     // Create Redis replication group
     this.replicationGroup = new elasticache.CfnReplicationGroup(this, 'RedisReplicationGroup', {
-      description: 'Redis cluster for task queue performance optimization',
+      replicationGroupDescription: 'Redis cluster for task queue performance optimization',
       replicationGroupId: 'steampunk-idle-game-redis',
       
       // Node configuration
-      nodeType: props.nodeType || 'cache.t3.micro',
+      cacheNodeType: props.nodeType || 'cache.t3.micro',
       numCacheClusters: props.numCacheNodes || 2,
       
       // Engine configuration
       engine: 'redis',
       engineVersion: props.engineVersion || '7.0',
-      parameterGroupName: this.parameterGroup.ref,
+      cacheParameterGroupName: this.parameterGroup.ref,
       
       // Network configuration
-      subnetGroupName: this.subnetGroup.ref,
+      cacheSubnetGroupName: this.subnetGroup.ref,
       securityGroupIds: [this.securityGroup.securityGroupId],
       
       // Multi-AZ configuration
@@ -251,7 +251,7 @@ export class RedisCacheInfrastructure extends Construct {
   createMonitoringAlarms(): void {
     const namespace = 'AWS/ElastiCache';
     const dimensions = {
-      CacheClusterId: this.replicationGroup.replicationGroupId,
+      CacheClusterId: this.replicationGroup.replicationGroupId || 'steampunk-idle-game-redis',
     };
 
     // CPU utilization alarm

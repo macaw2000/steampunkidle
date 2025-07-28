@@ -1,0 +1,308 @@
+/**
+ * Enhanced Error Boundary Styles
+ */
+
+.enhanced-error-boundary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  padding: 20px;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.enhanced-error-boundary--page {
+  min-height: 50vh;
+  margin: 0;
+  border-radius: 0;
+}
+
+.enhanced-error-boundary--section {
+  min-height: 300px;
+  margin: 20px 0;
+}
+
+.enhanced-error-boundary--component {
+  min-height: 150px;
+  margin: 10px 0;
+}
+
+.error-container {
+  max-width: 600px;
+  width: 100%;
+  text-align: center;
+}
+
+.error-message {
+  display: flex;
+  align-items: flex-start;
+  text-align: left;
+  margin-bottom: 24px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #f3f4f6;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.error-icon {
+  font-size: 32px;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-content h3 {
+  margin: 0 0 8px 0;
+  color: #dc2626;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.error-content p {
+  margin: 0 0 8px 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.error-summary {
+  color: #374151 !important;
+  font-size: 13px !important;
+  background-color: #f9fafb;
+  padding: 8px 12px;
+  border-radius: 4px;
+  border-left: 3px solid #dc2626;
+}
+
+.error-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.error-button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.error-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.error-button-primary {
+  background-color: #dc2626;
+  color: white;
+}
+
+.error-button-primary:hover:not(:disabled) {
+  background-color: #b91c1c;
+}
+
+.error-button-secondary {
+  background-color: #6b7280;
+  color: white;
+}
+
+.error-button-secondary:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.error-button-tertiary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+
+.error-button-tertiary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+
+.error-details {
+  text-align: left;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 16px;
+}
+
+.error-details h4 {
+  margin: 0 0 16px 0;
+  color: #374151;
+  font-size: 16px;
+  font-weight: 600;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 8px;
+}
+
+.error-info {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.error-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.error-field strong {
+  color: #374151;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.error-field:not(:has(pre)) {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.stack-trace,
+.component-stack {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 12px;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #374151;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+/* Responsive design */
+@media (max-width: 640px) {
+  .enhanced-error-boundary {
+    padding: 16px;
+  }
+  
+  .error-message {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .error-icon {
+    margin-right: 0;
+    margin-bottom: 12px;
+  }
+  
+  .error-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .error-button {
+    width: 100%;
+  }
+  
+  .error-details {
+    padding: 16px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .enhanced-error-boundary {
+    background-color: #1f2937;
+    border-color: #374151;
+  }
+  
+  .error-message {
+    background-color: #111827;
+    border-color: #374151;
+  }
+  
+  .error-content h3 {
+    color: #f87171;
+  }
+  
+  .error-content p {
+    color: #9ca3af;
+  }
+  
+  .error-summary {
+    color: #d1d5db !important;
+    background-color: #1f2937;
+    border-left-color: #f87171;
+  }
+  
+  .error-button-tertiary {
+    background-color: #374151;
+    color: #d1d5db;
+    border-color: #4b5563;
+  }
+  
+  .error-button-tertiary:hover:not(:disabled) {
+    background-color: #4b5563;
+  }
+  
+  .error-details {
+    background-color: #111827;
+    border-color: #374151;
+  }
+  
+  .error-details h4 {
+    color: #d1d5db;
+    border-bottom-color: #374151;
+  }
+  
+  .error-field strong {
+    color: #d1d5db;
+  }
+  
+  .error-field:not(:has(pre)) {
+    color: #9ca3af;
+  }
+  
+  .stack-trace,
+  .component-stack {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #d1d5db;
+  }
+}
+
+/* Animation for retry state */
+.error-button:disabled {
+  position: relative;
+}
+
+.error-button:disabled::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 16px;
+  height: 16px;
+  margin: -8px 0 0 -8px;
+  border: 2px solid transparent;
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

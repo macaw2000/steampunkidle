@@ -6,7 +6,8 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setCharacter, setLoading, setError } from '../../store/slices/gameSlice';
-import { CharacterService } from '../../services/characterService';
+import { AdaptiveCharacterService } from '../../services/adaptiveCharacterService';
+import NetworkStatusIndicator from '../common/NetworkStatusIndicator';
 import './CharacterCreation.css';
 
 interface CharacterCreationProps {
@@ -20,6 +21,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
   
   const [characterName, setCharacterName] = useState('');
   const [nameError, setNameError] = useState('');
+  const [retryCount, setRetryCount] = useState(0);
 
   const validateName = (name: string): boolean => {
     if (name.length < 3) {
@@ -64,7 +66,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
     dispatch(setError(null));
 
     try {
-      const character = await CharacterService.createCharacter({
+      const character = await AdaptiveCharacterService.createCharacter({
         userId: user.userId,
         name: characterName,
       });
@@ -75,14 +77,29 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
         onCharacterCreated();
       }
     } catch (error) {
-      dispatch(setError(error instanceof Error ? error.message : 'Failed to create character'));
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create character';
+      console.error('[CharacterCreation] Character creation failed:', errorMessage);
+      dispatch(setError(errorMessage));
     } finally {
       dispatch(setLoading(false));
     }
   };
 
+  const handleRetry = () => {
+    setRetryCount(prev => prev + 1);
+    dispatch(setError(null));
+    handleSubmit(new Event('submit') as any);
+  };
+
+  const handleNetworkRetry = () => {
+    // Clear any existing errors and allow user to retry
+    dispatch(setError(null));
+    setRetryCount(0);
+  };
+
   return (
     <div className="character-creation">
+      <NetworkStatusIndicator onRetry={handleNetworkRetry} />
       <div className="character-creation-container">
         <h2 className="character-creation-title">Create Your Steampunk Character</h2>
         <p className="character-creation-description">
@@ -145,7 +162,27 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
             </div>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
+          {error && (
+            <div className="error-message">
+              <div className="error-text">{error}</div>
+              {retryCount < 3 && (
+                <button 
+                  type="button" 
+                  onClick={handleRetry}
+                  className="retry-button"
+                  disabled={loading}
+                >
+                  Try Again
+                </button>
+              )}
+              {retryCount >= 3 && (
+                <div className="error-help">
+                  <p>Having trouble? The app is now using offline mode with mock data.</p>
+                  <p>You can still create a character and play the game!</p>
+                </div>
+              )}
+            </div>
+          )}
 
           <button
             type="submit"

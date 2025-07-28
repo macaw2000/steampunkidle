@@ -23,6 +23,17 @@ import { Enemy, PlayerCombatStats } from '../types/combat';
 import { CharacterStats } from '../types/character';
 import { TaskValidationService } from '../services/taskValidation';
 
+// Activity option interface for Fargate integration
+export interface ActivityOption {
+  id: string;
+  name: string;
+  type: TaskType;
+  icon: string;
+  description: string;
+  duration: number;
+  requirements?: string[];
+}
+
 export class TaskUtils {
   
   /**
@@ -733,6 +744,84 @@ export class TaskUtils {
    */
   static filterValidTasks(tasks: Task[]): Task[] {
     return tasks.filter(task => task.isValid && task.validationErrors.length === 0);
+  }
+
+  /**
+   * Create a task from an activity option (for Fargate integration)
+   */
+  static createTaskFromActivity(playerId: string, activity: ActivityOption): Task {
+    const taskId = `${activity.type.toLowerCase()}-${activity.id}-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+    
+    // Build basic prerequisites from requirements
+    const prerequisites: TaskPrerequisite[] = [];
+    if (activity.requirements) {
+      for (const requirement of activity.requirements) {
+        prerequisites.push({
+          type: 'activity',
+          requirement,
+          description: requirement,
+          isMet: true // Assume met for demo purposes
+        });
+      }
+    }
+
+    // Create basic task structure
+    const task: Task = {
+      id: taskId,
+      type: activity.type,
+      name: activity.name,
+      description: activity.description,
+      icon: activity.icon,
+      duration: activity.duration,
+      startTime: 0,
+      playerId,
+      activityData: {
+        activity: {
+          id: activity.id,
+          name: activity.name,
+          description: activity.description,
+          icon: activity.icon,
+          category: HarvestingCategory.MECHANICAL, // Default category
+          requiredLevel: 1,
+          baseTime: activity.duration / 1000, // Convert to seconds
+          energyCost: 10,
+          dropTable: {
+            guaranteed: [],
+            common: [],
+            uncommon: [],
+            rare: [],
+            legendary: []
+          },
+          statBonuses: {
+            experience: 10
+          }
+        },
+        playerStats: {
+          strength: 10,
+          dexterity: 10,
+          intelligence: 10,
+          vitality: 10,
+          harvestingSkills: { level: 1, mining: 1, foraging: 1, salvaging: 1, crystal_extraction: 1, experience: 0 },
+          craftingSkills: { level: 1, experience: 0, clockmaking: 1, engineering: 1, alchemy: 1, steamcraft: 1 },
+          combatSkills: { level: 1, melee: 1, ranged: 1, defense: 1, tactics: 1, experience: 0 }
+        },
+        tools: [],
+        expectedYield: []
+      } as HarvestingTaskData,
+      prerequisites,
+      resourceRequirements: [],
+      progress: 0,
+      completed: false,
+      rewards: [],
+      priority: 5, // Default priority
+      estimatedCompletion: Date.now() + activity.duration,
+      retryCount: 0,
+      maxRetries: 3,
+      isValid: true,
+      validationErrors: []
+    };
+
+    return task;
   }
 
   /**

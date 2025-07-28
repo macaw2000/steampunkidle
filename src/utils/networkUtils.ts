@@ -1,302 +1,274 @@
 /**
- * Network utility functions for handling API requests with resilience
- * Provides retry logic, timeout handling, and offline detection
+ * Network Utility Functions
+ * Helper functions for making HTTP requests with retry logic and error handling
  */
 
 export interface NetworkRequestOptions {
   timeout?: number;
   retries?: number;
-  retryDelay?: number;
   exponentialBackoff?: boolean;
-  abortSignal?: AbortSignal;
   headers?: Record<string, string>;
+  retryDelay?: number;
 }
 
-export interface NetworkError extends Error {
-  isNetworkError: boolean;
-  isTimeout: boolean;
-  isOffline: boolean;
-  statusCode?: number;
-  retryAfter?: number;
+export interface NetworkResponse<T = any> {
+  data: T;
+  status: number;
+  statusText: string;
+  headers: Headers;
 }
 
 export class NetworkUtils {
   private static readonly DEFAULT_TIMEOUT = 10000; // 10 seconds
   private static readonly DEFAULT_RETRIES = 3;
-  private static readonly DEFAULT_RETRY_DELAY = 1000; // 1 second
-  private static readonly MAX_RETRY_DELAY = 30000; // 30 seconds
+  private static readonly BASE_DELAY = 1000; // 1 second
 
   /**
-   * Check if the browser is online
+   * Make a GET request with JSON response
    */
-  static isOnline(): boolean {
-    return navigator.onLine;
-  }
-
-  /**
-   * Create a network error with additional metadata
-   */
-  static createNetworkError(
-    message: string,
-    options: {
-      isTimeout?: boolean;
-      isOffline?: boolean;
-      statusCode?: number;
-      retryAfter?: number;
-    } = {}
-  ): NetworkError {
-    const error = new Error(message) as NetworkError;
-    error.isNetworkError = true;
-    error.isTimeout = options.isTimeout || false;
-    error.isOffline = options.isOffline || false;
-    error.statusCode = options.statusCode;
-    error.retryAfter = options.retryAfter;
-    return error;
-  }
-
-  /**
-   * Check if an error is retryable
-   */
-  static isRetryableError(error: any): boolean {
-    // Network errors are retryable
-    if (error.isNetworkError) {
-      return true;
-    }
-
-    // HTTP status codes that are retryable
-    const retryableStatusCodes = [408, 429, 500, 502, 503, 504];
-    if (error.statusCode && retryableStatusCodes.includes(error.statusCode)) {
-      return true;
-    }
-
-    // Fetch API network errors
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Calculate retry delay with exponential backoff
-   */
-  static calculateRetryDelay(
-    attempt: number,
-    baseDelay: number,
-    exponentialBackoff: boolean = true,
-    jitter: boolean = true
-  ): number {
-    let delay = exponentialBackoff ? baseDelay * Math.pow(2, attempt - 1) : baseDelay;
-    
-    // Cap the delay
-    delay = Math.min(delay, this.MAX_RETRY_DELAY);
-    
-    // Add jitter to prevent thundering herd
-    if (jitter) {
-      delay = delay * (0.5 + Math.random() * 0.5);
-    }
-    
-    return Math.floor(delay);
-  }
-
-  /**
-   * Create a timeout promise that rejects after specified time
-   */
-  static createTimeoutPromise(timeout: number, abortSignal?: AbortSignal): Promise<never> {
-    return new Promise((_, reject) => {
-      const timeoutId = setTimeout(() => {
-        reject(this.createNetworkError('Request timeout', { isTimeout: true }));
-      }, timeout);
-
-      // Clear timeout if request is aborted
-      if (abortSignal) {
-        abortSignal.addEventListener('abort', () => {
-          clearTimeout(timeoutId);
-          reject(new Error('Request aborted'));
-        });
-      }
-    });
-  }
-
-  /**
-   * Enhanced fetch with timeout, retries, and error handling
-   */
-  static async fetchWithRetry(
+  static async fetchJson<T = any>(
     url: string,
-    init: RequestInit = {},
+    headers: Record<string, string> = {},
     options: NetworkRequestOptions = {}
-  ): Promise<Response> {
+  ): Promise<T> {
+    const requestOptions: RequestInit = {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...headers,
+      },
+    };
+
+    return this.makeRequest<T>(url, requestOptions, options);
+  }
+
+  /**
+   * Make a POST request with JSON body and response
+   */
+  static async postJson<T = any>(
+    url: string,
+    body: any,
+    options: NetworkRequestOptions = {}
+  ): Promise<T> {
+    const requestOptions: RequestInit = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      body: JSON.stringify(body),
+    };
+
+    return this.makeRequest<T>(url, requestOptions, options);
+  }
+
+  /**
+   * Make a PUT request with JSON body and response
+   */
+  static async putJson<T = any>(
+    url: string,
+    body: any,
+    options: NetworkRequestOptions = {}
+  ): Promise<T> {
+    const requestOptions: RequestInit = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+      body: JSON.stringify(body),
+    };
+
+    return this.makeRequest<T>(url, requestOptions, options);
+  }
+
+  /**
+   * Make a DELETE request
+   */
+  static async deleteJson<T = any>(
+    url: string,
+    options: NetworkRequestOptions = {}
+  ): Promise<T> {
+    const requestOptions: RequestInit = {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    };
+
+    return this.makeRequest<T>(url, requestOptions, options);
+  }
+
+  /**
+   * Make a DELETE request (alias for deleteJson)
+   */
+  static async delete<T = any>(
+    url: string,
+    requestOptions: RequestInit,
+    options: NetworkRequestOptions = {}
+  ): Promise<T> {
+    return this.makeRequest<T>(url, requestOptions, options);
+  }
+
+  /**
+   * Core request method with retry logic and timeout handling
+   */
+  private static async makeRequest<T>(
+    url: string,
+    requestOptions: RequestInit,
+    options: NetworkRequestOptions
+  ): Promise<T> {
     const {
       timeout = this.DEFAULT_TIMEOUT,
       retries = this.DEFAULT_RETRIES,
-      retryDelay = this.DEFAULT_RETRY_DELAY,
       exponentialBackoff = true,
-      abortSignal
     } = options;
 
-    // Check if offline
-    if (!this.isOnline()) {
-      throw this.createNetworkError('Device is offline', { isOffline: true });
-    }
+    let lastError: Error;
 
-    let lastError: any;
-
-    for (let attempt = 1; attempt <= retries + 1; attempt++) {
+    for (let attempt = 0; attempt <= retries; attempt++) {
       try {
         // Create abort controller for timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), timeout);
 
-        // Combine abort signals
-        if (abortSignal) {
-          abortSignal.addEventListener('abort', () => controller.abort());
-        }
-
-        // Make the request with timeout
-        const response = await Promise.race([
-          fetch(url, {
-            ...init,
-            signal: controller.signal,
-          }),
-          this.createTimeoutPromise(timeout, controller.signal),
-        ]);
+        const response = await fetch(url, {
+          ...requestOptions,
+          signal: controller.signal,
+        });
 
         clearTimeout(timeoutId);
 
-        // Check for HTTP errors
         if (!response.ok) {
-          const error = this.createNetworkError(
+          throw new NetworkError(
             `HTTP ${response.status}: ${response.statusText}`,
-            { statusCode: response.status }
+            response.status,
+            response.statusText,
+            url
           );
-
-          // Check for Retry-After header
-          const retryAfter = response.headers.get('Retry-After');
-          if (retryAfter) {
-            error.retryAfter = parseInt(retryAfter) * 1000; // Convert to milliseconds
-          }
-
-          throw error;
         }
 
-        return response;
+        // Try to parse JSON response
+        try {
+          const data = await response.json();
+          return data;
+        } catch (parseError) {
+          // If JSON parsing fails, return the response text
+          const text = await response.text();
+          return text as unknown as T;
+        }
 
       } catch (error: any) {
         lastError = error;
 
-        // Don't retry if it's the last attempt or error is not retryable
-        if (attempt > retries || !this.isRetryableError(error)) {
-          break;
+        // Check if we're offline
+        const isOffline = !navigator.onLine;
+
+        // Don't retry on certain errors
+        if (error.name === 'AbortError') {
+          throw new NetworkError(
+            `Request timeout after ${timeout}ms`,
+            408,
+            'Request Timeout',
+            url,
+            { isTimeout: true, isOffline }
+          );
+        }
+
+        // Handle network errors
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+          throw new NetworkError(
+            isOffline ? 'You appear to be offline' : 'Network request failed',
+            0,
+            'Network Error',
+            url,
+            { isOffline }
+          );
+        }
+
+        if (error instanceof NetworkError && error.status >= 400 && error.status < 500) {
+          // Don't retry client errors (4xx)
+          throw error;
+        }
+
+        // If this is the last attempt, throw the error
+        if (attempt === retries) {
+          throw error;
         }
 
         // Calculate delay for next attempt
-        const delay = error.retryAfter || this.calculateRetryDelay(
-          attempt,
-          retryDelay,
-          exponentialBackoff
+        const delay = exponentialBackoff
+          ? this.BASE_DELAY * Math.pow(2, attempt)
+          : this.BASE_DELAY;
+
+        console.warn(
+          `NetworkUtils: Request failed (attempt ${attempt + 1}/${retries + 1}), retrying in ${delay}ms:`,
+          error.message
         );
 
-        console.warn(`Request failed (attempt ${attempt}/${retries + 1}), retrying in ${delay}ms:`, error.message);
-
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, delay));
-
-        // Check if still online before retrying
-        if (!this.isOnline()) {
-          throw this.createNetworkError('Device went offline during retry', { isOffline: true });
-        }
+        await this.sleep(delay);
       }
     }
 
-    // All retries exhausted
-    throw lastError;
+    throw lastError!;
   }
 
   /**
-   * Enhanced fetch with JSON parsing and error handling
+   * Sleep for specified milliseconds
    */
-  static async fetchJson<T = any>(
-    url: string,
-    init: RequestInit = {},
-    options: NetworkRequestOptions = {}
-  ): Promise<T> {
-    const response = await this.fetchWithRetry(url, init, options);
-    
+  private static sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Check if a URL is reachable
+   */
+  static async isReachable(url: string, timeout: number = 5000): Promise<boolean> {
     try {
-      return await response.json();
-    } catch (error) {
-      throw this.createNetworkError('Failed to parse JSON response');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+      const response = await fetch(url, {
+        method: 'HEAD',
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+      return response.ok;
+    } catch {
+      return false;
     }
   }
 
   /**
-   * POST request with JSON body
+   * Get network status information
    */
-  static async postJson<T = any>(
-    url: string,
-    data: any,
-    options: NetworkRequestOptions = {}
-  ): Promise<T> {
-    const headers = {
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    };
+  static getNetworkStatus(): {
+    online: boolean;
+    effectiveType?: string;
+    downlink?: number;
+    rtt?: number;
+  } {
+    const navigator = window.navigator as any;
     
-    return this.fetchJson<T>(url, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(data),
-    }, options);
-  }
-
-  /**
-   * PUT request with JSON body
-   */
-  static async putJson<T = any>(
-    url: string,
-    data: any,
-    options: NetworkRequestOptions = {}
-  ): Promise<T> {
-    return this.fetchJson<T>(url, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }, options);
-  }
-
-  /**
-   * DELETE request
-   */
-  static async delete(
-    url: string,
-    options: NetworkRequestOptions = {}
-  ): Promise<Response> {
-    return this.fetchWithRetry(url, {
-      method: 'DELETE',
-    }, options);
-  }
-
-  /**
-   * Listen for online/offline events
-   */
-  static onNetworkStatusChange(callback: (isOnline: boolean) => void): () => void {
-    const handleOnline = () => callback(true);
-    const handleOffline = () => callback(false);
-
-    window.addEventListener('online', handleOnline);
-    window.addEventListener('offline', handleOffline);
-
-    // Return cleanup function
-    return () => {
-      window.removeEventListener('online', handleOnline);
-      window.removeEventListener('offline', handleOffline);
+    return {
+      online: navigator.onLine,
+      effectiveType: navigator.connection?.effectiveType,
+      downlink: navigator.connection?.downlink,
+      rtt: navigator.connection?.rtt,
     };
   }
 
   /**
-   * Wait for network to come back online
+   * Check if the browser is online
+   */
+  static isOnline(): boolean {
+    return typeof navigator !== 'undefined' ? navigator.onLine : true;
+  }
+
+  /**
+   * Wait for the browser to come online
    */
   static waitForOnline(timeout: number = 30000): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -306,22 +278,143 @@ export class NetworkUtils {
       }
 
       const timeoutId = setTimeout(() => {
-        cleanup();
-        reject(this.createNetworkError('Timeout waiting for network', { isTimeout: true }));
+        window.removeEventListener('online', onlineHandler);
+        reject(new Error('Timeout waiting for online connection'));
       }, timeout);
 
-      const handleOnline = () => {
-        cleanup();
+      const onlineHandler = () => {
+        clearTimeout(timeoutId);
+        window.removeEventListener('online', onlineHandler);
         resolve();
       };
 
-      const cleanup = () => {
-        clearTimeout(timeoutId);
-        window.removeEventListener('online', handleOnline);
-      };
-
-      window.addEventListener('online', handleOnline);
+      window.addEventListener('online', onlineHandler);
     });
+  }
+
+  /**
+   * Listen for network status changes
+   */
+  static onNetworkStatusChange(callback: (isOnline: boolean) => void): () => void {
+    const onlineHandler = () => callback(true);
+    const offlineHandler = () => callback(false);
+
+    window.addEventListener('online', onlineHandler);
+    window.addEventListener('offline', offlineHandler);
+
+    // Return cleanup function
+    return () => {
+      window.removeEventListener('online', onlineHandler);
+      window.removeEventListener('offline', offlineHandler);
+    };
+  }
+
+  /**
+   * Calculate retry delay with exponential backoff
+   */
+  static calculateRetryDelay(
+    attempt: number, 
+    baseDelay: number = 1000, 
+    exponentialBackoff: boolean = true
+  ): number {
+    if (!exponentialBackoff) {
+      return baseDelay;
+    }
+    
+    // Exponential backoff with jitter
+    const exponentialDelay = baseDelay * Math.pow(2, attempt - 1);
+    const jitter = Math.random() * 0.1 * exponentialDelay; // 10% jitter
+    return Math.min(30000, exponentialDelay + jitter); // Cap at 30 seconds
+  }
+
+  /**
+   * Create a request with custom headers for authentication
+   */
+  static withAuth(token: string): {
+    fetchJson: <T>(url: string, options?: NetworkRequestOptions) => Promise<T>;
+    postJson: <T>(url: string, body: any, options?: NetworkRequestOptions) => Promise<T>;
+    putJson: <T>(url: string, body: any, options?: NetworkRequestOptions) => Promise<T>;
+    deleteJson: <T>(url: string, options?: NetworkRequestOptions) => Promise<T>;
+  } {
+    const authHeaders = {
+      'Authorization': `Bearer ${token}`,
+    };
+
+    return {
+      fetchJson: <T>(url: string, options: NetworkRequestOptions = {}) =>
+        this.fetchJson<T>(url, authHeaders, options),
+      
+      postJson: <T>(url: string, body: any, options: NetworkRequestOptions = {}) =>
+        this.postJson<T>(url, body, { ...options, headers: { ...authHeaders, ...options.headers } }),
+      
+      putJson: <T>(url: string, body: any, options: NetworkRequestOptions = {}) =>
+        this.putJson<T>(url, body, { ...options, headers: { ...authHeaders, ...options.headers } }),
+      
+      deleteJson: <T>(url: string, options: NetworkRequestOptions = {}) =>
+        this.deleteJson<T>(url, { ...options, headers: { ...authHeaders, ...options.headers } }),
+    };
+  }
+
+  /**
+   * Create a NetworkError with specific options
+   */
+  static createNetworkError(
+    message: string, 
+    options: { 
+      status?: number; 
+      statusText?: string; 
+      url?: string; 
+      isTimeout?: boolean; 
+      isOffline?: boolean; 
+    } = {}
+  ): NetworkError {
+    return new NetworkError(
+      message,
+      options.status || 0,
+      options.statusText || 'Network Error',
+      options.url || '',
+      { 
+        isTimeout: options.isTimeout || false, 
+        isOffline: options.isOffline || false 
+      }
+    );
+  }
+
+  /**
+   * Fetch with retry logic (alias for fetchJson for backward compatibility)
+   */
+  static async fetchWithRetry<T = any>(
+    url: string,
+    headers: Record<string, string> = {},
+    options: NetworkRequestOptions = {}
+  ): Promise<T> {
+    return this.fetchJson<T>(url, headers, options);
+  }
+}
+
+/**
+ * Custom network error class
+ */
+export class NetworkError extends Error {
+  public isNetworkError: boolean = true;
+  public isTimeout: boolean = false;
+  public isOffline: boolean = false;
+
+  constructor(
+    message: string,
+    public status: number,
+    public statusText: string,
+    public url: string,
+    options: { isTimeout?: boolean; isOffline?: boolean } = {}
+  ) {
+    super(message);
+    this.name = 'NetworkError';
+    this.isTimeout = options.isTimeout || false;
+    this.isOffline = options.isOffline || false;
+  }
+
+  get statusCode(): number {
+    return this.status;
   }
 }
 

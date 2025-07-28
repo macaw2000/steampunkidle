@@ -436,7 +436,7 @@ interface TaskReward {
 
 **Unit Tests**: Jest and React Testing Library for component testing
 **Integration Tests**: API integration testing with mock backends
-**E2E Tests**: Cypress for critical user flows (authentication, core gameplay)
+**E2E Tests**: End-to-end testing for critical user flows (authentication, core gameplay)
 **Performance Tests**: Lighthouse CI for performance regression detection
 
 ### Backend Testing

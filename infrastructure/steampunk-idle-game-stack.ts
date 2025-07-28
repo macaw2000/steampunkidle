@@ -533,6 +533,8 @@ export class SteampunkIdleGameStack extends cdk.Stack {
         characters: charactersTable.tableName,
         users: usersTable.tableName,
       },
+      alertingEmail: process.env.ALERTING_EMAIL,
+      environment: this.node.tryGetContext('environment') || 'dev',
     });
 
     // Authentication Lambda Functions

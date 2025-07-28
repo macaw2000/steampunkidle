@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { store } from './store/store';
 import AuthProvider from './components/auth/AuthProvider';
-import GameDashboard from './components/GameDashboardDebug';
+import GameDashboard from './components/GameDashboard';
 import AuthCallback from './components/auth/AuthCallback';
 import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import AppHeader from './components/common/AppHeaderDebug';
+import { DevServiceManager } from './services/devServiceManager';
+import { ErrorLoggingService } from './services/errorLoggingService';
 import './App.css';
 
 // Conditionally import test user setup only in development
@@ -21,6 +23,30 @@ if (process.env.NODE_ENV === 'development') {
 
 function App() {
   console.log('App component rendering...');
+  
+  useEffect(() => {
+    // Initialize error logging service
+    console.log('[App] Initializing ErrorLoggingService...');
+    ErrorLoggingService.initialize({
+      enabled: true,
+      logToConsole: true,
+      logToLocalStorage: true,
+      logToRemote: false, // Disabled for local development
+      maxLocalStorageEntries: 100,
+      maxBreadcrumbs: 50,
+    });
+
+    // Initialize development service manager in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log('[App] Initializing DevServiceManager...');
+      DevServiceManager.initialize({
+        healthCheckInterval: 30000, // 30 seconds
+        autoFallbackEnabled: true,
+        mockServicesEnabled: true,
+        logHealthChecks: true,
+      });
+    }
+  }, []);
   
   return (
     <GlobalErrorBoundary>

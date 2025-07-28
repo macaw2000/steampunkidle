@@ -439,13 +439,11 @@ export class SecureServerTaskQueueService {
       const response = await NetworkUtils.fetchJson(
         `${this.apiUrl}/task-queue/${validation.playerId}`,
         {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'X-Player-ID': validation.playerId!,
-            'X-Session-ID': context.sessionId || '',
-            'X-Client-IP': context.ipAddress || '',
-            'User-Agent': context.userAgent || ''
-          }
+          'Authorization': `Bearer ${token}`,
+          'X-Player-ID': validation.playerId!,
+          'X-Session-ID': context.sessionId || '',
+          'X-Client-IP': context.ipAddress || '',
+          'User-Agent': context.userAgent || ''
         },
         {
           timeout: 5000,

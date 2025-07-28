@@ -3,7 +3,7 @@
  * Main interface for steampunk resource gathering activities
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { harvestingService } from '../../services/harvestingService';
 import { serverTaskQueueService } from '../../services/serverTaskQueueService';
 import { 
@@ -12,6 +12,7 @@ import {
   HarvestingReward,
   PlayerHarvestingStats
 } from '../../types/harvesting';
+import { Task, TaskProgress, TaskCompletionResult } from '../../types/taskQueue';
 import './HarvestingHub.css';
 
 interface HarvestingHubProps {
@@ -39,11 +40,79 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
   const [harvestingStats, setHarvestingStats] = useState<PlayerHarvestingStats | null>(null);
   const [selectedActivity, setSelectedActivity] = useState<HarvestingActivity | null>(null);
   const [activityRounds, setActivityRounds] = useState<{[key: string]: number | 'infinite'}>({});
+  
+  // Real-time progress tracking
+  const [currentTask, setCurrentTask] = useState<Task | null>(null);
+  const [taskProgress, setTaskProgress] = useState<TaskProgress | null>(null);
+  const [queuedTasks, setQueuedTasks] = useState<Task[]>([]);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [completionNotifications, setCompletionNotifications] = useState<TaskCompletionResult[]>([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  const updateQueueStatus = useCallback(() => {
+    if (!playerId) return;
+
+    try {
+      const queueStatus = serverTaskQueueService.getQueueStatus(playerId);
+      setCurrentTask(queueStatus.currentTask);
+      setQueuedTasks(queueStatus.queuedTasks);
+      setIsProcessing(queueStatus.isRunning);
+    } catch (error) {
+      console.error('Failed to update queue status:', error);
+    }
+  }, [playerId]);
+
+  // Real-time progress tracking setup
+  const setupRealTimeTracking = useCallback(() => {
+    if (!playerId) return;
+
+    // Update queue status every second
+    const updateInterval = setInterval(() => {
+      updateQueueStatus();
+    }, 1000);
+
+    // Listen for task completion events
+    const handleTaskComplete = (result: TaskCompletionResult) => {
+      console.log('Harvesting task completed:', result);
+      
+      // Add completion notification
+      setCompletionNotifications(prev => [...prev, result]);
+      setShowNotifications(true);
+      
+      // Auto-hide notification after 5 seconds
+      setTimeout(() => {
+        setCompletionNotifications(prev => prev.filter(n => n !== result));
+      }, 5000);
+      
+      // Trigger rewards callback
+      if (result.rewards && onRewardsReceived) {
+        onRewardsReceived(result.rewards as HarvestingReward[]);
+      }
+      
+      // Update queue status
+      updateQueueStatus();
+    };
+
+    // Listen for progress updates
+    const handleProgressUpdate = (progress: TaskProgress) => {
+      setTaskProgress(progress);
+    };
+
+    serverTaskQueueService.onTaskComplete(playerId, handleTaskComplete);
+    serverTaskQueueService.onProgress(playerId, handleProgressUpdate);
+
+    return () => {
+      clearInterval(updateInterval);
+      serverTaskQueueService.removeCallbacks(playerId);
+    };
+  }, [playerId, onRewardsReceived, updateQueueStatus]);
 
   useEffect(() => {
     loadAvailableActivities();
     loadHarvestingStats();
-  }, [playerId, playerLevel, playerStats]);
+    const cleanup = setupRealTimeTracking();
+    return cleanup;
+  }, [playerId, playerLevel, playerStats, setupRealTimeTracking]);
 
   const loadAvailableActivities = () => {
     const activities = harvestingService.getAvailableActivities(playerId, playerLevel, playerStats);
@@ -186,6 +255,121 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         <h2>🔧 Steampunk Resource Harvesting</h2>
         <p>Gather materials and treasures through various Victorian-era activities</p>
       </div>
+
+      {/* Real-time Progress Section */}
+      {(currentTask || queuedTasks.length > 0) && (
+        <div className="progress-section">
+          <h3>🔄 Active Harvesting Operations</h3>
+          
+          {/* Current Task Progress */}
+          {currentTask && (
+            <div className="current-task-progress">
+              <div className="task-header">
+                <span className="task-icon">{currentTask.icon}</span>
+                <div className="task-info">
+                  <h4>{currentTask.name}</h4>
+                  <p className="task-description">{currentTask.description}</p>
+                </div>
+                <div className="task-status">
+                  {isProcessing ? (
+                    <span className="status-active">🟢 Active</span>
+                  ) : (
+                    <span className="status-paused">🟡 Paused</span>
+                  )}
+                </div>
+              </div>
+              
+              {taskProgress && (
+                <div className="progress-details">
+                  <div className="progress-bar-container">
+                    <div className="progress-bar">
+                      <div 
+                        className="progress-fill" 
+                        style={{ width: `${taskProgress.progress * 100}%` }}
+                      />
+                    </div>
+                    <span className="progress-text">
+                      {Math.round(taskProgress.progress * 100)}%
+                    </span>
+                  </div>
+                  
+                  <div className="time-info">
+                    <span className="time-remaining">
+                      ⏱️ {formatTime(taskProgress.timeRemaining)}
+                    </span>
+                    <span className="estimated-completion">
+                      🎯 ETA: {new Date(Date.now() + taskProgress.timeRemaining).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Queued Tasks */}
+          {queuedTasks.length > 0 && (
+            <div className="queued-tasks">
+              <h4>📋 Queued Activities ({queuedTasks.length})</h4>
+              <div className="queue-list">
+                {queuedTasks.slice(0, 3).map((task, index) => (
+                  <div key={task.id} className="queued-task">
+                    <span className="queue-position">#{index + 1}</span>
+                    <span className="task-icon">{task.icon}</span>
+                    <span className="task-name">{task.name}</span>
+                    <span className="task-duration">{formatTime(task.duration)}</span>
+                  </div>
+                ))}
+                {queuedTasks.length > 3 && (
+                  <div className="queue-overflow">
+                    +{queuedTasks.length - 3} more activities
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Completion Notifications */}
+      {showNotifications && completionNotifications.length > 0 && (
+        <div className="completion-notifications">
+          {completionNotifications.map((notification, index) => (
+            <div key={index} className="notification-card">
+              <div className="notification-header">
+                <span className="notification-icon">✅</span>
+                <h4>Activity Completed!</h4>
+                <button 
+                  className="close-notification"
+                  onClick={() => setCompletionNotifications(prev => prev.filter((_, i) => i !== index))}
+                >
+                  ×
+                </button>
+              </div>
+              
+              <div className="notification-content">
+                <p><strong>{notification.task.name}</strong> has been completed!</p>
+                
+                {notification.rewards && notification.rewards.length > 0 && (
+                  <div className="rewards-earned">
+                    <h5>Rewards Earned:</h5>
+                    <div className="rewards-list">
+                      {notification.rewards.map((reward, rewardIndex) => (
+                        <div key={rewardIndex} className={`reward-item ${reward.isRare ? 'rare' : 'common'}`}>
+                          <span className="reward-quantity">{reward.quantity}x</span>
+                          <span className="reward-name">
+                            {reward.itemId || `${reward.type} reward`}
+                            {reward.isRare && ' ✨'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
 
 

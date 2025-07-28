@@ -17,6 +17,7 @@ import CharacterPanel from './character/CharacterPanel';
 import HarvestingRewards from './harvesting/HarvestingRewards';
 import HarvestingHub from './harvesting/HarvestingHub';
 import TaskQueueContainer from './taskQueue/TaskQueueContainer';
+import FargateTaskQueueManager from './taskQueue/FargateTaskQueueManager';
 import DevelopmentIndicator from './common/DevelopmentIndicator';
 
 import GuildManager from './guild/GuildManager';
@@ -160,6 +161,24 @@ const GameDashboard: React.FC = () => {
             <UserProfile />
           </ErrorBoundary>
         );
+      case 'Fargate Game Engine':
+        return character ? (
+          <ErrorBoundary fallback={<div>Fargate Game Engine failed to load</div>}>
+            <FargateTaskQueueManager
+              playerId={character.characterId}
+              onTaskComplete={(result) => {
+                console.log('Fargate task completed:', result);
+                // Handle task completion if needed
+              }}
+              onStatusChange={(status) => {
+                console.log('Fargate queue status changed:', status);
+                // Handle status changes if needed
+              }}
+            />
+          </ErrorBoundary>
+        ) : (
+          <div>Loading character data...</div>
+        );
       default:
         return <div>Feature not found</div>;
     }
@@ -297,6 +316,7 @@ const GameDashboard: React.FC = () => {
     { id: 'guild', label: 'Guild', icon: '🏰', onClick: () => handleFeatureAction('Guild Management') },
     { id: 'auction', label: 'Auction', icon: '💰', onClick: () => handleFeatureAction('Auction Marketplace') },
     { id: 'leaderboard', label: 'Leaderboard', icon: '🏆', onClick: () => handleFeatureAction('Leaderboards') },
+    { id: 'fargate', label: 'Game Engine', icon: '🎮', onClick: () => handleFeatureAction('Fargate Game Engine') },
     { id: 'profile', label: 'Profile', icon: '⚙️', onClick: () => handleFeatureAction('User Profile') },
   ];
 
@@ -327,7 +347,7 @@ const GameDashboard: React.FC = () => {
           
           {/* Navigation Section */}
           <div className="sidebar-navigation">
-            {navigationItems.slice(0, 7).map((item) => (
+            {navigationItems.slice(0, 8).map((item) => (
               <button
                 key={item.id}
                 className="sidebar-nav-button"

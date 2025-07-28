@@ -141,64 +141,268 @@ class GameEngine {
 
     const task = queue.currentTask;
     const elapsed = now - task.startTime;
+    const progress = Math.min(elapsed / task.duration, 1);
+    
+    // Send progress updates every 5 seconds or when task completes
+    if (progress >= 1 || elapsed % 5000 < 1000) {
+      await this.sendProgressNotification(queue.playerId, task, progress, elapsed);
+    }
     
     // Check if task is completed
     if (elapsed >= task.duration) {
       console.log(`✅ Task completed: ${task.name} for player ${queue.playerId}`);
       
-      // Generate rewards
+      // Generate rewards with enhanced calculation
       const rewards = this.generateTaskRewards(task);
       
-      // Apply rewards to character
+      // Apply rewards to character with detailed tracking
       await this.applyRewardsToCharacter(queue.playerId, rewards);
       
-      // Update queue stats
+      // Update task with completion data
+      task.completed = true;
+      task.rewards = rewards;
+      task.progress = 1.0;
+      task.completedAt = now;
+      
+      // Update queue stats with detailed metrics
       queue.totalTasksCompleted++;
       queue.totalTimeSpent += task.duration;
+      queue.totalRewardsEarned = (queue.totalRewardsEarned || []).concat(rewards);
+      
+      // Calculate efficiency metrics
+      queue.averageTaskDuration = queue.totalTimeSpent / queue.totalTasksCompleted;
+      queue.taskCompletionRate = queue.totalTasksCompleted / (queue.totalTasksCompleted + (queue.queuedTasks.length || 0));
+      queue.queueEfficiencyScore = this.calculateEfficiencyScore(queue);
+      
+      // Send comprehensive task completion notification
+      await this.sendTaskCompletionNotification(queue.playerId, {
+        task,
+        rewards,
+        queueStats: {
+          totalCompleted: queue.totalTasksCompleted,
+          averageDuration: queue.averageTaskDuration,
+          completionRate: queue.taskCompletionRate,
+          efficiencyScore: queue.queueEfficiencyScore
+        }
+      });
       
       // Start next task or create identical task for idle gameplay
       const nextTask = queue.queuedTasks.shift();
       if (nextTask) {
         nextTask.startTime = now;
         queue.currentTask = nextTask;
+        
+        // Send task started notification
+        await this.sendTaskStartedNotification(queue.playerId, nextTask);
       } else {
         // Create identical task for continuous idle gameplay
         const newTask = this.createIdenticalTask(task);
         newTask.startTime = now;
         queue.currentTask = newTask;
+        
+        // Send task started notification for continuous task
+        await this.sendTaskStartedNotification(queue.playerId, newTask);
       }
       
       // Mark queue as updated
       queue.lastProcessed = new Date().toISOString();
+      queue.lastUpdated = now;
+      
       return true;
     }
 
     return false;
   }
 
+  calculateEfficiencyScore(queue) {
+    // Base score starts at 50%
+    let score = 0.5;
+    
+    // Bonus for having tasks queued (shows planning)
+    if (queue.queuedTasks && queue.queuedTasks.length > 0) {
+      score += 0.2;
+    }
+    
+    // Bonus for consistent task completion
+    if (queue.totalTasksCompleted > 10) {
+      score += 0.1;
+    }
+    
+    // Bonus for high completion rate
+    if (queue.taskCompletionRate > 0.8) {
+      score += 0.1;
+    }
+    
+    // Penalty for very long average task duration (over 10 minutes)
+    if (queue.averageTaskDuration > 600000) {
+      score -= 0.1;
+    }
+    
+    return Math.max(0, Math.min(1, score));
+  }
+
+  async sendProgressNotification(playerId, task, progress, elapsed) {
+    try {
+      const notification = {
+        type: 'task_progress',
+        playerId,
+        taskId: task.id,
+        data: {
+          progress,
+          timeRemaining: Math.max(task.duration - elapsed, 0),
+          isComplete: progress >= 1,
+          taskName: task.name,
+          taskType: task.type
+        },
+        timestamp: Date.now()
+      };
+
+      // In a real implementation, this would send via WebSocket
+      console.log(`📊 Progress update for ${playerId}: ${task.name} ${Math.floor(progress * 100)}%`);
+      
+    } catch (error) {
+      console.error(`❌ Error sending progress notification:`, error);
+    }
+  }
+
+  async sendTaskCompletionNotification(playerId, completionData) {
+    try {
+      const notification = {
+        type: 'task_completed',
+        playerId,
+        taskId: completionData.task.id,
+        data: {
+          task: {
+            id: completionData.task.id,
+            name: completionData.task.name,
+            type: completionData.task.type,
+            duration: completionData.task.duration,
+            completed: true
+          },
+          rewards: completionData.rewards,
+          queueStats: completionData.queueStats,
+          rewardSummary: this.summarizeRewards(completionData.rewards)
+        },
+        timestamp: Date.now()
+      };
+
+      console.log(`🎉 Task completed for ${playerId}: ${completionData.task.name} - ${notification.data.rewardSummary}`);
+      
+    } catch (error) {
+      console.error(`❌ Error sending task completion notification:`, error);
+    }
+  }
+
+  async sendTaskStartedNotification(playerId, task) {
+    try {
+      const notification = {
+        type: 'task_started',
+        playerId,
+        taskId: task.id,
+        data: {
+          task: {
+            id: task.id,
+            name: task.name,
+            type: task.type,
+            duration: task.duration,
+            estimatedCompletion: task.startTime + task.duration
+          }
+        },
+        timestamp: Date.now()
+      };
+
+      console.log(`🚀 Task started for ${playerId}: ${task.name} (${task.duration / 1000}s)`);
+      
+    } catch (error) {
+      console.error(`❌ Error sending task started notification:`, error);
+    }
+  }
+
+  summarizeRewards(rewards) {
+    const summary = [];
+    let exp = 0, currency = 0, resources = 0, items = 0;
+
+    rewards.forEach(reward => {
+      switch (reward.type) {
+        case 'experience':
+          exp += reward.quantity;
+          break;
+        case 'currency':
+          currency += reward.quantity;
+          break;
+        case 'resource':
+          resources += reward.quantity;
+          break;
+        case 'item':
+          items += reward.quantity;
+          break;
+      }
+    });
+
+    if (exp > 0) summary.push(`${exp} exp`);
+    if (currency > 0) summary.push(`${currency} currency`);
+    if (resources > 0) summary.push(`${resources} resources`);
+    if (items > 0) summary.push(`${items} items`);
+
+    return summary.join(', ') || 'No rewards';
+  }
+
   generateTaskRewards(task) {
     const rewards = [];
+    const playerLevel = task.playerLevel || 1;
+    const baseRewardMultiplier = 1 + (playerLevel * 0.05); // 5% bonus per level
 
     switch (task.type) {
       case 'HARVESTING':
+        // Enhanced harvesting rewards with predictable primary materials
+        const harvestingData = task.activityData || {};
+        const activity = harvestingData.activity || {};
+        const playerStats = harvestingData.playerStats || {};
+        const tools = harvestingData.tools || [];
+        const location = harvestingData.location || {};
+
+        // Calculate tool bonuses
+        const toolBonus = tools.reduce((bonus, tool) => {
+          return bonus + tool.bonuses.reduce((toolBonus, b) => toolBonus + (b.type === 'yield' ? b.value : 0), 0);
+        }, 0);
+
+        // Calculate skill bonus
+        const relevantSkill = this.getSkillForCategory(activity.category || 'metallurgical');
+        const skillBonus = (playerStats.harvestingSkills && playerStats.harvestingSkills[relevantSkill]) || 0;
+        const locationBonus = (location.bonusModifiers && location.bonusModifiers.yield) || 0;
+
+        const totalEfficiency = 1 + (toolBonus * 0.01) + (skillBonus * 0.02) + (locationBonus * 0.01);
+
+        // Guaranteed primary material (requirement 17.1)
+        const primaryResource = activity.primaryResource || 'copper_ore';
+        const baseYield = Math.max(1, activity.baseYield || 2);
+        const primaryQuantity = Math.floor(baseYield * totalEfficiency * baseRewardMultiplier);
+
         rewards.push({
           type: 'resource',
-          itemId: 'copper_ore',
-          quantity: Math.floor(Math.random() * 3) + 1,
+          itemId: primaryResource,
+          quantity: Math.max(1, primaryQuantity), // Always at least 1
           rarity: 'common',
           isRare: false,
         });
-        
+
+        // Experience reward
+        const baseExp = 25 * baseRewardMultiplier * totalEfficiency;
         rewards.push({
           type: 'experience',
-          quantity: 25,
+          quantity: Math.floor(baseExp),
         });
 
-        // 10% chance for rare item
-        if (Math.random() < 0.1) {
+        // Exotic item discovery with <1% base chance (requirement 17.2)
+        const baseExoticChance = 0.008; // 0.8% base chance
+        const skillExoticBonus = skillBonus * 0.0001; // Slight increase with skill
+        const exoticChance = Math.min(baseExoticChance + skillExoticBonus, 0.02); // Cap at 2%
+
+        if (Math.random() < exoticChance) {
+          const exoticResource = activity.rareResource || this.getExoticItemForCategory(activity.category);
           rewards.push({
             type: 'resource',
-            itemId: 'steam_crystal',
+            itemId: exoticResource,
             quantity: 1,
             rarity: 'rare',
             isRare: true,
@@ -207,34 +411,124 @@ class GameEngine {
         break;
 
       case 'COMBAT':
+        const combatData = task.activityData || {};
+        const enemy = combatData.enemy || {};
+        const combatStats = combatData.playerStats || {};
+        const equipment = combatData.equipment || [];
+
+        // Calculate combat effectiveness
+        const levelAdvantage = Math.max(0, playerLevel - (enemy.level || 1)) * 0.1;
+        const equipmentBonus = equipment.reduce((bonus, eq) => {
+          return bonus + ((eq.stats && eq.stats.attack) || 0) + ((eq.stats && eq.stats.defense) || 0);
+        }, 0) * 0.01;
+
+        const winProbability = Math.min(0.5 + levelAdvantage + equipmentBonus, 0.9);
+        const experienceMultiplier = (enemy.level || 1) * 0.15;
+
+        // Experience reward
+        const combatExp = 35 * baseRewardMultiplier * experienceMultiplier;
         rewards.push({
           type: 'experience',
-          quantity: 35,
+          quantity: Math.floor(combatExp),
         });
-        
-        rewards.push({
-          type: 'currency',
-          quantity: 15,
-        });
+
+        // Combat success rewards
+        if (Math.random() < winProbability) {
+          // Currency reward
+          const currencyReward = Math.floor(15 * baseRewardMultiplier * (1 + levelAdvantage));
+          rewards.push({
+            type: 'currency',
+            quantity: currencyReward,
+          });
+
+          // Loot drops
+          if (Math.random() < 0.3) {
+            const loot = (enemy.lootTable && enemy.lootTable[0]) || { itemId: 'combat_trophy', quantity: 1, rarity: 'common' };
+            rewards.push({
+              type: 'item',
+              itemId: loot.itemId,
+              quantity: loot.quantity,
+              rarity: loot.rarity || 'common',
+              isRare: loot.rarity === 'rare' || loot.rarity === 'epic' || loot.rarity === 'legendary',
+            });
+          }
+        }
         break;
 
       case 'CRAFTING':
+        const craftingData = task.activityData || {};
+        const recipe = craftingData.recipe || {};
+        const craftingStation = craftingData.craftingStation || {};
+        const playerSkillLevel = craftingData.playerSkillLevel || 1;
+
+        // Calculate crafting success rate and quality
+        const craftingSkillBonus = playerSkillLevel * 0.02;
+        const stationBonus = (craftingStation.bonuses && craftingStation.bonuses.reduce((bonus, b) => {
+          return bonus + (b.type === 'quality' ? b.value : 0);
+        }, 0)) || 0;
+
+        const successRate = Math.min(0.7 + craftingSkillBonus + (stationBonus * 0.01), 0.95);
+        const qualityBonus = craftingSkillBonus + (stationBonus * 0.01);
+
+        // Experience reward
+        const craftingExp = 30 * baseRewardMultiplier * ((recipe.requiredLevel || 1) * 0.1);
         rewards.push({
           type: 'experience',
-          quantity: 30,
+          quantity: Math.floor(craftingExp),
         });
-        
-        rewards.push({
-          type: 'item',
-          itemId: 'clockwork_gear',
-          quantity: 1,
-          rarity: 'common',
-          isRare: false,
-        });
+
+        // Crafted item reward (if successful)
+        if (Math.random() < successRate) {
+          const expectedOutputs = craftingData.expectedOutputs || [{ itemId: 'clockwork_gear', quantity: 1 }];
+          expectedOutputs.forEach(output => {
+            const quality = qualityBonus > 0.5 ? 'uncommon' : 'common';
+            rewards.push({
+              type: 'item',
+              itemId: output.itemId,
+              quantity: output.quantity,
+              rarity: quality,
+              isRare: quality !== 'common',
+            });
+          });
+        }
         break;
     }
 
     return rewards;
+  }
+
+  getSkillForCategory(category) {
+    switch (category) {
+      case 'metallurgical':
+      case 'mechanical':
+        return 'mining';
+      case 'botanical':
+      case 'alchemical':
+        return 'foraging';
+      case 'archaeological':
+        return 'salvaging';
+      case 'electrical':
+      case 'aeronautical':
+        return 'crystal_extraction';
+      default:
+        return 'mining';
+    }
+  }
+
+  getExoticItemForCategory(category) {
+    const exoticItems = {
+      'metallurgical': ['adamantine_shard', 'mithril_nugget', 'steam_infused_ore'],
+      'botanical': ['ethereal_bloom', 'time_moss', 'crystal_fruit'],
+      'archaeological': ['ancient_gear', 'temporal_artifact', 'lost_blueprint'],
+      'electrical': ['lightning_crystal', 'storm_essence', 'charged_coil'],
+      'aeronautical': ['sky_metal', 'wind_crystal', 'floating_stone'],
+      'mechanical': ['precision_spring', 'master_gear', 'steam_core'],
+      'alchemical': ['philosophers_stone', 'transmutation_catalyst', 'essence_of_steam'],
+      'literary': ['forbidden_knowledge', 'ancient_formula', 'steam_cipher']
+    };
+
+    const items = exoticItems[category] || exoticItems['metallurgical'];
+    return items[Math.floor(Math.random() * items.length)];
   }
 
   async applyRewardsToCharacter(playerId, rewards) {
@@ -250,9 +544,13 @@ class GameEngine {
         return;
       }
 
-      // Calculate reward totals
+      const character = result.Item;
+
+      // Calculate reward totals and organize by type
       let experienceGained = 0;
       let currencyGained = 0;
+      const resourcesGained = {};
+      const itemsGained = {};
 
       for (const reward of rewards) {
         switch (reward.type) {
@@ -262,33 +560,119 @@ class GameEngine {
           case 'currency':
             currencyGained += reward.quantity;
             break;
-          // TODO: Handle resource and item rewards
+          case 'resource':
+            resourcesGained[reward.itemId] = (resourcesGained[reward.itemId] || 0) + reward.quantity;
+            break;
+          case 'item':
+            itemsGained[reward.itemId] = (itemsGained[reward.itemId] || 0) + reward.quantity;
+            break;
         }
       }
 
-      // Update character if there are rewards to apply
-      if (experienceGained > 0 || currencyGained > 0) {
-        const updateExpression = [];
-        const expressionAttributeValues = {};
+      // Prepare update expression
+      const updateExpression = [];
+      const expressionAttributeNames = {};
+      const expressionAttributeValues = {};
 
-        if (experienceGained > 0) {
-          updateExpression.push('experience = experience + :exp');
-          expressionAttributeValues[':exp'] = experienceGained;
+      // Handle experience and level progression
+      if (experienceGained > 0) {
+        const currentExp = character.experience || 0;
+        const currentLevel = character.level || 1;
+        const newExp = currentExp + experienceGained;
+        
+        // Calculate new level (simple formula: level = floor(sqrt(exp/100)) + 1)
+        const newLevel = Math.floor(Math.sqrt(newExp / 100)) + 1;
+        const leveledUp = newLevel > currentLevel;
+
+        updateExpression.push('experience = :exp');
+        expressionAttributeValues[':exp'] = newExp;
+
+        if (leveledUp) {
+          updateExpression.push('#level = :level');
+          expressionAttributeNames['#level'] = 'level';
+          expressionAttributeValues[':level'] = newLevel;
+          console.log(`🎉 Player ${playerId} leveled up! ${currentLevel} → ${newLevel}`);
         }
+      }
 
-        if (currencyGained > 0) {
-          updateExpression.push('currency = currency + :currency');
-          expressionAttributeValues[':currency'] = currencyGained;
+      // Handle currency
+      if (currencyGained > 0) {
+        updateExpression.push('currency = if_not_exists(currency, :zero) + :currency');
+        expressionAttributeValues[':currency'] = currencyGained;
+        expressionAttributeValues[':zero'] = 0;
+      }
+
+      // Handle inventory updates for resources and items
+      const inventoryUpdates = { ...resourcesGained, ...itemsGained };
+      if (Object.keys(inventoryUpdates).length > 0) {
+        for (const [itemId, quantity] of Object.entries(inventoryUpdates)) {
+          const inventoryKey = `inventory.${itemId}`;
+          updateExpression.push(`${inventoryKey} = if_not_exists(${inventoryKey}, :zero) + :${itemId}_qty`);
+          expressionAttributeValues[`:${itemId}_qty`] = quantity;
         }
+        
+        if (!expressionAttributeValues[':zero']) {
+          expressionAttributeValues[':zero'] = 0;
+        }
+      }
 
-        await docClient.send(new UpdateCommand({
+      // Update character stats based on activity type
+      const lastTask = character.lastCompletedTask;
+      if (lastTask) {
+        switch (lastTask.type) {
+          case 'HARVESTING':
+            // Increase harvesting skill
+            const harvestingSkill = this.getSkillForCategory(lastTask.activityData?.activity?.category);
+            const skillPath = `stats.harvestingSkills.${harvestingSkill}`;
+            updateExpression.push(`${skillPath} = if_not_exists(${skillPath}, :zero) + :skill_gain`);
+            expressionAttributeValues[':skill_gain'] = Math.floor(experienceGained * 0.1); // 10% of exp as skill
+            break;
+          case 'COMBAT':
+            // Increase combat skills
+            updateExpression.push('stats.combatSkills.melee = if_not_exists(stats.combatSkills.melee, :zero) + :combat_skill');
+            expressionAttributeValues[':combat_skill'] = Math.floor(experienceGained * 0.08);
+            break;
+          case 'CRAFTING':
+            // Increase crafting skills
+            const craftingSkill = lastTask.activityData?.recipe?.skill || 'clockmaking';
+            const craftingPath = `stats.craftingSkills.${craftingSkill}`;
+            updateExpression.push(`${craftingPath} = if_not_exists(${craftingPath}, :zero) + :crafting_skill`);
+            expressionAttributeValues[':crafting_skill'] = Math.floor(experienceGained * 0.12);
+            break;
+        }
+      }
+
+      // Update last activity timestamp
+      updateExpression.push('lastActiveAt = :timestamp');
+      expressionAttributeValues[':timestamp'] = new Date().toISOString();
+
+      // Execute the update if there are changes to apply
+      if (updateExpression.length > 0) {
+        const updateParams = {
           TableName: TABLE_NAMES.CHARACTERS,
           Key: { userId: playerId },
           UpdateExpression: `SET ${updateExpression.join(', ')}`,
           ExpressionAttributeValues: expressionAttributeValues,
-        }));
+        };
 
-        console.log(`💰 Applied rewards to ${playerId}: ${experienceGained} exp, ${currencyGained} currency`);
+        if (Object.keys(expressionAttributeNames).length > 0) {
+          updateParams.ExpressionAttributeNames = expressionAttributeNames;
+        }
+
+        await docClient.send(new UpdateCommand(updateParams));
+
+        // Log detailed reward application
+        const rewardSummary = [];
+        if (experienceGained > 0) rewardSummary.push(`${experienceGained} exp`);
+        if (currencyGained > 0) rewardSummary.push(`${currencyGained} currency`);
+        if (Object.keys(resourcesGained).length > 0) {
+          rewardSummary.push(`resources: ${JSON.stringify(resourcesGained)}`);
+        }
+        if (Object.keys(itemsGained).length > 0) {
+          rewardSummary.push(`items: ${JSON.stringify(itemsGained)}`);
+        }
+
+        console.log(`💰 Applied rewards to ${playerId}: ${rewardSummary.join(', ')}`);
       }
 
     } catch (error) {
