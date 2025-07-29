@@ -61,6 +61,14 @@ export class NetworkClient {
       return this.isOnline;
     }
 
+    // Check if we're in local storage mode (no backend)
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.useLocalStorage) {
+      this.isOnline = true; // Consider "online" for mock services
+      this.lastNetworkCheck = now;
+      return true;
+    }
+
     try {
       // Try a simple health check
       const response = await NetworkUtils.fetchJson(`${this.config.baseURL}/health`, {}, {
@@ -381,6 +389,15 @@ export class NetworkClient {
     error?: string;
   }> {
     const startTime = Date.now();
+    
+    // Check if we're in local storage mode (static deployment)
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    if (envInfo.useLocalStorage) {
+      return {
+        isOnline: true,
+        latency: 1,
+      };
+    }
     
     try {
       await this.checkNetworkConnectivity();

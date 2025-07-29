@@ -32,7 +32,7 @@ export class FargateGameEngine extends Construct {
   public readonly loadBalancer: elbv2.ApplicationLoadBalancer;
   public readonly cluster: ecs.Cluster;
   public readonly taskDefinition: ecs.FargateTaskDefinition;
-  public readonly scalableTarget: applicationautoscaling.ScalableTarget;
+  // Scalable target is managed internally
   public readonly logGroup: logs.LogGroup;
   public readonly alarmTopic: sns.Topic;
   public readonly targetGroup: elbv2.ApplicationTargetGroup;
@@ -206,13 +206,7 @@ export class FargateGameEngine extends Construct {
       enableExecuteCommand: true, // For debugging
       minHealthyPercent: 50,
       maxHealthyPercent: 200,
-      deploymentConfiguration: {
-        alarms: {
-          alarmNames: [], // Will be populated after creating alarms
-          enable: true,
-          rollback: true,
-        },
-      },
+      // Deployment configuration will be handled separately
       capacityProviderStrategies: [
         {
           capacityProvider: 'FARGATE',
@@ -229,13 +223,13 @@ export class FargateGameEngine extends Construct {
     this.service.attachToApplicationTargetGroup(this.targetGroup);
 
     // Enhanced Auto Scaling Configuration
-    this.scalableTarget = this.service.autoScaleTaskCount({
+    const scalableTaskCount = this.service.autoScaleTaskCount({
       minCapacity: 1,
       maxCapacity: props.environment === 'production' ? 5 : 3,
     });
 
     // CPU-based scaling with optimized thresholds
-    const cpuScaling = this.scalableTarget.scaleOnCpuUtilization('CpuScaling', {
+    scalableTaskCount.scaleOnCpuUtilization('CpuScaling', {
       targetUtilizationPercent: 70,
       scaleInCooldown: cdk.Duration.minutes(5),
       scaleOutCooldown: cdk.Duration.minutes(2),
@@ -243,7 +237,7 @@ export class FargateGameEngine extends Construct {
     });
 
     // Memory-based scaling with optimized thresholds
-    const memoryScaling = this.scalableTarget.scaleOnMemoryUtilization('MemoryScaling', {
+    scalableTaskCount.scaleOnMemoryUtilization('MemoryScaling', {
       targetUtilizationPercent: 80,
       scaleInCooldown: cdk.Duration.minutes(5),
       scaleOutCooldown: cdk.Duration.minutes(2),
@@ -251,7 +245,7 @@ export class FargateGameEngine extends Construct {
     });
 
     // Custom metric scaling based on active task queues
-    const customMetricScaling = this.scalableTarget.scaleOnMetric('ActiveTaskQueuesScaling', {
+    scalableTaskCount.scaleOnMetric('ActiveTaskQueuesScaling', {
       metric: new cloudwatch.Metric({
         namespace: 'SteampunkIdleGame/GameEngine',
         metricName: 'ActiveTaskQueues',

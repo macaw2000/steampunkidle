@@ -121,7 +121,11 @@
     - _Requirements: 18.1, 18.2, 18.3, 18.4, 18.5_
 
 - [x] 6. Implement Fargate-based continuous game engine
-  - [ ] 6.1 Build containerized game engine for ECS Fargate
+  - [x] 6.1 Build containerized game engine for ECS Fargate
+
+
+
+
 
 
 

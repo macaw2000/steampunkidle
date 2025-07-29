@@ -121,12 +121,41 @@ export class DevServiceManager {
    * Check health of all services
    */
   static async checkAllServices(): Promise<void> {
+    const envInfo = EnvironmentService.getEnvironmentInfo();
+    
+    // Skip health checks if we're using localStorage/mock mode
+    if (envInfo.useLocalStorage) {
+      this.setMockServiceHealth();
+      return;
+    }
+
     const promises = [
       this.checkCharacterService(),
       this.checkAuthService(),
     ];
 
     await Promise.allSettled(promises);
+  }
+
+  /**
+   * Set all services to healthy status when using mock mode
+   */
+  private static setMockServiceHealth(): void {
+    this.serviceHealth.set('character', {
+      name: 'Character Service',
+      status: 'healthy',
+      message: 'Using mock service',
+      lastChecked: new Date(),
+      responseTime: 1,
+    });
+
+    this.serviceHealth.set('auth', {
+      name: 'Authentication Service',
+      status: 'healthy',
+      message: 'Using mock service',
+      lastChecked: new Date(),
+      responseTime: 1,
+    });
   }
 
   /**

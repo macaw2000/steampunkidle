@@ -5,16 +5,25 @@
 
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const WebSocket = require('ws');
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 
-// Initialize Express app
+// Initialize Express app and HTTP server
 const app = express();
 const port = process.env.PORT || 3001;
+const server = http.createServer(app);
+
+// Initialize WebSocket server
+const wss = new WebSocket.Server({ server });
 
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// WebSocket connection management
+const connectedClients = new Map(); // playerId -> WebSocket connection
 
 // Initialize DynamoDB client
 const client = new DynamoDBClient({
@@ -30,6 +39,47 @@ const TABLE_NAMES = {
 
 // In-memory cache for active task queues
 const activeQueues = new Map();
+
+// WebSocket connection handling
+wss.on('connection', (ws, req) => {
+  console.log('🔌 New WebSocket connection established');
+  
+  ws.on('message', (message) => {
+    try {
+      const data = JSON.parse(message);
+      
+      if (data.type === 'authenticate' && data.playerId) {
+        // Associate this connection with a player
+        connectedClients.set(data.playerId, ws);
+        console.log(`🔐 Player ${data.playerId} authenticated via WebSocket`);
+        
+        // Send confirmation
+        ws.send(JSON.stringify({
+          type: 'authenticated',
+          playerId: data.playerId,
+          timestamp: Date.now()
+        }));
+      }
+    } catch (error) {
+      console.error('❌ Error processing WebSocket message:', error);
+    }
+  });
+  
+  ws.on('close', () => {
+    // Remove connection from active clients
+    for (const [playerId, connection] of connectedClients.entries()) {
+      if (connection === ws) {
+        connectedClients.delete(playerId);
+        console.log(`🔌 Player ${playerId} disconnected from WebSocket`);
+        break;
+      }
+    }
+  });
+  
+  ws.on('error', (error) => {
+    console.error('❌ WebSocket error:', error);
+  });
+});
 
 /**
  * Game Engine - Continuous Task Processing
@@ -257,7 +307,12 @@ class GameEngine {
         timestamp: Date.now()
       };
 
-      // In a real implementation, this would send via WebSocket
+      // Send via WebSocket if client is connected
+      const client = connectedClients.get(playerId);
+      if (client && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(notification));
+      }
+      
       console.log(`📊 Progress update for ${playerId}: ${task.name} ${Math.floor(progress * 100)}%`);
       
     } catch (error) {
@@ -286,6 +341,12 @@ class GameEngine {
         timestamp: Date.now()
       };
 
+      // Send via WebSocket if client is connected
+      const client = connectedClients.get(playerId);
+      if (client && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(notification));
+      }
+
       console.log(`🎉 Task completed for ${playerId}: ${completionData.task.name} - ${notification.data.rewardSummary}`);
       
     } catch (error) {
@@ -310,6 +371,12 @@ class GameEngine {
         },
         timestamp: Date.now()
       };
+
+      // Send via WebSocket if client is connected
+      const client = connectedClients.get(playerId);
+      if (client && client.readyState === WebSocket.OPEN) {
+        client.send(JSON.stringify(notification));
+      }
 
       console.log(`🚀 Task started for ${playerId}: ${task.name} (${task.duration / 1000}s)`);
       
@@ -698,13 +765,30 @@ const gameEngine = new GameEngine();
  * REST API Endpoints
  */
 
-// Health check
+// Health check with enhanced metrics
 app.get('/health', (req, res) => {
+  const memoryUsage = process.memoryUsage();
+  const cpuUsage = process.cpuUsage();
+  
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
     activeQueues: activeQueues.size,
+    connectedClients: connectedClients.size,
     uptime: process.uptime(),
+    memory: {
+      rss: Math.round(memoryUsage.rss / 1024 / 1024) + ' MB',
+      heapUsed: Math.round(memoryUsage.heapUsed / 1024 / 1024) + ' MB',
+      heapTotal: Math.round(memoryUsage.heapTotal / 1024 / 1024) + ' MB',
+    },
+    cpu: {
+      user: cpuUsage.user,
+      system: cpuUsage.system,
+    },
+    gameEngine: {
+      isRunning: gameEngine.isRunning,
+      totalTasksProcessed: Array.from(activeQueues.values()).reduce((total, queue) => total + (queue.totalTasksCompleted || 0), 0),
+    }
   });
 });
 
@@ -879,31 +963,87 @@ app.post('/task-queue/stop-tasks', async (req, res) => {
   });
 });
 
+// Metrics endpoint for monitoring
+app.get('/metrics', (req, res) => {
+  const metrics = {
+    timestamp: new Date().toISOString(),
+    activeQueues: activeQueues.size,
+    connectedClients: connectedClients.size,
+    totalTasksCompleted: Array.from(activeQueues.values()).reduce((total, queue) => total + (queue.totalTasksCompleted || 0), 0),
+    averageQueueLength: activeQueues.size > 0 ? 
+      Array.from(activeQueues.values()).reduce((total, queue) => total + (queue.queuedTasks?.length || 0), 0) / activeQueues.size : 0,
+    systemHealth: {
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      cpu: process.cpuUsage(),
+    },
+    gameEngineStatus: {
+      isRunning: gameEngine.isRunning,
+      processingInterval: gameEngine.processingInterval ? 'active' : 'inactive',
+    }
+  };
+
+  res.json(metrics);
+});
+
 /**
  * Server Startup and Shutdown
  */
 
-// Graceful shutdown
-process.on('SIGTERM', async () => {
-  console.log('📡 Received SIGTERM, shutting down gracefully...');
-  await gameEngine.stop();
-  process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-  console.log('📡 Received SIGINT, shutting down gracefully...');
-  await gameEngine.stop();
-  process.exit(0);
-});
-
-// Start server
-app.listen(port, async () => {
-  console.log(`🚀 Steampunk Idle Game Server running on port ${port}`);
+// Enhanced graceful shutdown
+async function gracefulShutdown(signal) {
+  console.log(`📡 Received ${signal}, shutting down gracefully...`);
   
-  // Start the game engine
-  await gameEngine.start();
-  
-  console.log('🎮 Game Engine is now processing player queues continuously!');
+  try {
+    // Stop accepting new connections
+    server.close(() => {
+      console.log('🔌 HTTP server closed');
+    });
+    
+    // Close all WebSocket connections
+    wss.clients.forEach((ws) => {
+      if (ws.readyState === WebSocket.OPEN) {
+        ws.close(1000, 'Server shutting down');
+      }
+    });
+    console.log('🔌 All WebSocket connections closed');
+    
+    // Stop the game engine
+    await gameEngine.stop();
+    
+    console.log('✅ Graceful shutdown completed');
+    process.exit(0);
+  } catch (error) {
+    console.error('❌ Error during graceful shutdown:', error);
+    process.exit(1);
+  }
+}
+
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', (error) => {
+  console.error('❌ Uncaught Exception:', error);
+  gracefulShutdown('uncaughtException');
 });
 
-module.exports = app;
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+  gracefulShutdown('unhandledRejection');
+});
+
+// Start server only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  server.listen(port, async () => {
+    console.log(`🚀 Steampunk Idle Game Server running on port ${port}`);
+    console.log(`🔌 WebSocket server ready for real-time notifications`);
+    
+    // Start the game engine
+    await gameEngine.start();
+    
+    console.log('🎮 Game Engine is now processing player queues continuously!');
+  });
+}
+
+module.exports = { app, server, wss, GameEngine, gameEngine };

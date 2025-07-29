@@ -74,8 +74,8 @@ describe('EnhancedErrorBoundary', () => {
   describe('Error Handling', () => {
     it('catches and displays error when child component throws', async () => {
       render(
-        <EnhancedErrorBoundary componentName=\"TestComponent\">
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+        <EnhancedErrorBoundary componentName="TestComponent">
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 
@@ -86,8 +86,8 @@ describe('EnhancedErrorBoundary', () => {
 
     it('logs error with correct context when error occurs', async () => {
       render(
-        <EnhancedErrorBoundary componentName=\"TestComponent\" level=\"section\">
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+        <EnhancedErrorBoundary componentName="TestComponent" level="section">
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 
@@ -110,8 +110,8 @@ describe('EnhancedErrorBoundary', () => {
 
     it('adds breadcrumb when error occurs', async () => {
       render(
-        <EnhancedErrorBoundary componentName=\"TestComponent\">
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+        <EnhancedErrorBoundary componentName="TestComponent">
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 

@@ -115,11 +115,17 @@ export class EnvironmentService {
       window.location.protocol === 'http:' && isLocalhost
     );
 
+    // Check if we're running on CloudFront (production static hosting)
+    const isCloudFrontDeployment = isBrowser && (
+      window.location.hostname.includes('cloudfront.net') ||
+      window.location.hostname.includes('amazonaws.com')
+    );
+
     // Check for backend API availability
     const hasApiBaseUrl = !!process.env.REACT_APP_API_BASE_URL;
     
     // Determine if we should use localStorage (no backend available)
-    const useLocalStorage = !hasApiBaseUrl || isDevelopmentServer || nodeEnv === 'development';
+    const useLocalStorage = !hasApiBaseUrl || isDevelopmentServer || nodeEnv === 'development' || isCloudFrontDeployment;
     
     // Enable mock auth when using localStorage
     const enableMockAuth = useLocalStorage;
