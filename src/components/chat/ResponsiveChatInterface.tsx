@@ -228,11 +228,7 @@ const ResponsiveChatInterface: React.FC = () => {
           <div className="chat-title">
             <span className="chat-icon">💬</span>
             <span className="title-text">Steam Telegraph</span>
-            {process.env.NODE_ENV === 'development' && (
-              <span className="debug-info">
-                {isDesktop ? '(Desktop)' : isMobile ? '(Mobile)' : '(Tablet)'}
-              </span>
-            )}
+
           </div>
           
           {/* Channel Tabs */}

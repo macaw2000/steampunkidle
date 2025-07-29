@@ -7,19 +7,11 @@ import GameDashboard from './components/GameDashboard';
 import AuthCallback from './components/auth/AuthCallback';
 import GlobalErrorBoundary from './components/common/GlobalErrorBoundary';
 import ErrorBoundary from './components/common/ErrorBoundary';
-import AppHeader from './components/common/AppHeaderDebug';
-import { DevServiceManager } from './services/devServiceManager';
+import AppHeader from './components/common/AppHeader';
 import { ErrorLoggingService } from './services/errorLoggingService';
 import './App.css';
 
-// Conditionally import test user setup only in development
-if (process.env.NODE_ENV === 'development') {
-  try {
-    require('./utils/testUserSetup');
-  } catch (error) {
-    console.warn('Failed to load test user setup:', error);
-  }
-}
+// Test user setup disabled in AWS-only mode
 
 function App() {
   console.log('App component rendering...');
@@ -36,16 +28,7 @@ function App() {
       maxBreadcrumbs: 50,
     });
 
-    // Initialize development service manager in development mode
-    if (process.env.NODE_ENV === 'development') {
-      console.log('[App] Initializing DevServiceManager...');
-      DevServiceManager.initialize({
-        healthCheckInterval: 30000, // 30 seconds
-        autoFallbackEnabled: true,
-        mockServicesEnabled: true,
-        logHealthChecks: true,
-      });
-    }
+    // AWS-only initialization - no local development services needed
   }, []);
   
   return (

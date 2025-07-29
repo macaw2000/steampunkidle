@@ -5,7 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { NetworkClient } from '../../services/networkClient';
-import { DevServiceManager } from '../../services/devServiceManager';
+
 import './NetworkStatusIndicator.css';
 
 interface NetworkStatusIndicatorProps {
@@ -71,14 +71,14 @@ export const NetworkStatusIndicator: React.FC<NetworkStatusIndicatorProps> = ({
     
     try {
       const connectivity = await NetworkClient.testConnectivity();
-      const statusSummary = DevServiceManager.getStatusSummary();
+      // AWS-only status - no service manager needed
       
       setNetworkStatus({
         isOnline: connectivity.isOnline,
         latency: connectivity.latency,
         error: connectivity.error,
         lastChecked: new Date(),
-        usingMockServices: statusSummary.mockModeActive,
+        usingMockServices: false, // AWS-only, no mock services
       });
     } catch (error: any) {
       setNetworkStatus(prev => ({

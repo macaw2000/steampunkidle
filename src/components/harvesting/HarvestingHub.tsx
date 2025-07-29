@@ -164,7 +164,7 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         metadata: { rounds }
       };
       const fullPlayerStats = createFullPlayerStats();
-      serverTaskQueueService.startHarvestingTask(playerId, taskData, fullPlayerStats);
+      serverTaskQueueService.addHarvestingTask(playerId, taskData, fullPlayerStats);
       
       console.log(`Started ${activity.name} immediately with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       
@@ -187,7 +187,7 @@ const HarvestingHub: React.FC<HarvestingHubProps> = ({
         metadata: { rounds, queued: true }
       };
       const fullPlayerStats = createFullPlayerStats();
-      serverTaskQueueService.queueHarvestingTask(playerId, taskData, fullPlayerStats);
+      serverTaskQueueService.addHarvestingTask(playerId, taskData, fullPlayerStats);
       
       console.log(`Added ${activity.name} to queue with ${rounds === 'infinite' ? 'infinite' : rounds} rounds`);
       

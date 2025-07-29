@@ -4,10 +4,8 @@
  */
 
 export const setupTestUsers = () => {
-  // Only run in development mode and if localStorage is available
-  if (process.env.NODE_ENV !== 'development' || typeof window === 'undefined' || !window.localStorage) {
-    return;
-  }
+  // Test user setup disabled in AWS-only mode
+  return;
 
   const testUsers = {
     // User with character (existing user)
@@ -104,7 +102,4 @@ export const clearTestData = () => {
   console.log('Test data cleared');
 };
 
-// Auto-setup test users in development
-if (process.env.NODE_ENV === 'development') {
-  setupTestUsers();
-}
+// Test user auto-setup disabled in AWS-only mode

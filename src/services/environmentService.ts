@@ -1,43 +1,37 @@
 /**
- * Centralized environment detection service
- * Provides consistent environment information across the application
+ * Environment Service - AWS Only
+ * Simplified environment detection for AWS-only deployment
  */
 
 export interface EnvironmentInfo {
-  environment: 'development' | 'production' | 'test';
-  isDevelopment: boolean;
+  environment: 'staging' | 'production' | 'test';
+  isStaging: boolean;
   isProduction: boolean;
   hasBackendAPI: boolean;
-  useLocalStorage: boolean;
-  enableMockAuth: boolean;
-}
-
-export interface EnvironmentConfig {
-  apiBaseUrl?: string;
-  enableMockAuth: boolean;
-  useLocalStorage: boolean;
-  enableOfflineMode: boolean;
   enableDebugMode: boolean;
 }
 
+interface EnvironmentConfig {
+  apiBaseUrl?: string;
+  enableDebugMode: boolean;
+  enableOfflineMode: boolean;
+}
+
 export class EnvironmentService {
-  private static _config: EnvironmentConfig | null = null;
+  private static config: EnvironmentConfig | null = null;
 
   /**
-   * Get the current environment configuration
+   * Initialize the environment service
    */
-  static getConfig(): EnvironmentConfig {
-    if (!this._config) {
-      this._config = this.detectEnvironment();
-    }
-    return this._config;
+  static initialize(): void {
+    this.config = this.detectEnvironmentConfig();
   }
 
   /**
-   * Check if we're in development mode
+   * Check if we're in staging mode
    */
-  static isDevelopment(): boolean {
-    return this.getEnvironment() === 'development';
+  static isStaging(): boolean {
+    return this.getEnvironment() === 'staging';
   }
 
   /**
@@ -50,20 +44,15 @@ export class EnvironmentService {
   /**
    * Get the current environment
    */
-  static getEnvironment(): 'development' | 'production' | 'test' {
-    const config = this.getConfig();
-    
-    // If we're using localStorage and mock auth, treat as development
-    if (config.useLocalStorage && config.enableMockAuth) {
-      return 'development';
-    }
-
-    // Check NODE_ENV
+  static getEnvironment(): 'staging' | 'production' | 'test' {
     const nodeEnv = process.env.NODE_ENV;
     if (nodeEnv === 'test') return 'test';
-    if (nodeEnv === 'development') return 'development';
     
-    // Default to production
+    // Check for staging environment indicators
+    const awsEnvironment = process.env.REACT_APP_AWS_ENVIRONMENT;
+    if (awsEnvironment === 'staging') return 'staging';
+    
+    // Default to production for AWS deployment
     return 'production';
   }
 
@@ -72,7 +61,7 @@ export class EnvironmentService {
    */
   static hasBackendAPI(): boolean {
     const config = this.getConfig();
-    return !!config.apiBaseUrl && !config.useLocalStorage;
+    return !!config.apiBaseUrl;
   }
 
   /**
@@ -80,87 +69,123 @@ export class EnvironmentService {
    */
   static getEnvironmentInfo(): EnvironmentInfo {
     const environment = this.getEnvironment();
-    const config = this.getConfig();
     
     return {
       environment,
-      isDevelopment: environment === 'development',
+      isStaging: environment === 'staging',
       isProduction: environment === 'production',
       hasBackendAPI: this.hasBackendAPI(),
-      useLocalStorage: config.useLocalStorage,
-      enableMockAuth: config.enableMockAuth,
+      enableDebugMode: this.getConfig().enableDebugMode,
     };
   }
 
   /**
-   * Detect the current environment and create configuration
+   * Get environment configuration
    */
-  private static detectEnvironment(): EnvironmentConfig {
-    // Check if we're running in a browser
-    const isBrowser = typeof window !== 'undefined';
-    
-    // Check various environment indicators
+  static getConfig(): EnvironmentConfig {
+    if (!this.config) {
+      this.initialize();
+    }
+    return this.config!;
+  }
+
+  /**
+   * Detect environment configuration
+   */
+  private static detectEnvironmentConfig(): EnvironmentConfig {
     const nodeEnv = process.env.NODE_ENV;
-    const isLocalhost = isBrowser && (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1' ||
-      window.location.hostname.startsWith('192.168.') ||
-      window.location.hostname.endsWith('.local')
-    );
+    const awsEnvironment = process.env.REACT_APP_AWS_ENVIRONMENT;
     
-    // Check if we're running on a development server
-    const isDevelopmentServer = isBrowser && (
-      window.location.port === '3000' || // React dev server
-      window.location.port === '3001' || // Alternative dev port
-      window.location.protocol === 'http:' && isLocalhost
-    );
-
-    // Check if we're running on CloudFront (production static hosting)
-    const isCloudFrontDeployment = isBrowser && (
-      window.location.hostname.includes('cloudfront.net') ||
-      window.location.hostname.includes('amazonaws.com')
-    );
-
-    // Check for backend API availability
-    const hasApiBaseUrl = !!process.env.REACT_APP_API_BASE_URL;
+    // Get API base URL from environment variables
+    const apiBaseUrl = process.env.REACT_APP_API_URL || process.env.REACT_APP_AWS_API_URL;
     
-    // Determine if we should use localStorage (no backend available)
-    const useLocalStorage = !hasApiBaseUrl || isDevelopmentServer || nodeEnv === 'development' || isCloudFrontDeployment;
+    // Enable debug mode in staging or test environments
+    const enableDebugMode = awsEnvironment === 'staging' || nodeEnv === 'test';
     
-    // Enable mock auth when using localStorage
-    const enableMockAuth = useLocalStorage;
-    
-    // Enable offline mode in development or when no backend
-    const enableOfflineMode = useLocalStorage;
-    
-    // Enable debug mode in development
-    const enableDebugMode = nodeEnv === 'development' || isDevelopmentServer;
+    // Offline mode is not supported in AWS-only architecture
+    const enableOfflineMode = false;
 
     return {
-      apiBaseUrl: process.env.REACT_APP_API_BASE_URL,
-      enableMockAuth,
-      useLocalStorage,
-      enableOfflineMode,
+      apiBaseUrl,
       enableDebugMode,
+      enableOfflineMode,
     };
   }
 
   /**
-   * Force refresh of environment detection
+   * Get API base URL
    */
-  static refresh(): void {
-    this._config = null;
+  static getApiBaseUrl(): string {
+    const config = this.getConfig();
+    if (!config.apiBaseUrl) {
+      throw new Error('API base URL is not configured. Please set REACT_APP_API_URL or REACT_APP_AWS_API_URL environment variable.');
+    }
+    return config.apiBaseUrl;
   }
 
   /**
-   * Override configuration for testing
+   * Get WebSocket URL
    */
-  static setConfig(config: Partial<EnvironmentConfig>): void {
-    this._config = {
-      ...this.detectEnvironment(),
-      ...config,
-    };
+  static getWebSocketUrl(): string {
+    const wsUrl = process.env.REACT_APP_WS_URL || process.env.REACT_APP_AWS_WS_URL;
+    if (!wsUrl) {
+      throw new Error('WebSocket URL is not configured. Please set REACT_APP_WS_URL or REACT_APP_AWS_WS_URL environment variable.');
+    }
+    return wsUrl;
+  }
+
+  /**
+   * Get AWS region
+   */
+  static getAwsRegion(): string {
+    return process.env.REACT_APP_AWS_REGION || 'us-east-1';
+  }
+
+  /**
+   * Check if debug mode is enabled
+   */
+  static isDebugMode(): boolean {
+    return this.getConfig().enableDebugMode;
+  }
+
+  /**
+   * Get environment-specific configuration
+   */
+  static getEnvironmentSpecificConfig(): {
+    logLevel: 'error' | 'warn' | 'info' | 'debug';
+    enableMetrics: boolean;
+    enableTracing: boolean;
+  } {
+    const environment = this.getEnvironment();
+    
+    switch (environment) {
+      case 'production':
+        return {
+          logLevel: 'error',
+          enableMetrics: true,
+          enableTracing: true,
+        };
+      case 'staging':
+        return {
+          logLevel: 'info',
+          enableMetrics: true,
+          enableTracing: true,
+        };
+      case 'test':
+        return {
+          logLevel: 'warn',
+          enableMetrics: false,
+          enableTracing: false,
+        };
+      default:
+        return {
+          logLevel: 'error',
+          enableMetrics: true,
+          enableTracing: true,
+        };
+    }
   }
 }
 
-export default EnvironmentService;
+// Initialize on module load
+EnvironmentService.initialize();

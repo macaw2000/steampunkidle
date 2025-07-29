@@ -18,7 +18,7 @@ import HarvestingRewards from './harvesting/HarvestingRewards';
 import HarvestingHub from './harvesting/HarvestingHub';
 import TaskQueueContainer from './taskQueue/TaskQueueContainer';
 import FargateTaskQueueManager from './taskQueue/FargateTaskQueueManager';
-import DevelopmentIndicator from './common/DevelopmentIndicator';
+
 
 import GuildManager from './guild/GuildManager';
 import { serverTaskQueueService } from '../services/serverTaskQueueService';
@@ -294,7 +294,6 @@ const GameDashboard: React.FC = () => {
   if (hasCharacter === false) {
     return (
       <div className="game-dashboard">
-        <DevelopmentIndicator />
         <ErrorBoundary fallback={<div>Character creation failed to load</div>}>
           <CharacterCreation 
             onCharacterCreated={() => {
@@ -323,7 +322,6 @@ const GameDashboard: React.FC = () => {
   // Show main game interface if user has a character
   return (
     <>
-      <DevelopmentIndicator />
       <ResponsiveLayout
       sidebar={
         <div className="game-features-sidebar-content">

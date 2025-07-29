@@ -57,7 +57,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
       setTaskQueue(status);
       
       // Calculate additional statistics
-      const totalQueueTime = status.queuedTasks.reduce((total, task) => total + task.duration, 0);
+      const totalQueueTime = (status.queuedTasks || []).reduce((total, task) => total + task.duration, 0);
       const currentTaskETA = status.currentTask && status.currentTask.startTime 
         ? Math.max(0, status.currentTask.duration - (Date.now() - status.currentTask.startTime))
         : 0;
@@ -119,7 +119,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
     
     if (!draggedTask || !taskQueue) return;
 
-    const draggedIndex = taskQueue.queuedTasks.findIndex(task => task.id === draggedTask);
+    const draggedIndex = (taskQueue.queuedTasks || []).findIndex(task => task.id === draggedTask);
     if (draggedIndex === -1 || draggedIndex === dropIndex) {
       setDraggedTask(null);
       setDragOverIndex(null);
@@ -128,7 +128,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
 
     try {
       // Create new task order
-      const newTasks = [...taskQueue.queuedTasks];
+      const newTasks = [...(taskQueue.queuedTasks || [])];
       const [draggedTaskObj] = newTasks.splice(draggedIndex, 1);
       newTasks.splice(dropIndex, 0, draggedTaskObj);
       
@@ -336,7 +336,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
             </div>
             <div className="stat-item">
               <span className="stat-label">Queued</span>
-              <span className="stat-value">{taskQueue.queuedTasks.length}</span>
+              <span className="stat-value">{taskQueue.queuedTasks?.length || 0}</span>
             </div>
             <div className="stat-item">
               <span className="stat-label">Completed</span>
@@ -394,7 +394,7 @@ const TaskQueueManagement: React.FC<TaskQueueManagementProps> = ({
               const taskStatusClass = getTaskStatusClass(task, isCurrentTask);
               const priorityClass = getPriorityClass(task.priority);
               const isDragOver = dragOverIndex === index;
-              const canDrag = !isCurrentTask && taskQueue.queuedTasks.length > 1;
+              const canDrag = !isCurrentTask && (taskQueue.queuedTasks?.length || 0) > 1;
 
               return (
                 <div

@@ -74,7 +74,7 @@ class HealthCheckService {
         status: overallStatus,
         timestamp: new Date().toISOString(),
         version: process.env.VERSION || 'unknown',
-        environment: process.env.NODE_ENV || 'development',
+        environment: process.env.NODE_ENV || 'production',
         uptime: Date.now() - this.startTime,
         checks,
         metrics
@@ -84,7 +84,7 @@ class HealthCheckService {
         status: 'unhealthy',
         timestamp: new Date().toISOString(),
         version: process.env.VERSION || 'unknown',
-        environment: process.env.NODE_ENV || 'development',
+        environment: process.env.NODE_ENV || 'production',
         uptime: Date.now() - this.startTime,
         checks: {
           database: { status: 'unhealthy', message: 'Health check failed' },

@@ -33,10 +33,9 @@ npm run localstack:start
 
 Deploy infrastructure to LocalStack:
 ```bash
-# Set environment for LocalStack
-export AWS_ENDPOINT_URL=http://localhost:4566
-export AWS_ACCESS_KEY_ID=test
-export AWS_SECRET_ACCESS_KEY=test
+# AWS Configuration (Production Only)
+# Set your AWS credentials and region
+export AWS_REGION=us-west-2
 export AWS_DEFAULT_REGION=us-east-1
 
 # Deploy CDK stack to LocalStack
@@ -48,7 +47,7 @@ Start the React development server:
 npm start
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be deployed to AWS CloudFront and available at your configured domain.
 
 ### 3. AWS Deployment
 
@@ -68,9 +67,8 @@ npm run cdk:deploy
 - `npm run cdk:deploy` - Deploy CDK stack
 - `npm run cdk:destroy` - Destroy CDK stack
 - `npm run cdk:synth` - Synthesize CDK templates
-- `npm run localstack:start` - Start LocalStack
-- `npm run localstack:stop` - Stop LocalStack
-- `npm run dev:local` - Start LocalStack and React dev server
+- `npm run build` - Build for AWS deployment
+- `npm run deploy` - Deploy to AWS infrastructure
 
 ## Project Structure
 
@@ -113,10 +111,10 @@ npm run cdk:deploy
 Copy `.env.local` and configure:
 
 ```bash
-# Local development
-REACT_APP_ENV=local
-REACT_APP_API_URL=http://localhost:4566
-REACT_APP_AWS_REGION=us-east-1
+# AWS Production Configuration
+REACT_APP_ENV=production
+REACT_APP_API_URL=https://your-api-gateway-url
+REACT_APP_AWS_REGION=us-west-2
 
 # AWS Cognito (populated after CDK deployment)
 REACT_APP_USER_POOL_ID=your-user-pool-id

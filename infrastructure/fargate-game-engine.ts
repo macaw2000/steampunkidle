@@ -141,7 +141,7 @@ export class FargateGameEngine extends Construct {
         datetimeFormat: '%Y-%m-%d %H:%M:%S',
       }),
       healthCheck: {
-        command: ['CMD-SHELL', 'node -e "require(\'http\').get(\'http://localhost:3001/health\', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"'],
+        command: ['CMD-SHELL', 'node -e "require(\'http\').get(\'http://localhost:3001/api/health\', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"'],
         interval: cdk.Duration.seconds(30),
         timeout: cdk.Duration.seconds(5),
         retries: 3,

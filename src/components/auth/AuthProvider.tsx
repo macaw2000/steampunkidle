@@ -99,7 +99,7 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           // Restore task queue state for idle game continuity
           console.log('AuthProvider: Restoring task queue for character:', character.characterId);
           try {
-            await serverTaskQueueService.loadPlayerQueue(character.characterId);
+            await serverTaskQueueService.syncWithServer(character.characterId);
             console.log('AuthProvider: Task queue restored successfully');
             
             // Verify queue status after restoration

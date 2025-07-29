@@ -40,7 +40,7 @@ export class Logger {
 
   constructor(context: LogContext = {}, logLevel: LogLevel = LogLevel.INFO) {
     this.context = {
-      environment: process.env.NODE_ENV || process.env.ENVIRONMENT || 'development',
+      environment: process.env.ENVIRONMENT || 'production',
       ...context,
     };
     this.logLevel = logLevel;

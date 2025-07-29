@@ -13,7 +13,7 @@ This document provides a comprehensive reference for all configuration options a
 | `ENVIRONMENT` | Deployment environment | `development` | Yes | `production` |
 | `AWS_REGION` | AWS region for resources | `us-east-1` | Yes | `us-west-2` |
 | `LOG_LEVEL` | Logging verbosity level | `info` | No | `debug` |
-| `NODE_ENV` | Node.js environment | `development` | No | `production` |
+| `NODE_ENV` | Node.js environment | `production` | No | `production` |
 | `PORT` | Server port number | `3000` | No | `8080` |
 
 ### Database Configuration

@@ -64,10 +64,8 @@ export const errorLoggingMiddleware = (store: any) => (next: any) => (action: an
         userId: state.auth.user?.userId,
       };
       
-      // Log error to console in development
-      if (process.env.NODE_ENV === 'development') {
-        console.error('Redux Error:', errorLog);
-      }
+      // Always log errors to AWS CloudWatch
+      console.error('Redux Error:', errorLog);
       
       // In production, you would send this to your error tracking service
       // Example: errorTrackingService.logError(errorLog);

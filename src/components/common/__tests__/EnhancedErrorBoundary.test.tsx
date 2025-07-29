@@ -132,7 +132,7 @@ describe('EnhancedErrorBoundary', () => {
       
       render(
         <EnhancedErrorBoundary onError={mockOnError}>
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 
@@ -152,7 +152,7 @@ describe('EnhancedErrorBoundary', () => {
   describe('Error Levels', () => {
     it('displays page-level error message', () => {
       render(
-        <EnhancedErrorBoundary level=\"page\">
+        <EnhancedErrorBoundary level="page">
           <ThrowError shouldThrow={true} />
         </EnhancedErrorBoundary>
       );
@@ -163,7 +163,7 @@ describe('EnhancedErrorBoundary', () => {
 
     it('displays section-level error message', () => {
       render(
-        <EnhancedErrorBoundary level=\"section\">
+        <EnhancedErrorBoundary level="section">
           <ThrowError shouldThrow={true} />
         </EnhancedErrorBoundary>
       );
@@ -240,8 +240,8 @@ describe('EnhancedErrorBoundary', () => {
   describe('Error Details', () => {
     it('shows details when show details button is clicked', async () => {
       render(
-        <EnhancedErrorBoundary componentName=\"TestComponent\">
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+        <EnhancedErrorBoundary componentName="TestComponent">
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 
@@ -258,8 +258,8 @@ describe('EnhancedErrorBoundary', () => {
 
     it('hides details when hide details button is clicked', async () => {
       render(
-        <EnhancedErrorBoundary componentName=\"TestComponent\">
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+        <EnhancedErrorBoundary componentName="TestComponent">
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 
@@ -384,7 +384,7 @@ describe('EnhancedErrorBoundary', () => {
     it('reports error when report button is clicked', async () => {
       render(
         <EnhancedErrorBoundary enableReporting={true}>
-          <ThrowError shouldThrow={true} errorMessage=\"Test error message\" />
+          <ThrowError shouldThrow={true} errorMessage="Test error message" />
         </EnhancedErrorBoundary>
       );
 

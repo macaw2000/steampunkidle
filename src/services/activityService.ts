@@ -23,10 +23,7 @@ export class ActivityService {
    * Switch character to a new activity
    */
   static async switchActivity(userId: string, activityType: ActivityType): Promise<SwitchActivityResponse> {
-    // Check if we're in development mode - use mock functionality
-    if (process.env.NODE_ENV === 'development') {
-      return this.mockSwitchActivity(userId, activityType);
-    }
+    // Always use AWS services for activity switching
 
     try {
       const response = await fetch(`/api/activity/${userId}/switch`, {
@@ -55,10 +52,7 @@ export class ActivityService {
    * Get current activity progress
    */
   static async getActivityProgress(userId: string): Promise<ActivityProgress | null> {
-    // Check if we're in development mode - use mock functionality
-    if (process.env.NODE_ENV === 'development') {
-      return this.mockGetActivityProgress(userId);
-    }
+    // Always use AWS services for activity progress
 
     try {
       const response = await fetch(`/api/activity/${userId}/progress`);

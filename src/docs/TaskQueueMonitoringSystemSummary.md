@@ -182,7 +182,7 @@ This document summarizes the implementation of Task 17: "Build Monitoring and Me
 ## Configuration
 
 ### Environment Variables
-- `NODE_ENV` - Environment setting (development/production)
+- `NODE_ENV` - Environment setting (staging/production)
 - `REACT_APP_LOGGING_ENDPOINT` - Remote logging endpoint
 - `REACT_APP_ALERT_WEBHOOK_URL` - Alert webhook URL
 - `REACT_APP_SLACK_WEBHOOK_URL` - Slack notification webhook

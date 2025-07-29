@@ -90,9 +90,8 @@ const RealTimeProgressTracker: React.FC<RealTimeProgressTrackerProps> = ({ class
       return;
     }
 
-    // In development mode, simulate connection and progress
-    if (process.env.NODE_ENV === 'development') {
-      setConnectionStatus('connecting');
+    // Always use AWS WebSocket connection
+    setConnectionStatus('connecting');
       
       // Simulate connection delay
       const connectTimer = setTimeout(() => {
@@ -130,34 +129,6 @@ const RealTimeProgressTracker: React.FC<RealTimeProgressTrackerProps> = ({ class
         setConnectionStatus('disconnected');
         dispatch(setOnlineStatus(false));
       };
-    } else {
-      // Production WebSocket connection
-      setConnectionStatus('connecting');
-
-      const connectWebSocket = async () => {
-        try {
-          await wsService.connect(character.userId);
-          
-          // Subscribe to messages
-          const unsubscribeMessages = wsService.subscribe('*', handleWebSocketMessage);
-          const unsubscribeStatus = wsService.onConnectionStatusChange(handleConnectionStatus);
-
-          return () => {
-            if (unsubscribeMessages) unsubscribeMessages();
-            if (unsubscribeStatus) unsubscribeStatus();
-          };
-        } catch (error) {
-          console.error('Failed to connect to WebSocket:', error);
-          setConnectionStatus('disconnected');
-        }
-      };
-
-      const cleanup = connectWebSocket();
-
-      return () => {
-        cleanup.then(fn => fn?.());
-      };
-    }
   }, [character, handleWebSocketMessage, handleConnectionStatus, wsService, dispatch]);
 
   // Clean up notifications after they're shown

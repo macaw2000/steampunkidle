@@ -76,30 +76,11 @@ class TaskQueueService {
   async loadPlayerQueue(playerId: string): Promise<void> {
     console.log('TaskQueueService: Loading player queue for:', playerId);
     try {
-      // In development mode, use localStorage as fallback
-      let savedQueue: TaskQueue | null = null;
-      
-      if (process.env.NODE_ENV === 'development') {
-        // Try localStorage first for development
-        const localData = localStorage.getItem(`taskQueue_${playerId}`);
-        console.log('TaskQueueService: Raw localStorage data:', localData);
-        if (localData) {
-          try {
-            savedQueue = JSON.parse(localData);
-            console.log('TaskQueueService: Parsed saved queue:', savedQueue);
-          } catch (e) {
-            console.warn('Failed to parse localStorage task queue:', e);
-          }
-        } else {
-          console.log('TaskQueueService: No localStorage data found for key:', `taskQueue_${playerId}`);
-        }
-      } else {
-        // Production: use database
-        savedQueue = await DatabaseService.getItem<TaskQueue>({
-          TableName: TABLE_NAMES.TASK_QUEUES,
-          Key: { playerId }
-        });
-      }
+      // Load from AWS DynamoDB
+      const savedQueue = await DatabaseService.getItem<TaskQueue>({
+        TableName: TABLE_NAMES.TASK_QUEUES,
+        Key: { playerId }
+      });
 
       if (savedQueue) {
         console.log('TaskQueueService: Restoring queue state:', savedQueue);
@@ -147,18 +128,12 @@ class TaskQueueService {
         lastSaved: Date.now()
       };
 
-      if (process.env.NODE_ENV === 'development') {
-        // Save to localStorage in development
-        localStorage.setItem(`taskQueue_${playerId}`, JSON.stringify(queueData));
-        console.log('TaskQueueService: Saved task queue to localStorage:', queueData);
-      } else {
-        // Save to database in production
-        await DatabaseService.putItem({
-          TableName: TABLE_NAMES.TASK_QUEUES,
-          Item: queueData
-        });
-        console.log('TaskQueueService: Saved task queue to database:', queueData);
-      }
+      // Save to AWS DynamoDB
+      await DatabaseService.putItem({
+        TableName: TABLE_NAMES.TASK_QUEUES,
+        Item: queueData
+      });
+      console.log('TaskQueueService: Saved task queue to database:', queueData);
     } catch (error) {
       console.error('TaskQueueService: Error saving player queue:', error);
     }

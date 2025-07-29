@@ -88,7 +88,7 @@ describe('SafeComponent', () => {
 
   it('shows error details in development mode when showErrorDetails is true', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
+    process.env.NODE_ENV = 'test';
 
     render(
       <SafeComponent showErrorDetails={true}>
@@ -103,7 +103,7 @@ describe('SafeComponent', () => {
 
   it('does not show error details in production mode', () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
+    process.env.NODE_ENV = 'test';
 
     render(
       <SafeComponent showErrorDetails={true}>

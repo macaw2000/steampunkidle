@@ -60,7 +60,7 @@ export class SafeComponent extends Component<SafeComponentProps, SafeComponentSt
               {this.props.errorMessage || 'This component encountered an error and cannot be displayed.'}
             </p>
             
-            {this.props.showErrorDetails && process.env.NODE_ENV === 'development' && (
+            {this.props.showErrorDetails && (
               <details className="safe-component-error__details">
                 <summary>Error Details</summary>
                 <pre className="safe-component-error__stack">

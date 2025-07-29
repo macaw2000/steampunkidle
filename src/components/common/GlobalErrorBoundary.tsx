@@ -30,14 +30,12 @@ const GlobalErrorBoundary: React.FC<Props> = ({ children }) => {
       }
     );
 
-    // In development, provide detailed logging
-    if (process.env.NODE_ENV === 'development') {
-      console.group('🚨 Global Runtime Error Details');
-      console.error('Error:', error.message);
-      console.error('Stack:', error.stack);
-      console.error('Component Stack:', errorInfo.componentStack);
-      console.groupEnd();
-    }
+    // Always provide detailed logging for AWS CloudWatch
+    console.group('🚨 Global Runtime Error Details');
+    console.error('Error:', error.message);
+    console.error('Stack:', error.stack);
+    console.error('Component Stack:', errorInfo.componentStack);
+    console.groupEnd();
   };
 
   const customFallback = (
@@ -217,7 +215,7 @@ const GlobalErrorBoundary: React.FC<Props> = ({ children }) => {
       enableReporting={true}
       componentName="GlobalErrorBoundary"
       level="page"
-      showErrorDetails={process.env.NODE_ENV === 'development'}
+      showErrorDetails={true}
     >
       {children}
     </EnhancedErrorBoundary>

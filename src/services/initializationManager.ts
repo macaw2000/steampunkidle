@@ -356,8 +356,8 @@ class InitializationManager {
       // Load feature flags from environment or API
       const featureFlags = {
         enableOfflineMode: process.env.REACT_APP_ENABLE_OFFLINE_MODE === 'true',
-        enableDebugMode: process.env.NODE_ENV === 'development',
-        enableMockAuth: !process.env.REACT_APP_USER_POOL_ID,
+        enableDebugMode: false, // Debug mode disabled in AWS-only deployment
+        enableMockAuth: false, // Always use AWS Cognito
       };
 
       // Store feature flags in a way that components can access them

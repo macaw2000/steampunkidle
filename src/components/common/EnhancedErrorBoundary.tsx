@@ -5,7 +5,7 @@
 
 import React, { Component, ErrorInfo, ReactNode } from 'react';
 import { ErrorLoggingService, ErrorContext } from '../../services/errorLoggingService';
-import { DevServiceManager } from '../../services/devServiceManager';
+
 import './EnhancedErrorBoundary.css';
 
 interface Props {

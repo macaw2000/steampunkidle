@@ -61,13 +61,7 @@ export class NetworkClient {
       return this.isOnline;
     }
 
-    // Check if we're in local storage mode (no backend)
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      this.isOnline = true; // Consider "online" for mock services
-      this.lastNetworkCheck = now;
-      return true;
-    }
+    // Always use AWS network connectivity check
 
     try {
       // Try a simple health check

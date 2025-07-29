@@ -219,7 +219,7 @@ interface TaskQueueRecovery {
   validateQueueIntegrity(queue: TaskQueue): Promise<boolean>;
   
   // Conflict Resolution
-  resolveQueueConflicts(localQueue: TaskQueue, serverQueue: TaskQueue): TaskQueue;
+  resolveQueueConflicts(clientQueue: TaskQueue, serverQueue: TaskQueue): TaskQueue;
   
   // Retry Logic
   retryFailedTask(task: Task): Promise<TaskCompletionResult>;

@@ -324,9 +324,9 @@ class TaskQueueLogger {
 
 // Singleton instance
 export const taskQueueLogger = new TaskQueueLogger({
-  minLevel: process.env.NODE_ENV === 'development' ? LogLevel.DEBUG : LogLevel.INFO,
+  minLevel: LogLevel.INFO, // Use INFO level for AWS deployment
   enableConsole: true,
-  enableRemote: process.env.NODE_ENV === 'production',
+  enableRemote: true, // Always enable remote logging for AWS
   remoteEndpoint: process.env.REACT_APP_LOGGING_ENDPOINT
 });
 

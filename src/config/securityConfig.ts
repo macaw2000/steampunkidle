@@ -156,7 +156,7 @@ const productionConfig: Partial<SecurityConfig> = {
  * Get security configuration based on environment
  */
 export function getSecurityConfig(): SecurityConfig {
-  const environment = process.env.NODE_ENV || 'development';
+  const environment = process.env.NODE_ENV || 'production';
   
   let config = { ...defaultConfig };
   

@@ -1033,10 +1033,10 @@ process.on('unhandledRejection', (reason, promise) => {
   gracefulShutdown('unhandledRejection');
 });
 
-// Start server only if not in test environment
+// Start server for AWS Fargate deployment
 if (process.env.NODE_ENV !== 'test') {
   server.listen(port, async () => {
-    console.log(`🚀 Steampunk Idle Game Server running on port ${port}`);
+    console.log(`🚀 Steampunk Idle Game Server running on AWS Fargate port ${port}`);
     console.log(`🔌 WebSocket server ready for real-time notifications`);
     
     // Start the game engine

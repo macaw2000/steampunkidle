@@ -19,4 +19,4 @@ new SteampunkIdleGameStack(app, 'SteampunkIdleGameStack', {
 
 // Add tags to all resources
 cdk.Tags.of(app).add('Project', 'SteampunkIdleGame');
-cdk.Tags.of(app).add('Environment', process.env.NODE_ENV || 'development');
+cdk.Tags.of(app).add('Environment', process.env.NODE_ENV || 'production');

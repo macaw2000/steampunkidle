@@ -283,7 +283,7 @@ class TaskQueueAlertingSystem {
     const payload = {
       alert,
       timestamp: new Date().toISOString(),
-      environment: process.env.NODE_ENV || 'development'
+      environment: process.env.NODE_ENV || 'production'
     };
 
     // Send to webhook
@@ -489,7 +489,7 @@ Please investigate and take appropriate action.
 
 // Singleton instance
 export const taskQueueAlerting = new TaskQueueAlertingSystem({
-  enabled: process.env.NODE_ENV === 'production',
+  enabled: true, // Always enabled in AWS deployment
   webhookUrl: process.env.REACT_APP_ALERT_WEBHOOK_URL,
   slackWebhook: process.env.REACT_APP_SLACK_WEBHOOK_URL,
   emailEndpoint: process.env.REACT_APP_EMAIL_ENDPOINT
