@@ -4,7 +4,7 @@
 
 import { ChatMessage, ChatChannel, SendMessageRequest, CreateChannelRequest } from '../types/chat';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod';
 
 export class ChatService {
   private static instance: ChatService;

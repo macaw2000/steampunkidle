@@ -10,7 +10,7 @@ import {
   UserLeaderboardPosition 
 } from '../types/leaderboard';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:3001';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod';
 
 export interface LeaderboardResponse {
   leaderboard: Leaderboard;

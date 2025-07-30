@@ -173,7 +173,7 @@ export class WebSocketService {
 
       // For development, use a mock WebSocket URL
       // In production, this would be the actual WebSocket API Gateway URL
-      const wsUrl = process.env.REACT_APP_WS_URL || `ws://localhost:3001/ws?userId=${userId}`;
+      const wsUrl = process.env.REACT_APP_WS_URL || `wss://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod/ws?userId=${userId}`;
       
       try {
         this.socket = new WebSocket(wsUrl);

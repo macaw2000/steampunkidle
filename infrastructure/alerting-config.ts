@@ -253,7 +253,7 @@ export class AlertingConfig extends Construct {
       alarmDescription: 'Overall system health composite alarm',
       compositeAlarmRule: cloudwatch.AlarmRule.anyOf(
         cloudwatch.AlarmRule.fromAlarm(
-          cloudwatch.Alarm.fromAlarmArn(this, 'LambdaErrorsRef', 
+          cloudwatch.Alarm.fromAlarmArn(this, 'LambdaErrorsRef',
             `arn:aws:cloudwatch:${cdk.Stack.of(this).region}:${cdk.Stack.of(this).account}:alarm:*lambda*errors*`
           ),
           cloudwatch.TreatMissingData.NOT_BREACHING

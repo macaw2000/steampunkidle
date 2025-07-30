@@ -59,7 +59,7 @@ export class FargateGameEngineService {
 
   private constructor() {
     // Use environment variable or default to localhost for development
-    this.apiUrl = process.env.REACT_APP_FARGATE_API_URL || 'http://localhost:3001';
+    this.apiUrl = process.env.REACT_APP_FARGATE_API_URL || 'https://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod';
     this.startHealthMonitoring();
   }
 

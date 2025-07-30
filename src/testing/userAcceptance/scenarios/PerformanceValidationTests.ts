@@ -183,7 +183,7 @@ export class PerformanceValidationTests {
         while (processedTasks < Math.min(5, queueSize) && (Date.now() - processStartTime) < maxProcessTime) {
           // Simulate task completion
           if (queueStatus.queuedTasks[processedTasks]) {
-            await this.serverTaskQueueService.completeTask(player.id, queueStatus.queuedTasks[processedTasks].id);
+            await this.serverTaskQueueService.removeTask(player.id, queueStatus.queuedTasks[processedTasks].id);
             processedTasks++;
           }
           await new Promise(resolve => setTimeout(resolve, 100));
@@ -482,7 +482,7 @@ export class PerformanceValidationTests {
         
         if (status.queuedTasks.length > 0) {
           const updateStartTime = Date.now();
-          await this.serverTaskQueueService.completeTask(player.id, status.queuedTasks[0].id);
+          await this.serverTaskQueueService.removeTask(player.id, status.queuedTasks[0].id);
           const updateDuration = Date.now() - updateStartTime;
           
           dbOperationTimes.updates.push(updateDuration);

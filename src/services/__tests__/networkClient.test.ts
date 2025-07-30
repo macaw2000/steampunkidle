@@ -17,7 +17,7 @@ describe('NetworkClient', () => {
     
     // Default to production mode (not using localStorage)
     mockEnvironmentService.getEnvironmentInfo.mockReturnValue({
-      useLocalStorage: false,
+      // useLocalStorage removed in AWS-only mode
       isDevelopment: false,
       apiUrl: '/api',
     });
@@ -43,7 +43,7 @@ describe('NetworkClient', () => {
   describe('local storage mode', () => {
     it('should skip network requests in local storage mode', async () => {
       mockEnvironmentService.getEnvironmentInfo.mockReturnValue({
-        useLocalStorage: true,
+        // useLocalStorage removed in AWS-only mode
         isDevelopment: true,
         apiUrl: '/api',
       });

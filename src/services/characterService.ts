@@ -103,86 +103,7 @@ export class CharacterService {
    * Create a new character
    */
   static async createCharacter(request: CreateCharacterRequest): Promise<Character> {
-    // Use localStorage when no backend API is available
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Check if character name is already taken (simulate uniqueness check)
-      const existingCharacters = Object.keys(localStorage)
-        .filter(key => key.startsWith('testCharacter-'))
-        .map(key => JSON.parse(localStorage.getItem(key) || '{}'))
-        .filter(char => char.name);
-
-      if (existingCharacters.some(char => char.name.toLowerCase() === request.name.toLowerCase())) {
-        throw new Error('Character name is already taken');
-      }
-
-      // Create new character with default stats
-      const newCharacter: Character = {
-        characterId: uuidv4(),
-        userId: request.userId,
-        name: request.name,
-        level: 1,
-        experience: 0,
-        currency: 50, // Starting currency
-        stats: {
-          strength: 10,
-          dexterity: 10,
-          intelligence: 10,
-          vitality: 10,
-          craftingSkills: {
-            clockmaking: 0,
-            engineering: 0,
-            alchemy: 0,
-            steamcraft: 0,
-            level: 1,
-            experience: 0,
-          },
-          harvestingSkills: {
-            mining: 0,
-            foraging: 0,
-            salvaging: 0,
-            crystal_extraction: 0,
-            level: 1,
-            experience: 0,
-          },
-          combatSkills: {
-            melee: 0,
-            ranged: 0,
-            defense: 0,
-            tactics: 0,
-            level: 1,
-            experience: 0,
-          },
-        },
-        specialization: {
-          tankProgress: 0,
-          healerProgress: 0,
-          dpsProgress: 0,
-          primaryRole: null,
-          secondaryRole: null,
-          bonuses: [],
-        },
-        currentActivity: {
-          type: 'crafting',
-          startedAt: new Date(),
-          progress: 0,
-          rewards: [],
-        },
-        lastActiveAt: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      // Store the character in localStorage
-      localStorage.setItem(`testCharacter-${request.userId}`, JSON.stringify(newCharacter));
-
-      return newCharacter;
-    }
-
-    // Production mode - call the actual API with network resilience
+    // Always use AWS services for character creation
     try {
       const response = await NetworkClient.post<{ character: Character }>('/character', request);
       return response.data.character;
@@ -201,16 +122,7 @@ export class CharacterService {
    * Get character by user ID
    */
   static async getCharacter(userId: string): Promise<Character | null> {
-    // Use localStorage when no backend API is available
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      const testCharacter = localStorage.getItem(`testCharacter-${userId}`);
-      if (testCharacter) {
-        return JSON.parse(testCharacter);
-      }
-      return null; // No character found in test data
-    }
-
+    // Always use AWS services for character retrieval
     try {
       const response = await NetworkClient.get<{ character: Character }>(`/character?userId=${userId}`);
       return response.data.character;

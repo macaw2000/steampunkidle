@@ -60,7 +60,7 @@ export class CraftingTaskIntegration {
     }
     
     // Start the crafting task
-    await serverTaskQueueService.startCraftingTask(
+    await serverTaskQueueService.addCraftingTask(
       playerId,
       recipe,
       playerStats,
@@ -123,7 +123,7 @@ export class CraftingTaskIntegration {
     }
     
     // Queue the crafting task
-    await serverTaskQueueService.queueCraftingTask(
+    await serverTaskQueueService.addCraftingTask(
       playerId,
       recipe,
       playerStats,

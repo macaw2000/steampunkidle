@@ -226,7 +226,7 @@ export class OfflineOnlineTransitionTests {
       await this.offlineTaskQueueManager.addTask(player.id, offlineTask);
       
       // Server: Modify the same task (simulate completion)
-      await this.serverTaskQueueService.completeTask(player.id, baseTask.id);
+      await this.serverTaskQueueService.removeTask(player.id, baseTask.id);
       const serverTask = this.testDataGenerator.generateTask(TaskType.COMBAT);
       await this.addTaskToService(player.id, serverTask);
       

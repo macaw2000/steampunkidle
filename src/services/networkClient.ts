@@ -24,7 +24,7 @@ export interface NetworkResponse<T> {
 
 export class NetworkClient {
   private static config: NetworkClientConfig = {
-    baseURL: process.env.REACT_APP_API_URL || '/api',
+    baseURL: process.env.REACT_APP_API_URL || 'https://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod',
     timeout: 15000, // 15 seconds for character operations
     retries: 2,
     retryDelay: 1000,
@@ -65,15 +65,17 @@ export class NetworkClient {
 
     try {
       // Try a simple health check
-      const response = await NetworkUtils.fetchJson(`${this.config.baseURL}/health`, {}, {
+      const healthData = await NetworkUtils.fetchJson(`${this.config.baseURL}/health`, {}, {
         timeout: 3000,
         retries: 0,
       });
       
-      this.isOnline = response.ok;
+      // Check if the health response indicates healthy status
+      this.isOnline = healthData && (healthData.status === 'healthy' || healthData.status === 'degraded');
       this.lastNetworkCheck = now;
       return this.isOnline;
     } catch (error) {
+      console.warn('[NetworkClient] Health check failed:', error);
       this.isOnline = false;
       this.lastNetworkCheck = now;
       return false;
@@ -90,12 +92,7 @@ export class NetworkClient {
   ): Promise<NetworkResponse<T>> {
     const url = `${this.config.baseURL}${endpoint}`;
     
-    // Check if we should use local storage mode
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      console.log('[NetworkClient] Using local storage mode, skipping network request');
-      throw new Error('Local storage mode - network requests disabled');
-    }
+    // Always use AWS network requests
 
     // Check network connectivity first
     const isConnected = await this.checkNetworkConnectivity();
@@ -147,11 +144,7 @@ export class NetworkClient {
     const url = `${this.config.baseURL}${endpoint}`;
     
     // Check if we should use local storage mode
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      console.log('[NetworkClient] Using local storage mode, skipping network request');
-      throw new Error('Local storage mode - network requests disabled');
-    }
+    // Always use AWS network requests
 
     try {
       console.log(`[NetworkClient] Attempting GET to ${url}`);
@@ -198,11 +191,7 @@ export class NetworkClient {
     const url = `${this.config.baseURL}${endpoint}`;
     
     // Check if we should use local storage mode
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      console.log('[NetworkClient] Using local storage mode, skipping network request');
-      throw new Error('Local storage mode - network requests disabled');
-    }
+    // Always use AWS network requests
 
     try {
       console.log(`[NetworkClient] Attempting PUT to ${url}`);
@@ -248,11 +237,7 @@ export class NetworkClient {
     const url = `${this.config.baseURL}${endpoint}`;
     
     // Check if we should use local storage mode
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      console.log('[NetworkClient] Using local storage mode, skipping network request');
-      throw new Error('Local storage mode - network requests disabled');
-    }
+    // Always use AWS network requests
 
     try {
       console.log(`[NetworkClient] Attempting DELETE to ${url}`);
@@ -384,15 +369,7 @@ export class NetworkClient {
   }> {
     const startTime = Date.now();
     
-    // Check if we're in local storage mode (static deployment)
-    const envInfo = EnvironmentService.getEnvironmentInfo();
-    if (envInfo.useLocalStorage) {
-      return {
-        isOnline: true,
-        latency: 1,
-      };
-    }
-    
+    // Always use AWS network connectivity check
     try {
       await this.checkNetworkConnectivity();
       const latency = Date.now() - startTime;
@@ -425,3 +402,4 @@ export class NetworkFallbackError extends Error {
 }
 
 export default NetworkClient;
+

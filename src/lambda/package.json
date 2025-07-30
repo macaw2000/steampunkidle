@@ -1,0 +1,11 @@
+{
+  "name": "steampunk-idle-game-lambda",
+  "version": "1.0.0",
+  "description": "Lambda functions for Steampunk Idle Game",
+  "main": "index.js",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.450.0",
+    "@aws-sdk/lib-dynamodb": "^3.450.0",
+    "uuid": "^9.0.0"
+  }
+}

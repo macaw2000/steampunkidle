@@ -203,6 +203,14 @@ class ServerTaskQueueService {
   }
 
   /**
+   * Generic method to add any task type (for test compatibility)
+   * Note: This method is deprecated in AWS-only mode. Use specific task methods instead.
+   */
+  async addTask(playerId: string, task: any): Promise<any> {
+    throw new Error('Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead.');
+  }
+
+  /**
    * Add a crafting task to the server queue
    */
   async addCraftingTask(

@@ -29,6 +29,7 @@
     "start:server": "node src/server/gameEngine.js",
 
     "build": "react-scripts build",
+    "build:lambda": "node scripts/build-lambda.js",
     "test": "react-scripts test --watchAll=false",
     "test:watch": "react-scripts test",
     "test:lambda": "jest --config jest.lambda.config.js --watchAll=false",
@@ -42,8 +43,10 @@
     "cdk:destroy": "cdk destroy",
     "cdk:synth": "cdk synth",
 
-    "deploy:staging": "npm run build && cdk deploy --context environment=staging",
-    "deploy:production": "npm run build && cdk deploy --context environment=production --context deploymentStrategy=blue-green",
+    "deploy:staging": "npm run build:lambda && npm run build && cdk deploy --context environment=staging",
+    "deploy:production": "npm run build:lambda && npm run build && cdk deploy --context environment=production --context deploymentStrategy=blue-green",
+    "deploy:backend": "npm run build:lambda && cdk deploy SteampunkIdleGameStack",
+    "deploy:minimal": "cdk deploy SteampunkIdleGameMinimalBackend --app \"npx ts-node infrastructure/minimal-app.ts\"",
     "health-check": "node -e \"console.log('Health check would run here')\"",
     "health-check:staging": "bash scripts/health-check.sh staging https://api-staging.steampunk-idle-game.com",
     "health-check:production": "bash scripts/health-check.sh production https://api.steampunk-idle-game.com",

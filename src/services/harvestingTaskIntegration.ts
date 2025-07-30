@@ -109,7 +109,7 @@ export class HarvestingTaskIntegration {
     const tools = getBestAvailableTools(activity.category, playerLevel, toolInventory);
     
     // Queue the harvesting task
-    await serverTaskQueueService.queueHarvestingTask(
+    await serverTaskQueueService.addHarvestingTask(
       playerId,
       activity,
       playerStats,
