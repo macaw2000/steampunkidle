@@ -2,7 +2,7 @@
  * Character creation component
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
 import { setCharacter, setLoading, setError } from '../../store/slices/gameSlice';
@@ -21,9 +21,12 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
   
   const [characterName, setCharacterName] = useState('');
   const [nameError, setNameError] = useState('');
+  const [nameValidating, setNameValidating] = useState(false);
+  const [nameAvailable, setNameAvailable] = useState<boolean | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [validationTimeout, setValidationTimeout] = useState<NodeJS.Timeout | null>(null);
 
-  const validateName = (name: string): boolean => {
+  const validateNameFormat = (name: string): boolean => {
     if (name.length < 3) {
       setNameError('Character name must be at least 3 characters long');
       return false;
@@ -36,17 +39,57 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
       setNameError('Character name can only contain letters, numbers, underscores, and hyphens');
       return false;
     }
-    setNameError('');
     return true;
+  };
+
+  const validateNameUniqueness = async (name: string) => {
+    if (!validateNameFormat(name)) {
+      setNameAvailable(null);
+      return;
+    }
+
+    setNameValidating(true);
+    setNameError('');
+    setNameAvailable(null);
+
+    try {
+      const result = await AdaptiveCharacterService.validateCharacterName(name);
+      setNameAvailable(result.available);
+      if (!result.available) {
+        setNameError(result.message);
+      }
+    } catch (error) {
+      console.error('Name validation error:', error);
+      setNameError('Unable to validate name. Please try again.');
+      setNameAvailable(null);
+    } finally {
+      setNameValidating(false);
+    }
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const name = e.target.value;
     setCharacterName(name);
+    setNameAvailable(null);
+
+    // Clear existing timeout
+    if (validationTimeout) {
+      clearTimeout(validationTimeout);
+    }
+
     if (name) {
-      validateName(name);
+      // Validate format immediately
+      if (validateNameFormat(name)) {
+        setNameError('');
+        // Debounce uniqueness validation
+        const timeout = setTimeout(() => {
+          validateNameUniqueness(name);
+        }, 500);
+        setValidationTimeout(timeout);
+      }
     } else {
       setNameError('');
+      setNameValidating(false);
     }
   };
 
@@ -58,7 +101,10 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
       return;
     }
 
-    if (!validateName(characterName)) {
+    if (!validateNameFormat(characterName) || nameAvailable !== true) {
+      if (nameAvailable === false) {
+        setNameError('Character name is already taken. Please choose a different name.');
+      }
       return;
     }
 
@@ -97,6 +143,15 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
     setRetryCount(0);
   };
 
+  // Cleanup validation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (validationTimeout) {
+        clearTimeout(validationTimeout);
+      }
+    };
+  }, [validationTimeout]);
+
   return (
     <div className="character-creation">
       <NetworkStatusIndicator onRetry={handleNetworkRetry} />
@@ -111,16 +166,30 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
             <label htmlFor="characterName" className="form-label">
               Character Name
             </label>
-            <input
-              type="text"
-              id="characterName"
-              value={characterName}
-              onChange={handleNameChange}
-              className={`form-input ${nameError ? 'form-input-error' : ''}`}
-              placeholder="Enter your character name"
-              disabled={loading}
-              maxLength={20}
-            />
+            <div className="name-input-container">
+              <input
+                type="text"
+                id="characterName"
+                value={characterName}
+                onChange={handleNameChange}
+                className={`form-input ${nameError ? 'form-input-error' : nameAvailable === true ? 'form-input-success' : ''}`}
+                placeholder="Enter your character name"
+                disabled={loading}
+                maxLength={20}
+              />
+              {nameValidating && (
+                <div className="name-validation-indicator">
+                  <span className="validation-spinner">⚙️</span>
+                  <span>Checking availability...</span>
+                </div>
+              )}
+              {nameAvailable === true && !nameValidating && (
+                <div className="name-validation-success">
+                  <span className="validation-check">✅</span>
+                  <span>Name is available!</span>
+                </div>
+              )}
+            </div>
             {nameError && <span className="form-error">{nameError}</span>}
           </div>
 
@@ -187,7 +256,7 @@ export const CharacterCreation: React.FC<CharacterCreationProps> = ({ onCharacte
           <button
             type="submit"
             className="create-character-button"
-            disabled={loading || !characterName || !!nameError}
+            disabled={loading || !characterName || !!nameError || nameValidating || nameAvailable !== true}
           >
             {loading ? 'Creating Character...' : 'Create Character'}
           </button>

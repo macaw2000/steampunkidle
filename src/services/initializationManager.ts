@@ -307,12 +307,15 @@ class InitializationManager {
   private async checkServiceHealth(): Promise<void> {
     try {
       const apiUrl = process.env.REACT_APP_API_URL || 'https://ks7h6drcjd.execute-api.us-west-2.amazonaws.com/prod';
+      const healthUrl = `${apiUrl}/health`;
+      
+      console.log('[InitializationManager] Checking service health at:', healthUrl);
       
       // Check if API is reachable
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // Increased timeout
       
-      const response = await fetch(`${apiUrl}/health`, {
+      const response = await fetch(healthUrl, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -322,12 +325,18 @@ class InitializationManager {
       
       clearTimeout(timeoutId);
 
+      console.log('[InitializationManager] Health check response status:', response.status);
+      console.log('[InitializationManager] Health check response ok:', response.ok);
+
       if (!response.ok) {
         throw new Error(`API health check failed with status: ${response.status}`);
       }
 
-      console.log('Service health check successful');
+      const healthData = await response.json();
+      console.log('[InitializationManager] Health check data:', healthData);
+      console.log('[InitializationManager] Service health check successful');
     } catch (error) {
+      console.error('[InitializationManager] Service health check failed:', error);
       throw new Error(`Service health check failed: ${error}`);
     }
   }

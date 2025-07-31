@@ -1,0 +1,277 @@
+{
+  "playerUsagePatterns": {
+    "totalTests": 6,
+    "passedTests": 0,
+    "scenarios": [
+      {
+        "name": "Typical Queue Operations",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Multi-Activity Workflows",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Long-Running Session",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Casual Play Patterns",
+        "status": "FAILED",
+        "duration": 102,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Queue Management Operations",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Resource Validation Scenarios",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      }
+    ]
+  },
+  "offlineOnlineTransitions": {
+    "totalTests": 6,
+    "passedTests": 0,
+    "scenarios": [
+      {
+        "name": "Offline Task Processing",
+        "status": "FAILED",
+        "duration": 1,
+        "details": "Failed: Task validation failed: Need 10 Energy, have 0"
+      },
+      {
+        "name": "Online Reconnection Sync",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Task validation failed: Need 10 Energy, have 0"
+      },
+      {
+        "name": "Conflict Resolution",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Task validation failed: Need 10 Energy, have 0"
+      },
+      {
+        "name": "Data Integrity During Transitions",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Task validation failed: Need 10 Energy, have 0"
+      },
+      {
+        "name": "Incremental Synchronization",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Extended Offline Periods",
+        "status": "FAILED",
+        "duration": 1,
+        "details": "Failed: Task validation failed: Need 10 Energy, have 0"
+      }
+    ]
+  },
+  "performanceValidation": {
+    "totalTests": 6,
+    "passedTests": 2,
+    "scenarios": [
+      {
+        "name": "Concurrent Player Load",
+        "status": "FAILED",
+        "duration": 106323,
+        "details": "Concurrent load test with 100 players: 0.15368894338851422ms avg response, 0% error rate, -0.000005579515266176421 ops/sec",
+        "performanceMetrics": {
+          "concurrentPlayers": 100,
+          "loadTestDuration": 106323,
+          "averageResponseTime": 0.15368894338851422,
+          "maxResponseTime": 0.30737788677702843,
+          "errorRate": 0,
+          "throughput": -0.000005579515266176421,
+          "responseTimeAcceptable": true,
+          "errorRateAcceptable": true,
+          "throughputAcceptable": false
+        }
+      },
+      {
+        "name": "Queue Processing Speed",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "UI Responsiveness Under Load",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Memory Usage Patterns",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Database Performance",
+        "status": "PASSED",
+        "duration": 0,
+        "details": "DB performance: 0.0ms write, 0.0ms read, 0.0ms update",
+        "performanceMetrics": {
+          "playersCount": 20,
+          "averageWriteTime": 0,
+          "averageReadTime": 0,
+          "averageUpdateTime": 0,
+          "averageDeleteTime": 0,
+          "writePerformanceGood": true,
+          "readPerformanceGood": true,
+          "updatePerformanceGood": true,
+          "deletePerformanceGood": true
+        }
+      },
+      {
+        "name": "Scalability Limits",
+        "status": "PASSED",
+        "duration": 1,
+        "details": "Scalability: handled up to 100 concurrent users successfully",
+        "performanceMetrics": {
+          "loadLevelsTested": [
+            10,
+            25,
+            50,
+            100
+          ],
+          "maxSuccessfulLoad": 100,
+          "scalabilityResults": [
+            {
+              "loadLevel": 10,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 10,
+              "throughput": null
+            },
+            {
+              "loadLevel": 25,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 25,
+              "throughput": null
+            },
+            {
+              "loadLevel": 50,
+              "avgResponseTime": 0.48,
+              "maxResponseTime": 1,
+              "loadTestDuration": 1,
+              "successfulOperations": 50,
+              "throughput": 50000
+            },
+            {
+              "loadLevel": 100,
+              "avgResponseTime": 0,
+              "maxResponseTime": 0,
+              "loadTestDuration": 0,
+              "successfulOperations": 100,
+              "throughput": null
+            }
+          ],
+          "linearScaling": false,
+          "performanceDegradation": "SIGNIFICANT",
+          "scalabilityGood": true
+        }
+      }
+    ]
+  },
+  "usabilityTesting": {
+    "totalTests": 6,
+    "passedTests": 1,
+    "scenarios": [
+      {
+        "name": "Queue Management Interface Usability",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Task Addition Workflow",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Queue Reordering Usability",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      },
+      {
+        "name": "Progress Visualization Clarity",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead."
+      },
+      {
+        "name": "Error Handling User Experience",
+        "status": "PASSED",
+        "duration": 0,
+        "details": "Error handling: 3/3 scenarios handled properly, avg 0ms response",
+        "usabilityMetrics": {
+          "errorHandlingTests": [
+            {
+              "scenario": "Invalid Task Data",
+              "errorHandled": true,
+              "errorMessage": "Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead.",
+              "responseTime": 0,
+              "messageClarity": 0.6000000000000001,
+              "acceptable": true
+            },
+            {
+              "scenario": "Resource Shortage",
+              "errorHandled": true,
+              "errorMessage": "Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead.",
+              "responseTime": 0,
+              "messageClarity": 0.6000000000000001,
+              "acceptable": true
+            },
+            {
+              "scenario": "Queue Limit Exceeded",
+              "errorHandled": true,
+              "errorMessage": "Generic addTask method is not supported in AWS-only mode. Use addCraftingTask, addCombatTask, or addHarvestingTask instead.",
+              "responseTime": 0,
+              "messageClarity": 0.6000000000000001,
+              "acceptable": true
+            }
+          ],
+          "allErrorsHandledProperly": true,
+          "averageErrorResponseTime": 0,
+          "errorMessageClarityScore": 0.6000000000000001,
+          "userFriendlyErrorHandling": true
+        }
+      },
+      {
+        "name": "Mobile Responsiveness",
+        "status": "FAILED",
+        "duration": 0,
+        "details": "Failed: Unknown task type: HARVESTING"
+      }
+    ]
+  },
+  "summary": {
+    "totalTests": 24,
+    "passedTests": 3,
+    "failedTests": 21,
+    "duration": 106428,
+    "overallStatus": "FAILED"
+  }
+}

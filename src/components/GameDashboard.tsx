@@ -5,8 +5,7 @@ import { setOnlineStatus } from '../store/slices/gameSlice';
 import ErrorBoundary from './common/ErrorBoundary';
 import FeatureModal from './common/FeatureModal';
 import ResponsiveLayout from './layout/ResponsiveLayout';
-import ResponsiveGrid from './common/ResponsiveGrid';
-import ResponsiveCard from './common/ResponsiveCard';
+
 import ResponsiveChatInterface from './chat/ResponsiveChatInterface';
 import LoginComponent from './auth/LoginComponent';
 import UserProfile from './auth/UserProfile';

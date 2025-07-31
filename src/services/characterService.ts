@@ -100,6 +100,24 @@ export class CharacterService {
   }
 
   /**
+   * Validate character name uniqueness
+   */
+  static async validateCharacterName(name: string): Promise<{ available: boolean; message: string }> {
+    try {
+      const response = await NetworkClient.post<{ available: boolean; message: string }>('/character/validate-name', { name });
+      return response.data;
+    } catch (error: any) {
+      // If it's a network fallback error, let the AdaptiveCharacterService handle it
+      if (error instanceof NetworkFallbackError) {
+        throw error;
+      }
+      
+      console.error('Error validating character name:', error);
+      throw new Error(error.message || 'Failed to validate character name');
+    }
+  }
+
+  /**
    * Create a new character
    */
   static async createCharacter(request: CreateCharacterRequest): Promise<Character> {
@@ -114,6 +132,9 @@ export class CharacterService {
       }
       
       // For other errors, provide user-friendly messages
+      if (error.statusCode === 409) {
+        throw new Error('Character name is already taken. Please choose a different name.');
+      }
       throw new Error(error.message || 'Failed to create character');
     }
   }

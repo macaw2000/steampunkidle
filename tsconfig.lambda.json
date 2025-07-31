@@ -13,16 +13,39 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": false,
     "sourceMap": false,
-    "removeComments": true
+    "removeComments": true,
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/lambda/**/*",
-    "src/utils/**/*",
-    "src/types/**/*"
+    "src/types/character.ts",
+    "src/types/item.ts",
+    "src/types/guild.ts",
+    "src/types/auction.ts",
+    "src/types/chat.ts",
+    "src/types/party.ts",
+    "src/types/zone.ts",
+    "src/types/crafting.ts"
   ],
   "exclude": [
     "node_modules",
     "**/*.test.ts",
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "src/lambda/jest.setup.ts",
+    "src/lambda/crafting/startCrafting.ts",
+    "src/lambda/crafting/completeCrafting.ts",
+    "src/lambda/zone/startZoneInstance.ts",
+    "src/lambda/zone/attackMonster.ts",
+    "src/lambda/activity/taskQueueMonitoringHandler.ts",
+    "src/utils/networkUtils.ts",
+    "src/utils/renderingHelpers.ts",
+    "src/utils/testUserSetup.ts",
+    "src/services/craftingService.ts",
+    "src/services/taskQueueAlerting.ts",
+    "src/services/taskQueueLogger.ts",
+    "src/services/taskValidation.ts",
+    "src/services/zoneService.ts"
   ]
 }

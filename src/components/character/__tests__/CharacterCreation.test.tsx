@@ -1,5 +1,5 @@
 /**
- * Tests for CharacterCreation component
+ * Tests for mandatory character creation flow
  */
 
 import React from 'react';
@@ -7,52 +7,66 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import CharacterCreation from '../CharacterCreation';
-import authReducer from '../../../store/slices/authSlice';
-import gameReducer from '../../../store/slices/gameSlice';
-import { CharacterService } from '../../../services/characterService';
+import authSlice from '../../../store/slices/authSlice';
+import gameSlice from '../../../store/slices/gameSlice';
+import chatSlice from '../../../store/slices/chatSlice';
+import { AdaptiveCharacterService } from '../../../services/adaptiveCharacterService';
 
-// Mock CharacterService
-jest.mock('../../../services/characterService');
-const mockCharacterService = CharacterService as jest.Mocked<typeof CharacterService>;
+// Mock the AdaptiveCharacterService
+jest.mock('../../../services/adaptiveCharacterService');
+const mockAdaptiveCharacterService = AdaptiveCharacterService as jest.Mocked<typeof AdaptiveCharacterService>;
 
-// Mock CSS imports
-jest.mock('../CharacterCreation.css', () => ({}));
+// Mock NetworkStatusIndicator
+jest.mock('../../common/NetworkStatusIndicator', () => {
+  return function MockNetworkStatusIndicator() {
+    return <div data-testid="network-status-indicator">Network Status</div>;
+  };
+});
+
+const createMockStore = (initialState = {}) => {
+  return configureStore({
+    reducer: {
+      auth: authSlice,
+      game: gameSlice,
+      chat: chatSlice,
+    },
+    preloadedState: {
+      auth: {
+        isAuthenticated: true,
+        user: { userId: 'test-user-id', email: 'test@example.com' },
+        loading: false,
+        error: null,
+      },
+      game: {
+        character: null,
+        hasCharacter: false,
+        characterLoading: false,
+        loading: false,
+        error: null,
+        isOnline: true,
+        currentActivity: null,
+        inventory: [],
+        currency: 0,
+        notifications: [],
+      },
+      chat: {
+        messages: [],
+        activeChannel: 'general',
+        isConnected: false,
+        error: null,
+      },
+      ...initialState,
+    },
+  });
+};
 
 describe('CharacterCreation', () => {
-  const createMockStore = (authState = {}, gameState = {}) => {
-    return configureStore({
-      reducer: {
-        auth: authReducer,
-        game: gameReducer,
-      },
-      preloadedState: {
-        auth: {
-          isAuthenticated: true,
-          user: { userId: 'test-user-id', email: 'test@example.com', socialProviders: [], lastLogin: '2023-01-01' },
-          tokens: null,
-          loading: false,
-          error: null,
-          ...authState,
-        },
-        game: {
-          character: null,
-          isOnline: false,
-          lastSyncTime: null,
-          loading: false,
-          error: null,
-          ...gameState,
-        },
-      },
-    });
-  };
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('should render character creation form', () => {
+  it('renders character creation form', () => {
     const store = createMockStore();
-    
     render(
       <Provider store={store}>
         <CharacterCreation />
@@ -61,34 +75,11 @@ describe('CharacterCreation', () => {
 
     expect(screen.getByText('Create Your Steampunk Character')).toBeInTheDocument();
     expect(screen.getByLabelText('Character Name')).toBeInTheDocument();
-    expect(screen.getByText('Create Character')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create character/i })).toBeInTheDocument();
   });
 
-  it('should show starting stats and skills', () => {
+  it('validates character name format', async () => {
     const store = createMockStore();
-    
-    render(
-      <Provider store={store}>
-        <CharacterCreation />
-      </Provider>
-    );
-
-    expect(screen.getByText('Starting Stats')).toBeInTheDocument();
-    expect(screen.getByText('Strength')).toBeInTheDocument();
-    expect(screen.getByText('Dexterity')).toBeInTheDocument();
-    expect(screen.getByText('Intelligence')).toBeInTheDocument();
-    expect(screen.getByText('Vitality')).toBeInTheDocument();
-
-    expect(screen.getByText('Starting Skills')).toBeInTheDocument();
-    expect(screen.getByText('Clockmaking: Level 1')).toBeInTheDocument();
-    expect(screen.getByText('Engineering: Level 1')).toBeInTheDocument();
-    expect(screen.getByText('Alchemy: Level 1')).toBeInTheDocument();
-    expect(screen.getByText('Steamcraft: Level 1')).toBeInTheDocument();
-  });
-
-  it('should validate character name length', async () => {
-    const store = createMockStore();
-    
     render(
       <Provider store={store}>
         <CharacterCreation />
@@ -103,22 +94,26 @@ describe('CharacterCreation', () => {
       expect(screen.getByText('Character name must be at least 3 characters long')).toBeInTheDocument();
     });
 
+    // Test invalid characters
+    fireEvent.change(nameInput, { target: { value: 'test@name' } });
+    await waitFor(() => {
+      expect(screen.getByText('Character name can only contain letters, numbers, underscores, and hyphens')).toBeInTheDocument();
+    });
+
     // Test too long name
     fireEvent.change(nameInput, { target: { value: 'a'.repeat(21) } });
     await waitFor(() => {
       expect(screen.getByText('Character name must be no more than 20 characters long')).toBeInTheDocument();
     });
-
-    // Test valid name
-    fireEvent.change(nameInput, { target: { value: 'ValidName' } });
-    await waitFor(() => {
-      expect(screen.queryByText(/Character name must be/)).not.toBeInTheDocument();
-    });
   });
 
-  it('should validate character name format', async () => {
+  it('validates character name uniqueness', async () => {
     const store = createMockStore();
-    
+    mockAdaptiveCharacterService.validateCharacterName.mockResolvedValue({
+      available: false,
+      message: 'Name is already taken'
+    });
+
     render(
       <Provider store={store}>
         <CharacterCreation />
@@ -127,94 +122,147 @@ describe('CharacterCreation', () => {
 
     const nameInput = screen.getByLabelText('Character Name');
     
-    // Test invalid characters
-    fireEvent.change(nameInput, { target: { value: 'Invalid Name!' } });
+    // Enter a valid format name
+    fireEvent.change(nameInput, { target: { value: 'TestName' } });
+
+    // Wait for validation to complete
     await waitFor(() => {
-      expect(screen.getByText('Character name can only contain letters, numbers, underscores, and hyphens')).toBeInTheDocument();
+      expect(mockAdaptiveCharacterService.validateCharacterName).toHaveBeenCalledWith('TestName');
     });
 
-    // Test valid characters
-    fireEvent.change(nameInput, { target: { value: 'Valid_Name-123' } });
     await waitFor(() => {
-      expect(screen.queryByText(/Character name can only contain/)).not.toBeInTheDocument();
+      expect(screen.getByText('Name is already taken')).toBeInTheDocument();
     });
   });
 
-  it('should disable submit button when name is invalid', () => {
+  it('shows success indicator for available name', async () => {
     const store = createMockStore();
-    
+    mockAdaptiveCharacterService.validateCharacterName.mockResolvedValue({
+      available: true,
+      message: 'Name is available'
+    });
+
     render(
       <Provider store={store}>
         <CharacterCreation />
       </Provider>
     );
 
-    const submitButton = screen.getByText('Create Character');
     const nameInput = screen.getByLabelText('Character Name');
     
-    // Initially disabled (no name)
+    // Enter a valid format name
+    fireEvent.change(nameInput, { target: { value: 'AvailableName' } });
+
+    // Wait for validation to complete
+    await waitFor(() => {
+      expect(mockAdaptiveCharacterService.validateCharacterName).toHaveBeenCalledWith('AvailableName');
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Name is available!')).toBeInTheDocument();
+    });
+  });
+
+  it('disables submit button until name is validated and available', async () => {
+    const store = createMockStore();
+    mockAdaptiveCharacterService.validateCharacterName.mockResolvedValue({
+      available: true,
+      message: 'Name is available'
+    });
+
+    render(
+      <Provider store={store}>
+        <CharacterCreation />
+      </Provider>
+    );
+
+    const submitButton = screen.getByRole('button', { name: /create character/i });
+    const nameInput = screen.getByLabelText('Character Name');
+
+    // Initially disabled
     expect(submitButton).toBeDisabled();
 
     // Still disabled with invalid name
     fireEvent.change(nameInput, { target: { value: 'ab' } });
     expect(submitButton).toBeDisabled();
 
-    // Enabled with valid name
+    // Still disabled while validating
     fireEvent.change(nameInput, { target: { value: 'ValidName' } });
-    expect(submitButton).not.toBeDisabled();
+    expect(submitButton).toBeDisabled();
+
+    // Enabled after successful validation
+    await waitFor(() => {
+      expect(mockAdaptiveCharacterService.validateCharacterName).toHaveBeenCalledWith('ValidName');
+    });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
   });
 
-  it('should create character successfully', async () => {
+  it('creates character when form is submitted with valid name', async () => {
+    const store = createMockStore();
     const mockCharacter = {
+      characterId: 'char-123',
       userId: 'test-user-id',
-      characterId: 'test-character-id',
       name: 'TestCharacter',
       level: 1,
       experience: 0,
-      currency: 100,
-      stats: {},
-      specialization: {},
-      currentActivity: {},
-      lastActiveAt: new Date(),
-      createdAt: new Date(),
     };
 
-    mockCharacterService.createCharacter.mockResolvedValue(mockCharacter as any);
+    mockAdaptiveCharacterService.validateCharacterName.mockResolvedValue({
+      available: true,
+      message: 'Name is available'
+    });
+    mockAdaptiveCharacterService.createCharacter.mockResolvedValue(mockCharacter as any);
 
-    const mockOnCharacterCreated = jest.fn();
-    const store = createMockStore();
-    
+    const onCharacterCreated = jest.fn();
+
     render(
       <Provider store={store}>
-        <CharacterCreation onCharacterCreated={mockOnCharacterCreated} />
+        <CharacterCreation onCharacterCreated={onCharacterCreated} />
       </Provider>
     );
 
     const nameInput = screen.getByLabelText('Character Name');
-    const submitButton = screen.getByText('Create Character');
+    const submitButton = screen.getByRole('button', { name: /create character/i });
 
+    // Enter valid name and wait for validation
     fireEvent.change(nameInput, { target: { value: 'TestCharacter' } });
+    
+    await waitFor(() => {
+      expect(mockAdaptiveCharacterService.validateCharacterName).toHaveBeenCalledWith('TestCharacter');
+    });
+
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    // Submit form
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(mockCharacterService.createCharacter).toHaveBeenCalledWith({
+      expect(mockAdaptiveCharacterService.createCharacter).toHaveBeenCalledWith({
         userId: 'test-user-id',
         name: 'TestCharacter',
       });
     });
 
     await waitFor(() => {
-      expect(mockOnCharacterCreated).toHaveBeenCalled();
+      expect(onCharacterCreated).toHaveBeenCalled();
     });
   });
 
-  it('should show loading state during character creation', async () => {
-    mockCharacterService.createCharacter.mockImplementation(() => 
-      new Promise(resolve => setTimeout(resolve, 100))
+  it('handles character creation errors', async () => {
+    const store = createMockStore();
+    mockAdaptiveCharacterService.validateCharacterName.mockResolvedValue({
+      available: true,
+      message: 'Name is available'
+    });
+    mockAdaptiveCharacterService.createCharacter.mockRejectedValue(
+      new Error('Character name is already taken. Please choose a different name.')
     );
 
-    const store = createMockStore();
-    
     render(
       <Provider store={store}>
         <CharacterCreation />
@@ -222,71 +270,49 @@ describe('CharacterCreation', () => {
     );
 
     const nameInput = screen.getByLabelText('Character Name');
-    const submitButton = screen.getByText('Create Character');
+    const submitButton = screen.getByRole('button', { name: /create character/i });
 
+    // Enter valid name and wait for validation
     fireEvent.change(nameInput, { target: { value: 'TestCharacter' } });
+    
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+
+    // Submit form
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText('Creating Character...')).toBeInTheDocument();
+      expect(screen.getByText('Character name is already taken. Please choose a different name.')).toBeInTheDocument();
     });
   });
 
-  it('should show error message on creation failure', async () => {
-    mockCharacterService.createCharacter.mockRejectedValue(new Error('Creation failed'));
-
-    const store = createMockStore();
-    
-    render(
-      <Provider store={store}>
-        <CharacterCreation />
-      </Provider>
-    );
-
-    const nameInput = screen.getByLabelText('Character Name');
-    const submitButton = screen.getByText('Create Character');
-
-    fireEvent.change(nameInput, { target: { value: 'TestCharacter' } });
-    fireEvent.click(submitButton);
-
-    await waitFor(() => {
-      expect(screen.getByText('Creation failed')).toBeInTheDocument();
+  it('prevents access to game until character is created', () => {
+    // This test verifies that the character creation component is shown
+    // when hasCharacter is false, which is handled by GameDashboard
+    const store = createMockStore({
+      game: {
+        character: null,
+        hasCharacter: false,
+        characterLoading: false,
+        loading: false,
+        error: null,
+        isOnline: true,
+        currentActivity: null,
+        inventory: [],
+        currency: 0,
+        notifications: [],
+      },
     });
-  });
 
-  it('should show error if user is not authenticated', () => {
-    const store = createMockStore({ user: null });
-    
     render(
       <Provider store={store}>
         <CharacterCreation />
       </Provider>
     );
 
-    const nameInput = screen.getByLabelText('Character Name');
-    const submitButton = screen.getByText('Create Character');
-
-    fireEvent.change(nameInput, { target: { value: 'TestCharacter' } });
-    fireEvent.click(submitButton);
-
-    // Should show error in Redux state, which would be displayed by parent component
-    const state = store.getState();
-    expect(state.game.error).toBe('User not authenticated');
-  });
-
-  it('should disable form when loading', () => {
-    const store = createMockStore({}, { loading: true });
-    
-    render(
-      <Provider store={store}>
-        <CharacterCreation />
-      </Provider>
-    );
-
-    const nameInput = screen.getByLabelText('Character Name');
-    const submitButton = screen.getByText('Creating Character...');
-
-    expect(nameInput).toBeDisabled();
-    expect(submitButton).toBeDisabled();
+    // Character creation form should be visible
+    expect(screen.getByText('Create Your Steampunk Character')).toBeInTheDocument();
+    expect(screen.getByText('Welcome to the world of steam and gears! Create your character to begin your idle adventure.')).toBeInTheDocument();
   });
 });

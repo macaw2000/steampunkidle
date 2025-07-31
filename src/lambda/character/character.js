@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
-const { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
+const { DynamoDBDocumentClient, GetCommand, PutCommand, UpdateCommand, ScanCommand } = require('@aws-sdk/lib-dynamodb');
 const { v4: uuidv4 } = require('uuid');
 
 const client = new DynamoDBClient({});
@@ -124,37 +124,119 @@ exports.handler = async (event, context) => {
         }
 
       case 'POST':
-        // Create character
-        const createData = JSON.parse(body || '{}');
-        if (!createData.userId || !createData.name) {
-          return {
-            statusCode: 400,
-            headers,
-            body: JSON.stringify({ error: 'userId and name are required' }),
-          };
-        }
+        // Handle different POST endpoints
+        const path = event.path || '';
+        
+        if (path.includes('/validate-name')) {
+          // Validate character name uniqueness
+          const validateData = JSON.parse(body || '{}');
+          if (!validateData.name) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ error: 'name is required' }),
+            };
+          }
 
-        const newCharacter = createDefaultCharacter(createData.userId, createData.name);
+          try {
+            // Check if name already exists
+            const result = await docClient.send(new ScanCommand({
+              TableName: process.env.CHARACTERS_TABLE,
+              FilterExpression: '#name = :name',
+              ExpressionAttributeNames: {
+                '#name': 'name'
+              },
+              ExpressionAttributeValues: {
+                ':name': validateData.name
+              },
+              Select: 'COUNT'
+            }));
 
-        try {
-          await docClient.send(new PutCommand({
-            TableName: process.env.CHARACTERS_TABLE,
-            Item: newCharacter,
-          }));
+            const isAvailable = result.Count === 0;
+            return {
+              statusCode: 200,
+              headers,
+              body: JSON.stringify({ 
+                available: isAvailable,
+                message: isAvailable ? 'Name is available' : 'Name is already taken'
+              }),
+            };
+          } catch (error) {
+            console.error('Error validating character name:', error);
+            return {
+              statusCode: 500,
+              headers,
+              body: JSON.stringify({ error: 'Failed to validate character name' }),
+            };
+          }
+        } else {
+          // Create character
+          const createData = JSON.parse(body || '{}');
+          if (!createData.userId || !createData.name) {
+            return {
+              statusCode: 400,
+              headers,
+              body: JSON.stringify({ error: 'userId and name are required' }),
+            };
+          }
 
-          console.log('Character created:', newCharacter.characterId);
-          return {
-            statusCode: 201,
-            headers,
-            body: JSON.stringify({ character: newCharacter }),
-          };
-        } catch (error) {
-          console.error('Error creating character:', error);
-          return {
-            statusCode: 500,
-            headers,
-            body: JSON.stringify({ error: 'Failed to create character' }),
-          };
+          // Check if character name is unique before creating
+          try {
+            const nameCheck = await docClient.send(new ScanCommand({
+              TableName: process.env.CHARACTERS_TABLE,
+              FilterExpression: '#name = :name',
+              ExpressionAttributeNames: {
+                '#name': 'name'
+              },
+              ExpressionAttributeValues: {
+                ':name': createData.name
+              },
+              Select: 'COUNT'
+            }));
+
+            if (nameCheck.Count > 0) {
+              return {
+                statusCode: 409,
+                headers,
+                body: JSON.stringify({ error: 'Character name is already taken' }),
+              };
+            }
+
+            // Check if user already has a character
+            const existingCharacter = await docClient.send(new GetCommand({
+              TableName: process.env.CHARACTERS_TABLE,
+              Key: { userId: createData.userId },
+            }));
+
+            if (existingCharacter.Item) {
+              return {
+                statusCode: 409,
+                headers,
+                body: JSON.stringify({ error: 'User already has a character' }),
+              };
+            }
+
+            const newCharacter = createDefaultCharacter(createData.userId, createData.name);
+
+            await docClient.send(new PutCommand({
+              TableName: process.env.CHARACTERS_TABLE,
+              Item: newCharacter,
+            }));
+
+            console.log('Character created:', newCharacter.characterId);
+            return {
+              statusCode: 201,
+              headers,
+              body: JSON.stringify({ character: newCharacter }),
+            };
+          } catch (error) {
+            console.error('Error creating character:', error);
+            return {
+              statusCode: 500,
+              headers,
+              body: JSON.stringify({ error: 'Failed to create character' }),
+            };
+          }
         }
 
       case 'PUT':

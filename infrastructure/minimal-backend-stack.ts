@@ -90,64 +90,106 @@ export class MinimalBackendStack extends cdk.Stack {
       },
     });
 
-    // API Gateway
+    // API Gateway (without default CORS - we'll handle it manually)
     const api = new apigateway.RestApi(this, 'SteampunkIdleGameApi', {
       restApiName: 'Steampunk Idle Game API',
       description: 'Minimal API for Steampunk Idle Game',
-      defaultCorsPreflightOptions: {
-        allowOrigins: apigateway.Cors.ALL_ORIGINS,
-        allowMethods: apigateway.Cors.ALL_METHODS,
-        allowHeaders: [
-          'Content-Type',
-          'X-Amz-Date',
-          'Authorization',
-          'X-Api-Key',
-          'X-Amz-Security-Token',
-        ],
-      },
     });
 
-    // Health endpoint
+    // Health endpoint with explicit CORS handling
     const healthResource = api.root.addResource('health');
-    healthResource.addMethod('GET', new apigateway.LambdaIntegration(healthFunction), {
+    
+    // Add GET method
+    healthResource.addMethod('GET', new apigateway.LambdaIntegration(healthFunction));
+    
+    // Add OPTIONS method for CORS preflight
+    healthResource.addMethod('OPTIONS', new apigateway.MockIntegration({
+      integrationResponses: [
+        {
+          statusCode: '200',
+          responseParameters: {
+            'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+            'method.response.header.Access-Control-Allow-Methods': "'GET,OPTIONS'",
+            'method.response.header.Access-Control-Allow-Origin': "'*'",
+          },
+        },
+      ],
+      requestTemplates: {
+        'application/json': '{"statusCode": 200}',
+      },
+    }), {
       methodResponses: [
         {
           statusCode: '200',
           responseParameters: {
-            'method.response.header.Access-Control-Allow-Origin': true,
             'method.response.header.Access-Control-Allow-Headers': true,
             'method.response.header.Access-Control-Allow-Methods': true,
-          },
-        },
-        {
-          statusCode: '503',
-          responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true,
-            'method.response.header.Access-Control-Allow-Headers': true,
-            'method.response.header.Access-Control-Allow-Methods': true,
           },
         },
       ],
     });
 
+    // Helper function to add CORS to a resource
+    const addCorsOptions = (resource: apigateway.Resource) => {
+      resource.addMethod('OPTIONS', new apigateway.MockIntegration({
+        integrationResponses: [
+          {
+            statusCode: '200',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Headers': "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+              'method.response.header.Access-Control-Allow-Methods': "'GET,POST,PUT,DELETE,OPTIONS'",
+              'method.response.header.Access-Control-Allow-Origin': "'*'",
+            },
+          },
+        ],
+        requestTemplates: {
+          'application/json': '{"statusCode": 200}',
+        },
+      }), {
+        methodResponses: [
+          {
+            statusCode: '200',
+            responseParameters: {
+              'method.response.header.Access-Control-Allow-Headers': true,
+              'method.response.header.Access-Control-Allow-Methods': true,
+              'method.response.header.Access-Control-Allow-Origin': true,
+            },
+          },
+        ],
+      });
+    };
+
     // Auth endpoints
     const authResource = api.root.addResource('auth');
+    addCorsOptions(authResource);
+    
     const loginResource = authResource.addResource('login');
     loginResource.addMethod('POST', new apigateway.LambdaIntegration(loginFunction));
+    addCorsOptions(loginResource);
     
     const refreshResource = authResource.addResource('refresh');
     refreshResource.addMethod('POST', new apigateway.LambdaIntegration(refreshFunction));
+    addCorsOptions(refreshResource);
     
     const logoutResource = authResource.addResource('logout');
     logoutResource.addMethod('POST', new apigateway.LambdaIntegration(logoutFunction));
+    addCorsOptions(logoutResource);
 
     // Character endpoints
     const characterResource = api.root.addResource('character');
     characterResource.addMethod('GET', new apigateway.LambdaIntegration(characterFunction));
     characterResource.addMethod('POST', new apigateway.LambdaIntegration(characterFunction));
+    addCorsOptions(characterResource);
+    
+    // Character name validation endpoint
+    const validateNameResource = characterResource.addResource('validate-name');
+    validateNameResource.addMethod('POST', new apigateway.LambdaIntegration(characterFunction));
+    addCorsOptions(validateNameResource);
     
     const characterByIdResource = characterResource.addResource('{userId}');
     characterByIdResource.addMethod('PUT', new apigateway.LambdaIntegration(characterFunction));
+    addCorsOptions(characterByIdResource);
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {

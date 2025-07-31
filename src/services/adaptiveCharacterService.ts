@@ -12,6 +12,19 @@ import { CharacterService } from './characterService';
  */
 export class AdaptiveCharacterService {
   /**
+   * Validate character name uniqueness
+   */
+  static async validateCharacterName(name: string): Promise<{ available: boolean; message: string }> {
+    try {
+      console.log('[AdaptiveCharacterService] Validating character name using AWS CharacterService');
+      return await CharacterService.validateCharacterName(name);
+    } catch (error: any) {
+      console.error('[AdaptiveCharacterService] Failed to validate character name:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Create a new character
    */
   static async createCharacter(request: CreateCharacterRequest): Promise<Character> {
