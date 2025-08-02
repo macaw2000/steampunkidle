@@ -189,7 +189,7 @@ export class PerformanceOptimizationStack extends cdk.Stack {
 
   private createCacheWarmerFunction(): lambda.Function {
     return new lambda.Function(this, 'CacheWarmerFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'cacheWarmer.handler',
       code: lambda.Code.fromInline(`
         const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
@@ -358,7 +358,7 @@ export class PerformanceOptimizationStack extends cdk.Stack {
 
   private createPerformanceMonitoringFunction(): lambda.Function {
     return new lambda.Function(this, 'PerformanceMonitoringFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'performanceMonitor.handler',
       code: lambda.Code.fromInline(`
         const { CloudWatchClient, PutMetricDataCommand, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');
@@ -526,7 +526,7 @@ export class PerformanceOptimizationStack extends cdk.Stack {
 
   private createIndexOptimizationFunction(): lambda.Function {
     return new lambda.Function(this, 'IndexOptimizationFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'indexOptimizer.handler',
       code: lambda.Code.fromInline(`
         const { DynamoDBClient, DescribeTableCommand } = require('@aws-sdk/client-dynamodb');

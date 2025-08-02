@@ -535,11 +535,12 @@ export class SteampunkIdleGameStack extends cdk.Stack {
       },
       alertingEmail: process.env.ALERTING_EMAIL,
       environment: this.node.tryGetContext('environment') || 'dev',
+      gameEngineImage: '735515353866.dkr.ecr.us-west-2.amazonaws.com/cdk-hnb659fds-container-assets-735515353866-us-west-2:game-engine-v2',
     });
 
     // Authentication Lambda Functions
     const loginFunction = new lambda.Function(this, 'LoginFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'login.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -551,7 +552,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const refreshTokenFunction = new lambda.Function(this, 'RefreshTokenFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'refresh.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -562,7 +563,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const logoutFunction = new lambda.Function(this, 'LogoutFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'logout.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -596,7 +597,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Offline Progress Calculation Lambda Function
     const calculateOfflineProgressFunction = new lambda.Function(this, 'CalculateOfflineProgressFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'calculateOfflineProgress.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/activity'),
@@ -618,7 +619,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Create a separate Lambda function for batch processing all active users
     const batchOfflineProgressFunction = new lambda.Function(this, 'BatchOfflineProgressFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromInline(`
@@ -696,7 +697,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Guild Lambda Functions
     const createGuildFunction = new lambda.Function(this, 'CreateGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'createGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -709,7 +710,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getGuildFunction = new lambda.Function(this, 'GetGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -721,7 +722,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const updateGuildFunction = new lambda.Function(this, 'UpdateGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'updateGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -733,7 +734,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const deleteGuildFunction = new lambda.Function(this, 'DeleteGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'deleteGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -745,7 +746,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const inviteToGuildFunction = new lambda.Function(this, 'InviteToGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'inviteToGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -759,7 +760,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const respondToInvitationFunction = new lambda.Function(this, 'RespondToInvitationFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'respondToInvitation.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -773,7 +774,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const kickMemberFunction = new lambda.Function(this, 'KickMemberFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'kickMember.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -785,7 +786,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const leaveGuildFunction = new lambda.Function(this, 'LeaveGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'leaveGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -797,7 +798,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const updateMemberRoleFunction = new lambda.Function(this, 'UpdateMemberRoleFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'updateMemberRole.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -809,7 +810,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const searchGuildsFunction = new lambda.Function(this, 'SearchGuildsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'searchGuilds.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -820,7 +821,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getUserGuildFunction = new lambda.Function(this, 'GetUserGuildFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getUserGuild.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/guild'),
@@ -833,7 +834,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Character Lambda Functions
     const createCharacterFunction = new lambda.Function(this, 'CreateCharacterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'createCharacter.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/character'),
@@ -845,7 +846,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getCharacterFunction = new lambda.Function(this, 'GetCharacterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getCharacter.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/character'),
@@ -856,7 +857,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const updateCharacterFunction = new lambda.Function(this, 'UpdateCharacterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'updateCharacter.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/character'),
@@ -867,7 +868,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const deleteCharacterFunction = new lambda.Function(this, 'DeleteCharacterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'deleteCharacter.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/character'),
@@ -879,7 +880,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Activity Lambda Functions
     const switchActivityFunction = new lambda.Function(this, 'SwitchActivityFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'switchActivity.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/activity'),
@@ -890,7 +891,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getActivityProgressFunction = new lambda.Function(this, 'GetActivityProgressFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getActivityProgress.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/activity'),
@@ -902,7 +903,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Currency Lambda Functions
     const earnCurrencyFunction = new lambda.Function(this, 'EarnCurrencyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'earnCurrency.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/currency'),
@@ -914,7 +915,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const spendCurrencyFunction = new lambda.Function(this, 'SpendCurrencyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'spendCurrency.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/currency'),
@@ -926,7 +927,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getCurrencyBalanceFunction = new lambda.Function(this, 'GetCurrencyBalanceFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getCurrencyBalance.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/currency'),
@@ -937,7 +938,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getCurrencyHistoryFunction = new lambda.Function(this, 'GetCurrencyHistoryFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getCurrencyHistory.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/currency'),
@@ -949,7 +950,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Auction Lambda Functions
     const createAuctionFunction = new lambda.Function(this, 'CreateAuctionFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'createAuction.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -962,7 +963,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const searchAuctionsFunction = new lambda.Function(this, 'SearchAuctionsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'searchAuctions.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -974,7 +975,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const placeBidFunction = new lambda.Function(this, 'PlaceBidFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'placeBid.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -986,7 +987,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const buyoutAuctionFunction = new lambda.Function(this, 'BuyoutAuctionFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'buyoutAuction.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -1000,7 +1001,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getAuctionFunction = new lambda.Function(this, 'GetAuctionFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getAuction.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -1012,7 +1013,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getUserAuctionsFunction = new lambda.Function(this, 'GetUserAuctionsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getUserAuctions.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -1024,7 +1025,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const cancelAuctionFunction = new lambda.Function(this, 'CancelAuctionFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'cancelAuction.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auction'),
@@ -1037,7 +1038,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Party Lambda Functions
     const createPartyFunction = new lambda.Function(this, 'CreatePartyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'createParty.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1049,7 +1050,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const joinPartyFunction = new lambda.Function(this, 'JoinPartyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'joinParty.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1061,7 +1062,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const leavePartyFunction = new lambda.Function(this, 'LeavePartyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'leaveParty.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1072,7 +1073,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getPartyFunction = new lambda.Function(this, 'GetPartyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getParty.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1083,7 +1084,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getAvailablePartiesFunction = new lambda.Function(this, 'GetAvailablePartiesFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getAvailableParties.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1094,7 +1095,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getUserPartyFunction = new lambda.Function(this, 'GetUserPartyFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getUserParty.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/party'),
@@ -1106,7 +1107,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Crafting Lambda Functions
     const startCraftingFunction = new lambda.Function(this, 'StartCraftingFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'startCrafting.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/crafting'),
@@ -1119,7 +1120,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const completeCraftingFunction = new lambda.Function(this, 'CompleteCraftingFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'completeCrafting.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/crafting'),
@@ -1133,7 +1134,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Chat Lambda Functions
     const chatConnectFunction = new lambda.Function(this, 'ChatConnectFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'connect.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/chat'),
@@ -1144,7 +1145,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const chatDisconnectFunction = new lambda.Function(this, 'ChatDisconnectFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'disconnect.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/chat'),
@@ -1155,7 +1156,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const chatSendMessageFunction = new lambda.Function(this, 'ChatSendMessageFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'sendMessage.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/chat'),
@@ -1169,7 +1170,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const chatGetMessageHistoryFunction = new lambda.Function(this, 'ChatGetMessageHistoryFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getMessageHistory.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/chat'),
@@ -1181,7 +1182,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const chatGetPrivateMessagesFunction = new lambda.Function(this, 'ChatGetPrivateMessagesFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getPrivateMessages.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/chat'),
@@ -1277,7 +1278,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Zone Lambda Functions
     const startZoneInstanceFunction = new lambda.Function(this, 'StartZoneInstanceFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'startZoneInstance.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/zone'),
@@ -1289,7 +1290,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getZoneInstanceFunction = new lambda.Function(this, 'GetZoneInstanceFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getZoneInstance.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/zone'),
@@ -1300,7 +1301,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const attackMonsterFunction = new lambda.Function(this, 'AttackMonsterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'attackMonster.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/zone'),
@@ -1314,7 +1315,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const completeZoneInstanceFunction = new lambda.Function(this, 'CompleteZoneInstanceFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'completeZoneInstance.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/zone'),
@@ -1327,7 +1328,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const leaveZoneInstanceFunction = new lambda.Function(this, 'LeaveZoneInstanceFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'leaveZoneInstance.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/zone'),
@@ -1340,7 +1341,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Leaderboard Lambda Functions
     const calculateLeaderboardsFunction = new lambda.Function(this, 'CalculateLeaderboardsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'calculateLeaderboards.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/leaderboard'),
@@ -1354,7 +1355,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getLeaderboardFunction = new lambda.Function(this, 'GetLeaderboardFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getLeaderboard.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/leaderboard'),
@@ -1365,7 +1366,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
     });
 
     const getUserRankingsFunction = new lambda.Function(this, 'GetUserRankingsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'getUserRankings.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/leaderboard'),
@@ -1386,7 +1387,7 @@ export class SteampunkIdleGameStack extends cdk.Stack {
 
     // Health Check Lambda Function
     const healthCheckFunction = new lambda.Function(this, 'HealthCheckFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'healthCheck.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/health'),

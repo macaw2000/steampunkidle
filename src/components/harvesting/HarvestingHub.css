@@ -415,6 +415,142 @@
   border-color: #ffd700;
 }
 
+/* Queue Status Info */
+.queue-status-info {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid #8b4513;
+  border-radius: 8px;
+}
+
+.queue-status-info h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.queue-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.queue-stats span {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  padding: 8px 12px;
+  border-radius: 15px;
+  border: 1px solid #8b4513;
+  font-size: 0.9em;
+}
+
+.queue-info-text {
+  text-align: center;
+  color: #d4af37;
+  font-style: italic;
+  margin: 0;
+}
+
+/* Activity Rewards Preview */
+.activity-rewards {
+  margin-bottom: 15px;
+  padding: 10px;
+  background: rgba(144, 238, 144, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid #90ee90;
+}
+
+.activity-rewards h5 {
+  margin: 0 0 8px 0;
+  color: #90ee90;
+  font-size: 0.9em;
+}
+
+.rewards-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.reward-preview {
+  background: rgba(255, 215, 0, 0.2);
+  color: #ffd700;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  border: 1px solid #8b4513;
+}
+
+/* Activity Controls */
+.activity-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.rounds-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.rounds-control label {
+  color: #ffd700;
+  font-weight: bold;
+  min-width: 60px;
+}
+
+.rounds-input {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.rounds-input button {
+  background: linear-gradient(145deg, #3d2817, #2c1810);
+  color: #e8d5b7;
+  border: 2px solid #8b4513;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.rounds-input button:hover:not(:disabled) {
+  background: linear-gradient(145deg, #4d3020, #3d2817);
+  border-color: #ffd700;
+}
+
+.rounds-input button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.rounds-input input {
+  width: 60px;
+  padding: 8px;
+  border: 2px solid #8b4513;
+  border-radius: 6px;
+  background: #2c1810;
+  color: #e8d5b7;
+  font-size: 1em;
+  font-family: inherit;
+  text-align: center;
+}
+
+.rounds-input input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
 /* Activity Action Buttons */
 .activity-actions {
   display: flex;
@@ -981,10 +1117,111 @@
   flex: 1;
 }
 
+/* Idle Game Tip */
+.idle-game-tip {
+  margin-top: 15px;
+  padding: 15px;
+  background: rgba(74, 144, 226, 0.1);
+  border-left: 4px solid #4a90e2;
+  border-radius: 6px;
+  color: #e8d5b7;
+}
+
+.idle-game-tip strong {
+  color: #4a90e2;
+}
+
+/* Character Info */
+.character-info {
+  margin-bottom: 30px;
+  padding: 20px;
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid #8b4513;
+  border-radius: 8px;
+}
+
+.character-info h3 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.character-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.character-stats span {
+  background: rgba(255, 215, 0, 0.1);
+  color: #ffd700;
+  padding: 8px 12px;
+  border-radius: 15px;
+  border: 1px solid #8b4513;
+  font-size: 0.9em;
+}
+
+/* Instructions */
+.instructions {
+  margin-top: 40px;
+  padding: 20px;
+  background: rgba(139, 69, 19, 0.2);
+  border: 1px solid #8b4513;
+  border-radius: 8px;
+}
+
+.instructions h4 {
+  color: #ffd700;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.instructions ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.instructions li {
+  margin-bottom: 10px;
+  padding-left: 30px;
+  position: relative;
+  color: #e8d5b7;
+  line-height: 1.4;
+}
+
+.instructions li::before {
+  content: attr(data-icon);
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.2em;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .harvesting-hub {
     padding: 10px;
+  }
+  
+  .activity-controls {
+    gap: 10px;
+  }
+  
+  .rounds-control {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .activity-actions {
+    flex-direction: column;
+  }
+  
+  .queue-stats {
+    flex-direction: column;
+    align-items: center;
   }
   
   .category-tabs {

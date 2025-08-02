@@ -74,7 +74,7 @@ export class ProductionMonitoringStack extends cdk.Stack {
 
   private createMonitoringFunction(props: ProductionMonitoringStackProps): lambda.Function {
     const monitoringFunction = new lambda.Function(this, 'MonitoringFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       timeout: cdk.Duration.minutes(5),
       memorySize: 512,

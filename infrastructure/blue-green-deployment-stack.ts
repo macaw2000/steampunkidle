@@ -161,7 +161,7 @@ export class BlueGreenDeploymentStack extends cdk.Stack {
 
     // Create Lambda function for deployment automation
     const deploymentAutomationFunction = new lambda.Function(this, 'DeploymentAutomation', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         const AWS = require('aws-sdk');

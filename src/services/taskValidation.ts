@@ -156,17 +156,16 @@ export class TaskValidationService {
     console.log(`[VALIDATION BYPASS] Task ${task.id} validation bypassed. Reason: ${reason}`);
     
     // In production, this would log to a proper audit system
-    if (typeof window !== 'undefined' && (window as any).gameAuditLog) {
-      (window as any).gameAuditLog.push({
-        type: 'validation_bypass',
-        taskId: task.id,
-        playerId: task.playerId,
-        reason,
-        timestamp: Date.now(),
-        adminOverride: options.adminOverride,
-        testMode: options.testMode
-      });
-    }
+    // Note: Audit logging would be implemented with CloudWatch or similar service
+    console.log(`[AUDIT] Validation bypass logged:`, {
+      type: 'validation_bypass',
+      taskId: task.id,
+      playerId: task.playerId,
+      reason,
+      timestamp: Date.now(),
+      adminOverride: options.adminOverride,
+      testMode: options.testMode
+    });
   }
 
   /**

@@ -66,7 +66,7 @@ export class AlertingConfig extends Construct {
 
   private createSlackNotificationFunction(webhookUrl: string, environment: string) {
     const slackNotificationFunction = new lambda.Function(this, 'SlackNotificationFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         const https = require('https');
@@ -167,7 +167,7 @@ export class AlertingConfig extends Construct {
 
   private createPagerDutyNotificationFunction(integrationKey: string, environment: string) {
     const pagerDutyFunction = new lambda.Function(this, 'PagerDutyNotificationFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         const https = require('https');

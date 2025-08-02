@@ -172,12 +172,20 @@ const LoginComponent: React.FC = () => {
       accessToken: `dev-access-token-${Date.now()}`,
       idToken: `dev-id-token-${Date.now()}`,
       refreshToken: `dev-refresh-token-${Date.now()}`,
-      expiresIn: 3600,
+      expiresIn: 604800, // 7 days
       tokenType: 'Bearer',
     };
 
-    // Store the session
+    // Store the session in both formats for compatibility
     localStorage.setItem('mockAuthSession', JSON.stringify({ user: mockUser, tokens: mockTokens }));
+    
+    // Also store in persistent format
+    const sessionData = {
+      tokens: mockTokens,
+      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+    };
+    localStorage.setItem('steampunk_idle_session', JSON.stringify(sessionData));
+    localStorage.setItem('steampunk_idle_user', JSON.stringify(mockUser));
     
     // Dispatch login success
     dispatch(loginSuccess({ user: mockUser, tokens: mockTokens }));

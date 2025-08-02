@@ -29,7 +29,34 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     };
 
     initializeAuth();
-  }, [dispatch]);
+
+    // Handle window focus events to maintain session
+    const handleWindowFocus = () => {
+      console.log('Window gained focus - checking session');
+      // Re-validate session when window regains focus
+      if (authService.isAuthenticated()) {
+        const currentUser = authService.getCurrentUser();
+        const currentTokens = authService.getAuthTokens();
+        if (currentUser && currentTokens && !isAuthenticated) {
+          console.log('Restoring session from localStorage');
+          dispatch(loginSuccess({ user: currentUser, tokens: currentTokens }));
+        }
+      }
+    };
+
+    const handleWindowBlur = () => {
+      // Don't logout on blur - just log the event
+      console.log('Window lost focus - maintaining session');
+    };
+
+    window.addEventListener('focus', handleWindowFocus);
+    window.addEventListener('blur', handleWindowBlur);
+
+    return () => {
+      window.removeEventListener('focus', handleWindowFocus);
+      window.removeEventListener('blur', handleWindowBlur);
+    };
+  }, [dispatch, isAuthenticated]);
 
   // Token refresh logic
   const refreshTokensIfNeeded = useCallback(async () => {
@@ -47,15 +74,39 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }, [tokens, isAuthenticated, dispatch]);
 
-  // Set up token refresh interval
+  // Set up token refresh interval and session validation
   useEffect(() => {
     if (!isAuthenticated || !tokens) return;
 
     // Check token expiration every 5 minutes
-    const interval = setInterval(refreshTokensIfNeeded, 5 * 60 * 1000);
+    const tokenInterval = setInterval(refreshTokensIfNeeded, 5 * 60 * 1000);
 
-    return () => clearInterval(interval);
-  }, [isAuthenticated, tokens, refreshTokensIfNeeded]);
+    // Session validation and heartbeat every 5 minutes
+    const sessionInterval = setInterval(async () => {
+      try {
+        const isValid = await authService.validateSession();
+        if (!isValid) {
+          console.log('Session expired, logging out');
+          dispatch(logout());
+        } else {
+          // Send heartbeat to keep session alive
+          await authService.sendHeartbeat();
+        }
+      } catch (error) {
+        console.error('Session validation failed:', error);
+      }
+    }, 5 * 60 * 1000);
+
+    // Send an immediate heartbeat
+    authService.sendHeartbeat().catch(error => {
+      console.error('Initial heartbeat failed:', error);
+    });
+
+    return () => {
+      clearInterval(tokenInterval);
+      clearInterval(sessionInterval);
+    };
+  }, [isAuthenticated, tokens, refreshTokensIfNeeded, dispatch]);
 
   // Refresh tokens on window focus (user returns to tab)
   useEffect(() => {
@@ -96,26 +147,8 @@ const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           dispatch(setCharacter(character));
           dispatch(setHasCharacter(true));
           
-          // Restore task queue state for idle game continuity
-          console.log('AuthProvider: Restoring task queue for character:', character.characterId);
-          try {
-            await serverTaskQueueService.syncWithServer(character.characterId);
-            console.log('AuthProvider: Task queue restored successfully');
-            
-            // Verify queue status after restoration
-            const queueStatus = serverTaskQueueService.getQueueStatus(character.characterId);
-            console.log('AuthProvider: Queue status after restoration:', {
-              hasCurrentTask: !!queueStatus.currentTask,
-              isRunning: queueStatus.isRunning,
-              queueLength: queueStatus.queueLength,
-              totalCompleted: queueStatus.totalCompleted
-            });
-            
-          } catch (queueError) {
-            console.error('AuthProvider: Failed to restore task queue:', queueError);
-            // Create user-friendly error message for task queue issues
-            console.warn('AuthProvider: Task queue restoration failed, but character loading will continue');
-          }
+          // Note: Task queue system disabled - using simple activity system instead
+          console.log('AuthProvider: Character loaded, using simple activity system');
         } else {
           dispatch(setHasCharacter(false));
         }

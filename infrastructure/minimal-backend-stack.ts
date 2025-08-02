@@ -38,8 +38,8 @@ export class MinimalBackendStack extends cdk.Stack {
 
     // Health Check Lambda
     const healthFunction = new lambda.Function(this, 'HealthFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'health.handler',
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'healthCheck.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/health'),
       timeout: cdk.Duration.seconds(30),
@@ -51,7 +51,7 @@ export class MinimalBackendStack extends cdk.Stack {
 
     // Auth Lambda Functions
     const loginFunction = new lambda.Function(this, 'LoginFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'login.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -62,7 +62,7 @@ export class MinimalBackendStack extends cdk.Stack {
     });
 
     const refreshFunction = new lambda.Function(this, 'RefreshFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'refresh.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -70,7 +70,7 @@ export class MinimalBackendStack extends cdk.Stack {
     });
 
     const logoutFunction = new lambda.Function(this, 'LogoutFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'logout.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/auth'),
@@ -79,13 +79,36 @@ export class MinimalBackendStack extends cdk.Stack {
 
     // Character Lambda
     const characterFunction = new lambda.Function(this, 'CharacterFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'character.handler',
       role: lambdaExecutionRole,
       code: lambda.Code.fromAsset('src/lambda/character'),
       timeout: cdk.Duration.seconds(30),
       environment: {
         USERS_TABLE: usersTable.tableName,
+        CHARACTERS_TABLE: charactersTable.tableName,
+      },
+    });
+
+    // Activity Lambda Functions
+    const switchActivityFunction = new lambda.Function(this, 'SwitchActivityFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'switchActivity.handler',
+      role: lambdaExecutionRole,
+      code: lambda.Code.fromAsset('src/lambda/activity'),
+      timeout: cdk.Duration.seconds(30),
+      environment: {
+        CHARACTERS_TABLE: charactersTable.tableName,
+      },
+    });
+
+    const getActivityProgressFunction = new lambda.Function(this, 'GetActivityProgressFunction', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'getActivityProgress.handler',
+      role: lambdaExecutionRole,
+      code: lambda.Code.fromAsset('src/lambda/activity'),
+      timeout: cdk.Duration.seconds(30),
+      environment: {
         CHARACTERS_TABLE: charactersTable.tableName,
       },
     });
@@ -190,6 +213,18 @@ export class MinimalBackendStack extends cdk.Stack {
     const characterByIdResource = characterResource.addResource('{userId}');
     characterByIdResource.addMethod('PUT', new apigateway.LambdaIntegration(characterFunction));
     addCorsOptions(characterByIdResource);
+
+    // Activity endpoints
+    const activityResource = api.root.addResource('activity');
+    addCorsOptions(activityResource);
+    
+    const switchActivityResource = activityResource.addResource('switch');
+    switchActivityResource.addMethod('POST', new apigateway.LambdaIntegration(switchActivityFunction));
+    addCorsOptions(switchActivityResource);
+    
+    const progressResource = activityResource.addResource('progress');
+    progressResource.addMethod('GET', new apigateway.LambdaIntegration(getActivityProgressFunction));
+    addCorsOptions(progressResource);
 
     // Outputs
     new cdk.CfnOutput(this, 'ApiUrl', {

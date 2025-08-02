@@ -1,0 +1,950 @@
+{
+  "version": "45.0.0",
+  "artifacts": {
+    "SteampunkIdleGameMinimalBackend.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "SteampunkIdleGameMinimalBackend.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "SteampunkIdleGameMinimalBackend": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://735515353866/us-west-2",
+      "properties": {
+        "templateFile": "SteampunkIdleGameMinimalBackend.template.json",
+        "terminationProtection": false,
+        "tags": {
+          "Environment": "minimal-backend",
+          "Project": "SteampunkIdleGame"
+        },
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-deploy-role-735515353866-us-west-2",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-cfn-exec-role-735515353866-us-west-2",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-735515353866-us-west-2/330cbc7535896aafaf0305ce8295e3c0204fb9f2df858c6f2fa186943df9913f.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "SteampunkIdleGameMinimalBackend.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-lookup-role-735515353866-us-west-2",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "SteampunkIdleGameMinimalBackend.assets"
+      ],
+      "metadata": {
+        "/SteampunkIdleGameMinimalBackend": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "Environment",
+                "Value": "minimal-backend"
+              },
+              {
+                "Key": "Project",
+                "Value": "SteampunkIdleGame"
+              }
+            ]
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/UsersTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "UsersTable9725E9C8"
+            }
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/UsersTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UsersTable9725E9C8"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CharactersTable": [
+          {
+            "type": "aws:cdk:hasPhysicalName",
+            "data": {
+              "Ref": "CharactersTable0F2A9F65"
+            }
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CharactersTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CharactersTable0F2A9F65"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/LambdaExecutionRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaExecutionRoleD5C26073"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/LambdaExecutionRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LambdaExecutionRoleDefaultPolicy6D69732F"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/HealthFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "HealthFunction19D7724A"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/LoginFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LoginFunction66F090C6"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/RefreshFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "RefreshFunction848BF7AF"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/LogoutFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "LogoutFunctionC3F6EAEB"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CharacterFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CharacterFunction69BA9C2D"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SwitchActivityFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SwitchActivityFunction7C3C4114"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/GetActivityProgressFunction/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetActivityProgressFunction8140C292"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApi740B0A2C"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Deployment/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiDeployment78478692ea1e07d907ef69f7576064ec6a5d6d89"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/DeploymentStage.prod/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Endpoint": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiEndpoint8EB3C979"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApihealth9837B496"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..health": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApihealthGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGEThealthDB5B62BB"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..health": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApihealthGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGEThealthAEB1D637"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApihealthGET8EBE92CE"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApihealthOPTIONS1F45263A"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauth0E889EC1"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthOPTIONS01806C16"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogin391FC7BD"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.login": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthloginPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogin622D293C"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.login": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthloginPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogin679206BF"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthloginPOST54552EFE"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthloginOPTIONS588DB71D"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthrefreshEB86EB02"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.refresh": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthrefreshPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthrefreshE40F3CB4"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.refresh": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthrefreshPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthrefreshE02579AF"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthrefreshPOSTD7E17DE6"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthrefreshOPTIONSA5397AA8"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogout2B5B1A48"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.logout": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogoutPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogoutB175E967"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.logout": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogoutPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogoutDFA371A4"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogoutPOST7237311F"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiauthlogoutOPTIONS772887CD"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacter753EF41C"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..character": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETcharacter89B86F80"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..character": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETcharacterBFC391F4"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterGET0A60EB83"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharacter701DD6F7"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharacter724370B6"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterPOST53E79CE8"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacterOPTIONS6D6A68E2"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharactervalidatenameC58921B5"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character.validate-name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharactervalidatenamePOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharactervalidatename3FD11904"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character.validate-name": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharactervalidatenamePOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharactervalidatename011CD071"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharactervalidatenamePOSTB33533E2"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharactervalidatenameOPTIONS9AEBA184"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacteruserIdDC91F570"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.PUT..character.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacteruserIdPUTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPUTcharacteruserIdFB48CE43"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.PUT..character.{userId}": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacteruserIdPUTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPUTcharacteruserId5EF8BD75"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacteruserIdPUTDDE32CBB"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApicharacteruserIdOPTIONS151BF5CB"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivity0CC7D1A6"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityOPTIONS25D2C3A8"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityswitchB4616454"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..activity.switch": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityswitchPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTactivityswitchBFCA1219"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..activity.switch": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityswitchPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTactivityswitchAFA4A08E"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityswitchPOST2CB00C99"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityswitchOPTIONSE3242BFC"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityprogress16EA14B4"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..activity.progress": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityprogressGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETactivityprogress2C8C8056"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..activity.progress": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityprogressGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETactivityprogress32E52100"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityprogressGETC77C6561"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/OPTIONS/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "SteampunkIdleGameApiactivityprogressOPTIONS2DB8AF47"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/ApiUrl": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ApiUrl"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/UsersTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UsersTableName"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CharactersTableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CharactersTableName"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/SteampunkIdleGameMinimalBackend/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "SteampunkIdleGameMinimalBackend"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    },
+    "aws-cdk-lib/feature-flag-report": {
+      "type": "cdk:feature-flag-report",
+      "properties": {
+        "module": "aws-cdk-lib",
+        "flags": {
+          "@aws-cdk/core:enableStackNameDuplicates": {
+            "recommendedValue": true,
+            "explanation": "Allow multiple stacks with the same name"
+          },
+          "aws-cdk:enableDiffNoFail": {
+            "recommendedValue": true,
+            "explanation": "Make `cdk diff` not fail when there are differences"
+          },
+          "@aws-cdk/core:newStyleStackSynthesis": {
+            "recommendedValue": true,
+            "explanation": "Switch to new stack synthesis method which enables CI/CD"
+          },
+          "@aws-cdk/core:stackRelativeExports": {
+            "recommendedValue": true,
+            "explanation": "Name exports based on the construct paths relative to the stack, rather than the global construct path"
+          },
+          "@aws-cdk/aws-ecr-assets:dockerIgnoreSupport": {
+            "recommendedValue": true,
+            "explanation": "DockerImageAsset properly supports `.dockerignore` files by default"
+          },
+          "@aws-cdk/aws-secretsmanager:parseOwnedSecretName": {
+            "recommendedValue": true,
+            "explanation": "Fix the referencing of SecretsManager names from ARNs"
+          },
+          "@aws-cdk/aws-kms:defaultKeyPolicies": {
+            "recommendedValue": true,
+            "explanation": "Tighten default KMS key policies"
+          },
+          "@aws-cdk/aws-s3:grantWriteWithoutAcl": {
+            "recommendedValue": true,
+            "explanation": "Remove `PutObjectAcl` from Bucket.grantWrite"
+          },
+          "@aws-cdk/aws-ecs-patterns:removeDefaultDesiredCount": {
+            "recommendedValue": true,
+            "explanation": "Do not specify a default DesiredCount for ECS services"
+          },
+          "@aws-cdk/aws-rds:lowercaseDbIdentifier": {
+            "recommendedValue": true,
+            "explanation": "Force lowercasing of RDS Cluster names in CDK"
+          },
+          "@aws-cdk/aws-apigateway:usagePlanKeyOrderInsensitiveId": {
+            "recommendedValue": true,
+            "explanation": "Allow adding/removing multiple UsagePlanKeys independently"
+          },
+          "@aws-cdk/aws-efs:defaultEncryptionAtRest": {
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to have elastic file systems encrypted at rest by default."
+          },
+          "@aws-cdk/aws-lambda:recognizeVersionProps": {
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to opt in to the updated logical id calculation for Lambda Version created using the  `fn.currentVersion`."
+          },
+          "@aws-cdk/aws-lambda:recognizeLayerVersion": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to opt in to the updated logical id calculation for Lambda Version created using the `fn.currentVersion`."
+          },
+          "@aws-cdk/aws-cloudfront:defaultSecurityPolicyTLSv1.2_2021": {
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to have cloudfront distributions use the security policy TLSv1.2_2021 by default."
+          },
+          "@aws-cdk/core:checkSecretUsage": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this flag to make it impossible to accidentally use SecretValues in unsafe locations"
+          },
+          "@aws-cdk/core:target-partitions": {
+            "userValue": [
+              "aws",
+              "aws-cn"
+            ],
+            "recommendedValue": [
+              "aws",
+              "aws-cn"
+            ],
+            "explanation": "What regions to include in lookup tables of environment agnostic stacks"
+          },
+          "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "ECS extensions will automatically add an `awslogs` driver if no logging is specified"
+          },
+          "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to have Launch Templates generated by the `InstanceRequireImdsv2Aspect` use unique names."
+          },
+          "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "ARN format used by ECS. In the new ARN format, the cluster name is part of the resource ID."
+          },
+          "@aws-cdk/aws-iam:minimizePolicies": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Minimize IAM policies by combining Statements"
+          },
+          "@aws-cdk/core:validateSnapshotRemovalPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Error on snapshot removal policies on resources that do not support it."
+          },
+          "@aws-cdk/aws-codepipeline:crossAccountKeyAliasStackSafeResourceName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate key aliases that include the stack name"
+          },
+          "@aws-cdk/aws-s3:createDefaultLoggingPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature flag to create an S3 bucket policy by default in cases where an AWS service would automatically create the Policy if one does not exist."
+          },
+          "@aws-cdk/aws-sns-subscriptions:restrictSqsDescryption": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Restrict KMS key policy for encrypted Queues a bit more"
+          },
+          "@aws-cdk/aws-apigateway:disableCloudWatchRole": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Make default CloudWatch Role behavior safe for multiple API Gateways in one environment"
+          },
+          "@aws-cdk/core:enablePartitionLiterals": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Make ARNs concrete if AWS partition is known"
+          },
+          "@aws-cdk/aws-events:eventsTargetQueueSameAccount": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Event Rules may only push to encrypted SQS queues in the same account"
+          },
+          "@aws-cdk/aws-ecs:disableExplicitDeploymentControllerForCircuitBreaker": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Avoid setting the \"ECS\" deployment controller when adding a circuit breaker"
+          },
+          "@aws-cdk/aws-iam:importedRoleStackSafeDefaultPolicyName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Enable this feature to by default create default policy names for imported roles that depend on the stack the role is in."
+          },
+          "@aws-cdk/aws-s3:serverAccessLogsUseBucketPolicy": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use S3 Bucket Policy instead of ACLs for Server Access Logging"
+          },
+          "@aws-cdk/aws-route53-patters:useCertificate": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use the official `Certificate` resource instead of `DnsValidatedCertificate`"
+          },
+          "@aws-cdk/customresources:installLatestAwsSdkDefault": {
+            "userValue": false,
+            "recommendedValue": false,
+            "explanation": "Whether to install the latest SDK by default in AwsCustomResource"
+          },
+          "@aws-cdk/aws-rds:databaseProxyUniqueResourceName": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Use unique resource name for Database Proxy"
+          },
+          "@aws-cdk/aws-codedeploy:removeAlarmsFromDeploymentGroup": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Remove CloudWatch alarms from deployment group"
+          },
+          "@aws-cdk/aws-apigateway:authorizerChangeDeploymentLogicalId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Include authorizer configuration in the calculation of the API deployment logical ID."
+          },
+          "@aws-cdk/aws-ec2:launchTemplateDefaultUserData": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Define user data for a launch template by default when a machine image is provided."
+          },
+          "@aws-cdk/aws-secretsmanager:useAttachedSecretResourcePolicyForSecretTargetAttachments": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "SecretTargetAttachments uses the ResourcePolicy of the attached Secret."
+          },
+          "@aws-cdk/aws-redshift:columnId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Whether to use an ID to track Redshift column changes"
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:enableEmrServicePolicyV2": {
+            "recommendedValue": true,
+            "explanation": "Enable AmazonEMRServicePolicy_v2 managed policies"
+          },
+          "@aws-cdk/aws-ec2:restrictDefaultSecurityGroup": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Restrict access to the VPC default security group"
+          },
+          "@aws-cdk/aws-apigateway:requestValidatorUniqueId": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate a unique id for each RequestValidator added to a method"
+          },
+          "@aws-cdk/aws-kms:aliasNameRef": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "KMS Alias name and keyArn will have implicit reference to KMS Key"
+          },
+          "@aws-cdk/aws-kms:applyImportedAliasPermissionsToPrincipal": {
+            "recommendedValue": true,
+            "explanation": "Enable grant methods on Aliases imported by name to use kms:ResourceAliases condition"
+          },
+          "@aws-cdk/aws-autoscaling:generateLaunchTemplateInsteadOfLaunchConfig": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Generate a launch template when creating an AutoScalingGroup"
+          },
+          "@aws-cdk/core:includePrefixInUniqueNameGeneration": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "Include the stack prefix in the stack name generation process"
+          },
+          "@aws-cdk/aws-efs:denyAnonymousAccess": {
+            "userValue": true,
+            "recommendedValue": true,
+            "explanation": "EFS denies anonymous clients accesses"
+          },
+          "@aws-cdk/aws-opensearchservice:enableOpensearchMultiAzWithStandby": {
+            "recommendedValue": true,
+            "explanation": "Enables support for Multi-AZ with Standby deployment for opensearch domains"
+          },
+          "@aws-cdk/aws-lambda-nodejs:useLatestRuntimeVersion": {
+            "recommendedValue": true,
+            "explanation": "Enables aws-lambda-nodejs.Function to use the latest available NodeJs runtime as the default"
+          },
+          "@aws-cdk/aws-efs:mountTargetOrderInsensitiveLogicalId": {
+            "recommendedValue": true,
+            "explanation": "When enabled, mount targets will have a stable logicalId that is linked to the associated subnet."
+          },
+          "@aws-cdk/aws-rds:auroraClusterChangeScopeOfInstanceParameterGroupWithEachParameters": {
+            "recommendedValue": true,
+            "explanation": "When enabled, a scope of InstanceParameterGroup for AuroraClusterInstance with each parameters will change."
+          },
+          "@aws-cdk/aws-appsync:useArnForSourceApiAssociationIdentifier": {
+            "recommendedValue": true,
+            "explanation": "When enabled, will always use the arn for identifiers for CfnSourceApiAssociation in the GraphqlApi construct rather than id."
+          },
+          "@aws-cdk/aws-rds:preventRenderingDeprecatedCredentials": {
+            "recommendedValue": true,
+            "explanation": "When enabled, creating an RDS database cluster from a snapshot will only render credentials for snapshot credentials."
+          },
+          "@aws-cdk/aws-codepipeline-actions:useNewDefaultBranchForCodeCommitSource": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the CodeCommit source action is using the default branch name 'main'."
+          },
+          "@aws-cdk/aws-cloudwatch-actions:changeLambdaPermissionLogicalIdForLambdaAction": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the logical ID of a Lambda permission for a Lambda action includes an alarm ID."
+          },
+          "@aws-cdk/aws-codepipeline:crossAccountKeysDefaultValueToFalse": {
+            "recommendedValue": true,
+            "explanation": "Enables Pipeline to set the default value for crossAccountKeys to false."
+          },
+          "@aws-cdk/aws-codepipeline:defaultPipelineTypeToV2": {
+            "recommendedValue": true,
+            "explanation": "Enables Pipeline to set the default pipeline type to V2."
+          },
+          "@aws-cdk/aws-kms:reduceCrossAccountRegionPolicyScope": {
+            "recommendedValue": true,
+            "explanation": "When enabled, IAM Policy created from KMS key grant will reduce the resource scope to this key only."
+          },
+          "@aws-cdk/pipelines:reduceAssetRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "Remove the root account principal from PipelineAssetsFileRole trust policy"
+          },
+          "@aws-cdk/aws-eks:nodegroupNameAttribute": {
+            "recommendedValue": true,
+            "explanation": "When enabled, nodegroupName attribute of the provisioned EKS NodeGroup will not have the cluster name prefix."
+          },
+          "@aws-cdk/aws-ec2:ebsDefaultGp3Volume": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the default volume type of the EBS volume will be GP3"
+          },
+          "@aws-cdk/aws-ecs:removeDefaultDeploymentAlarm": {
+            "recommendedValue": true,
+            "explanation": "When enabled, remove default deployment alarm settings"
+          },
+          "@aws-cdk/custom-resources:logApiResponseDataPropertyTrueDefault": {
+            "recommendedValue": false,
+            "explanation": "When enabled, the custom resource used for `AwsCustomResource` will configure the `logApiResponseData` property as true by default"
+          },
+          "@aws-cdk/aws-s3:keepNotificationInImportedBucket": {
+            "recommendedValue": false,
+            "explanation": "When enabled, Adding notifications to a bucket in the current stack will not remove notification from imported stack."
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:useNewS3UriParametersForBedrockInvokeModelTask": {
+            "recommendedValue": true,
+            "explanation": "When enabled, use new props for S3 URI field in task definition of state machine for bedrock invoke model."
+          },
+          "@aws-cdk/core:explicitStackTags": {
+            "recommendedValue": true,
+            "explanation": "When enabled, stack tags need to be assigned explicitly on a Stack."
+          },
+          "@aws-cdk/aws-ecs:enableImdsBlockingDeprecatedFeature": {
+            "recommendedValue": false,
+            "explanation": "When set to true along with canContainersAccessInstanceRole=false in ECS cluster, new updated commands will be added to UserData to block container accessing IMDS. **Applicable to Linux only. IMPORTANT: See [details.](#aws-cdkaws-ecsenableImdsBlockingDeprecatedFeature)**"
+          },
+          "@aws-cdk/aws-ecs:disableEcsImdsBlocking": {
+            "recommendedValue": true,
+            "explanation": "When set to true, CDK synth will throw exception if canContainersAccessInstanceRole is false. **IMPORTANT: See [details.](#aws-cdkaws-ecsdisableEcsImdsBlocking)**"
+          },
+          "@aws-cdk/aws-ecs:reduceEc2FargateCloudWatchPermissions": {
+            "recommendedValue": true,
+            "explanation": "When enabled, we will only grant the necessary permissions when users specify cloudwatch log group through logConfiguration"
+          },
+          "@aws-cdk/aws-dynamodb:resourcePolicyPerReplica": {
+            "recommendedValue": true,
+            "explanation": "When enabled will allow you to specify a resource policy per replica, and not copy the source table policy to all replicas"
+          },
+          "@aws-cdk/aws-ec2:ec2SumTImeoutEnabled": {
+            "recommendedValue": true,
+            "explanation": "When enabled, initOptions.timeout and resourceSignalTimeout values will be summed together."
+          },
+          "@aws-cdk/aws-appsync:appSyncGraphQLAPIScopeLambdaPermission": {
+            "recommendedValue": true,
+            "explanation": "When enabled, a Lambda authorizer Permission created when using GraphqlApi will be properly scoped with a SourceArn."
+          },
+          "@aws-cdk/aws-rds:setCorrectValueForDatabaseInstanceReadReplicaInstanceResourceId": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the value of property `instanceResourceId` in construct `DatabaseInstanceReadReplica` will be set to the correct value which is `DbiResourceId` instead of currently `DbInstanceArn`"
+          },
+          "@aws-cdk/core:cfnIncludeRejectComplexResourceUpdateCreatePolicyIntrinsics": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CFN templates added with `cfn-include` will error if the template contains Resource Update or Create policies with CFN Intrinsics that include non-primitive values."
+          },
+          "@aws-cdk/aws-lambda-nodejs:sdkV3ExcludeSmithyPackages": {
+            "recommendedValue": true,
+            "explanation": "When enabled, both `@aws-sdk` and `@smithy` packages will be excluded from the Lambda Node.js 18.x runtime to prevent version mismatches in bundled applications."
+          },
+          "@aws-cdk/aws-stepfunctions-tasks:fixRunEcsTaskPolicy": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the resource of IAM Run Ecs policy generated by SFN EcsRunTask will reference the definition, instead of constructing ARN."
+          },
+          "@aws-cdk/aws-ec2:bastionHostUseAmazonLinux2023ByDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the BastionHost construct will use the latest Amazon Linux 2023 AMI, instead of Amazon Linux 2."
+          },
+          "@aws-cdk/core:aspectStabilization": {
+            "recommendedValue": true,
+            "explanation": "When enabled, a stabilization loop will be run when invoking Aspects during synthesis."
+          },
+          "@aws-cdk/aws-route53-targets:userPoolDomainNameMethodWithoutCustomResource": {
+            "recommendedValue": true,
+            "explanation": "When enabled, use a new method for DNS Name of user pool domain target without creating a custom resource."
+          },
+          "@aws-cdk/aws-elasticloadbalancingV2:albDualstackWithoutPublicIpv4SecurityGroupRulesDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the default security group ingress rules will allow IPv6 ingress from anywhere"
+          },
+          "@aws-cdk/aws-iam:oidcRejectUnauthorizedConnections": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the default behaviour of OIDC provider will reject unauthorized connections"
+          },
+          "@aws-cdk/core:enableAdditionalMetadataCollection": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK will expand the scope of usage data collected to better inform CDK development and improve communication for security concerns and emerging issues."
+          },
+          "@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy": {
+            "recommendedValue": false,
+            "explanation": "[Deprecated] When enabled, Lambda will create new inline policies with AddToRolePolicy instead of adding to the Default Policy Statement"
+          },
+          "@aws-cdk/aws-s3:setUniqueReplicationRoleName": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK will automatically generate a unique role name that is used for s3 object replication."
+          },
+          "@aws-cdk/pipelines:reduceStageRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "Remove the root account principal from Stage addActions trust policy"
+          },
+          "@aws-cdk/aws-events:requireEventBusPolicySid": {
+            "recommendedValue": true,
+            "explanation": "When enabled, grantPutEventsTo() will use resource policies with Statement IDs for service principals."
+          },
+          "@aws-cdk/core:aspectPrioritiesMutating": {
+            "recommendedValue": true,
+            "explanation": "When set to true, Aspects added by the construct library on your behalf will be given a priority of MUTATING."
+          },
+          "@aws-cdk/aws-dynamodb:retainTableReplica": {
+            "recommendedValue": true,
+            "explanation": "When enabled, table replica will be default to the removal policy of source table unless specified otherwise."
+          },
+          "@aws-cdk/cognito:logUserPoolClientSecretValue": {
+            "recommendedValue": false,
+            "explanation": "When disabled, the value of the user pool client secret will not be logged in the custom resource lambda function logs."
+          },
+          "@aws-cdk/pipelines:reduceCrossAccountActionRoleTrustScope": {
+            "recommendedValue": true,
+            "explanation": "When enabled, scopes down the trust policy for the cross-account action role"
+          },
+          "@aws-cdk/aws-stepfunctions:useDistributedMapResultWriterV2": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the resultWriterV2 property of DistributedMap will be used insted of resultWriter"
+          },
+          "@aws-cdk/s3-notifications:addS3TrustKeyPolicyForSnsSubscriptions": {
+            "recommendedValue": true,
+            "explanation": "Add an S3 trust policy to a KMS key resource policy for SNS subscriptions."
+          },
+          "@aws-cdk/aws-ec2:requirePrivateSubnetsForEgressOnlyInternetGateway": {
+            "recommendedValue": true,
+            "explanation": "When enabled, the EgressOnlyGateway resource is only created if private subnets are defined in the dual-stack VPC."
+          },
+          "@aws-cdk/aws-ec2-alpha:useResourceIdForVpcV2Migration": {
+            "recommendedValue": false,
+            "explanation": "When enabled, use resource IDs for VPC V2 migration"
+          },
+          "@aws-cdk/aws-s3:publicAccessBlockedByDefault": {
+            "recommendedValue": true,
+            "explanation": "When enabled, setting any combination of options for BlockPublicAccess will automatically set true for any options not defined."
+          },
+          "@aws-cdk/aws-lambda:useCdkManagedLogGroup": {
+            "recommendedValue": true,
+            "explanation": "When enabled, CDK creates and manages loggroup for the lambda function"
+          }
+        }
+      }
+    }
+  },
+  "minimumCliVersion": "2.1020.2"
+}

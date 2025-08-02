@@ -25,6 +25,7 @@ export interface FargateGameEngineProps {
   };
   alertingEmail?: string;
   environment?: string;
+  gameEngineImage?: string;
 }
 
 export class FargateGameEngine extends Construct {
@@ -121,9 +122,11 @@ export class FargateGameEngine extends Construct {
 
     // Add Container to Task Definition with enhanced configuration
     const container = this.taskDefinition.addContainer('GameEngineContainer', {
-      image: ecs.ContainerImage.fromAsset('./src/server', {
-        file: 'Dockerfile',
-      }),
+      image: props.gameEngineImage 
+        ? ecs.ContainerImage.fromRegistry(props.gameEngineImage)
+        : ecs.ContainerImage.fromAsset('./src/server', {
+            file: 'Dockerfile',
+          }),
       environment: {
         NODE_ENV: props.environment || 'production',
         PORT: '3001',

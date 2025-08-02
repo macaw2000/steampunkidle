@@ -1,0 +1,81 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "5aad8d24a737a64ba96ac70d297df144f51bd48561b70b63d7e4a3067ea57713": {
+      "displayName": "HealthFunction/Code",
+      "source": {
+        "path": "asset.5aad8d24a737a64ba96ac70d297df144f51bd48561b70b63d7e4a3067ea57713",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-0fe9e060": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "5aad8d24a737a64ba96ac70d297df144f51bd48561b70b63d7e4a3067ea57713.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf": {
+      "displayName": "LoginFunction/Code",
+      "source": {
+        "path": "asset.e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-825002d1": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "ecd381599cc3cc93efced4ebc2dbc29b61d183e376110cdff08714c5fd49bd0b": {
+      "displayName": "CharacterFunction/Code",
+      "source": {
+        "path": "asset.ecd381599cc3cc93efced4ebc2dbc29b61d183e376110cdff08714c5fd49bd0b",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-cdf886ce": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "ecd381599cc3cc93efced4ebc2dbc29b61d183e376110cdff08714c5fd49bd0b.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7": {
+      "displayName": "SwitchActivityFunction/Code",
+      "source": {
+        "path": "asset.c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-c65df3db": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "330cbc7535896aafaf0305ce8295e3c0204fb9f2df858c6f2fa186943df9913f": {
+      "displayName": "SteampunkIdleGameMinimalBackend Template",
+      "source": {
+        "path": "SteampunkIdleGameMinimalBackend.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "735515353866-us-west-2-00bbdb6a": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "330cbc7535896aafaf0305ce8295e3c0204fb9f2df858c6f2fa186943df9913f.json",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

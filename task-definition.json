@@ -1,0 +1,82 @@
+{
+  "family": "steampunk-idle-game-engine-dev",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::735515353866:role/SteampunkIdleGameEngine-GameEngineGameEngineTaskDef-K8cVLKXo6EPx",
+  "taskRoleArn": "arn:aws:iam::735515353866:role/SteampunkIdleGameEngine-GameEngineGameEngineTaskDef-R0YmYsggDHPm",
+  "containerDefinitions": [
+    {
+      "name": "GameEngineContainer",
+      "image": "735515353866.dkr.ecr.us-west-2.amazonaws.com/cdk-hnb659fds-container-assets-735515353866-us-west-2:game-engine-v3",
+      "cpu": 0,
+      "memoryReservation": 512,
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 3001,
+          "hostPort": 3001,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "METRICS_NAMESPACE",
+          "value": "SteampunkIdleGame/GameEngine"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "us-west-2"
+        },
+        {
+          "name": "PORT",
+          "value": "3001"
+        },
+        {
+          "name": "CHARACTERS_TABLE",
+          "value": "steampunk-idle-game-characters"
+        },
+        {
+          "name": "TASK_QUEUES_TABLE",
+          "value": "steampunk-idle-game-task-queues-enhanced"
+        },
+        {
+          "name": "USERS_TABLE",
+          "value": "steampunk-idle-game-users"
+        },
+        {
+          "name": "ENVIRONMENT",
+          "value": "dev"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "dev"
+        },
+        {
+          "name": "LOG_LEVEL",
+          "value": "info"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/steampunk-idle-game-engine-dev",
+          "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S",
+          "awslogs-region": "us-west-2",
+          "awslogs-stream-prefix": "game-engine"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "node -e \"require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })\""
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+}

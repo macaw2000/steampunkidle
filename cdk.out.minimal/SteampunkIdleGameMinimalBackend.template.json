@@ -1,0 +1,2260 @@
+{
+ "Description": "Minimal backend for Steampunk Idle Game - fixes network connectivity",
+ "Resources": {
+  "UsersTable9725E9C8": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "userId",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "steampunk-idle-game-users",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/UsersTable/Resource"
+   }
+  },
+  "CharactersTable0F2A9F65": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "userId",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "KeySchema": [
+     {
+      "AttributeName": "userId",
+      "KeyType": "HASH"
+     }
+    ],
+    "TableName": "steampunk-idle-game-characters",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/CharactersTable/Resource"
+   }
+  },
+  "LambdaExecutionRoleD5C26073": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/LambdaExecutionRole/Resource"
+   }
+  },
+  "LambdaExecutionRoleDefaultPolicy6D69732F": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:ConditionCheckItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
+        "dynamodb:GetItem",
+        "dynamodb:GetRecords",
+        "dynamodb:GetShardIterator",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "CharactersTable0F2A9F65",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::GetAtt": [
+          "UsersTable9725E9C8",
+          "Arn"
+         ]
+        },
+        {
+         "Ref": "AWS::NoValue"
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "Roles": [
+     {
+      "Ref": "LambdaExecutionRoleD5C26073"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/LambdaExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "HealthFunction19D7724A": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "5aad8d24a737a64ba96ac70d297df144f51bd48561b70b63d7e4a3067ea57713.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "USERS_TABLE": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "CHARACTERS_TABLE": {
+       "Ref": "CharactersTable0F2A9F65"
+      }
+     }
+    },
+    "Handler": "healthCheck.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/HealthFunction/Resource",
+    "aws:asset:path": "asset.5aad8d24a737a64ba96ac70d297df144f51bd48561b70b63d7e4a3067ea57713",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "LoginFunction66F090C6": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "USERS_TABLE": {
+       "Ref": "UsersTable9725E9C8"
+      }
+     }
+    },
+    "Handler": "login.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/LoginFunction/Resource",
+    "aws:asset:path": "asset.e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "RefreshFunction848BF7AF": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf.zip"
+    },
+    "Handler": "refresh.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/RefreshFunction/Resource",
+    "aws:asset:path": "asset.e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "LogoutFunctionC3F6EAEB": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf.zip"
+    },
+    "Handler": "logout.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/LogoutFunction/Resource",
+    "aws:asset:path": "asset.e824e95835ee7d63f498a2c3777a344b0050e0c335e125f3852ddca4edd1cccf",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "CharacterFunction69BA9C2D": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "ecd381599cc3cc93efced4ebc2dbc29b61d183e376110cdff08714c5fd49bd0b.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "USERS_TABLE": {
+       "Ref": "UsersTable9725E9C8"
+      },
+      "CHARACTERS_TABLE": {
+       "Ref": "CharactersTable0F2A9F65"
+      }
+     }
+    },
+    "Handler": "character.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/CharacterFunction/Resource",
+    "aws:asset:path": "asset.ecd381599cc3cc93efced4ebc2dbc29b61d183e376110cdff08714c5fd49bd0b",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SwitchActivityFunction7C3C4114": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "CHARACTERS_TABLE": {
+       "Ref": "CharactersTable0F2A9F65"
+      }
+     }
+    },
+    "Handler": "switchActivity.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SwitchActivityFunction/Resource",
+    "aws:asset:path": "asset.c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "GetActivityProgressFunction8140C292": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "CHARACTERS_TABLE": {
+       "Ref": "CharactersTable0F2A9F65"
+      }
+     }
+    },
+    "Handler": "getActivityProgress.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "LambdaExecutionRoleD5C26073",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Timeout": 30
+   },
+   "DependsOn": [
+    "LambdaExecutionRoleDefaultPolicy6D69732F",
+    "LambdaExecutionRoleD5C26073"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/GetActivityProgressFunction/Resource",
+    "aws:asset:path": "asset.c17848eb500fca8b51c3b9dcca20b0cc82e1af47ab5554d5b926249f8a1fc9f7",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
+   }
+  },
+  "SteampunkIdleGameApi740B0A2C": {
+   "Type": "AWS::ApiGateway::RestApi",
+   "Properties": {
+    "Description": "Minimal API for Steampunk Idle Game",
+    "Name": "Steampunk Idle Game API",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Resource"
+   }
+  },
+  "SteampunkIdleGameApiDeployment78478692ea1e07d907ef69f7576064ec6a5d6d89": {
+   "Type": "AWS::ApiGateway::Deployment",
+   "Properties": {
+    "Description": "Minimal API for Steampunk Idle Game",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "DependsOn": [
+    "SteampunkIdleGameApiactivityOPTIONS25D2C3A8",
+    "SteampunkIdleGameApiactivityprogressGETC77C6561",
+    "SteampunkIdleGameApiactivityprogressOPTIONS2DB8AF47",
+    "SteampunkIdleGameApiactivityprogress16EA14B4",
+    "SteampunkIdleGameApiactivity0CC7D1A6",
+    "SteampunkIdleGameApiactivityswitchOPTIONSE3242BFC",
+    "SteampunkIdleGameApiactivityswitchPOST2CB00C99",
+    "SteampunkIdleGameApiactivityswitchB4616454",
+    "SteampunkIdleGameApiauthloginOPTIONS588DB71D",
+    "SteampunkIdleGameApiauthloginPOST54552EFE",
+    "SteampunkIdleGameApiauthlogin391FC7BD",
+    "SteampunkIdleGameApiauthlogoutOPTIONS772887CD",
+    "SteampunkIdleGameApiauthlogoutPOST7237311F",
+    "SteampunkIdleGameApiauthlogout2B5B1A48",
+    "SteampunkIdleGameApiauthOPTIONS01806C16",
+    "SteampunkIdleGameApiauthrefreshOPTIONSA5397AA8",
+    "SteampunkIdleGameApiauthrefreshPOSTD7E17DE6",
+    "SteampunkIdleGameApiauthrefreshEB86EB02",
+    "SteampunkIdleGameApiauth0E889EC1",
+    "SteampunkIdleGameApicharacteruserIdOPTIONS151BF5CB",
+    "SteampunkIdleGameApicharacteruserIdPUTDDE32CBB",
+    "SteampunkIdleGameApicharacteruserIdDC91F570",
+    "SteampunkIdleGameApicharacterGET0A60EB83",
+    "SteampunkIdleGameApicharacterOPTIONS6D6A68E2",
+    "SteampunkIdleGameApicharacterPOST53E79CE8",
+    "SteampunkIdleGameApicharacter753EF41C",
+    "SteampunkIdleGameApicharactervalidatenameOPTIONS9AEBA184",
+    "SteampunkIdleGameApicharactervalidatenamePOSTB33533E2",
+    "SteampunkIdleGameApicharactervalidatenameC58921B5",
+    "SteampunkIdleGameApihealthGET8EBE92CE",
+    "SteampunkIdleGameApihealthOPTIONS1F45263A",
+    "SteampunkIdleGameApihealth9837B496"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Deployment/Resource",
+    "aws:cdk:do-not-refactor": true
+   }
+  },
+  "SteampunkIdleGameApiDeploymentStageprodE13F4AA1": {
+   "Type": "AWS::ApiGateway::Stage",
+   "Properties": {
+    "DeploymentId": {
+     "Ref": "SteampunkIdleGameApiDeployment78478692ea1e07d907ef69f7576064ec6a5d6d89"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    },
+    "StageName": "prod",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "minimal-backend"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/DeploymentStage.prod/Resource"
+   }
+  },
+  "SteampunkIdleGameApihealth9837B496": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "SteampunkIdleGameApi740B0A2C",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "health",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/Resource"
+   }
+  },
+  "SteampunkIdleGameApihealthGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGEThealthDB5B62BB": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "HealthFunction19D7724A",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/GET/health"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..health"
+   }
+  },
+  "SteampunkIdleGameApihealthGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGEThealthAEB1D637": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "HealthFunction19D7724A",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/GET/health"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..health"
+   }
+  },
+  "SteampunkIdleGameApihealthGET8EBE92CE": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "HealthFunction19D7724A",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApihealth9837B496"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/GET/Resource"
+   }
+  },
+  "SteampunkIdleGameApihealthOPTIONS1F45263A": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApihealth9837B496"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/health/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauth0E889EC1": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "SteampunkIdleGameApi740B0A2C",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "auth",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthOPTIONS01806C16": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauth0E889EC1"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthlogin391FC7BD": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApiauth0E889EC1"
+    },
+    "PathPart": "login",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthloginPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogin622D293C": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LoginFunction66F090C6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/auth/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.login"
+   }
+  },
+  "SteampunkIdleGameApiauthloginPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogin679206BF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LoginFunction66F090C6",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/auth/login"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.login"
+   }
+  },
+  "SteampunkIdleGameApiauthloginPOST54552EFE": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "LoginFunction66F090C6",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthlogin391FC7BD"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthloginOPTIONS588DB71D": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthlogin391FC7BD"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/login/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthrefreshEB86EB02": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApiauth0E889EC1"
+    },
+    "PathPart": "refresh",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthrefreshPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthrefreshE40F3CB4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RefreshFunction848BF7AF",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/auth/refresh"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.refresh"
+   }
+  },
+  "SteampunkIdleGameApiauthrefreshPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthrefreshE02579AF": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "RefreshFunction848BF7AF",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/auth/refresh"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.refresh"
+   }
+  },
+  "SteampunkIdleGameApiauthrefreshPOSTD7E17DE6": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "RefreshFunction848BF7AF",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthrefreshEB86EB02"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthrefreshOPTIONSA5397AA8": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthrefreshEB86EB02"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/refresh/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthlogout2B5B1A48": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApiauth0E889EC1"
+    },
+    "PathPart": "logout",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthlogoutPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogoutB175E967": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LogoutFunctionC3F6EAEB",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/auth/logout"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.logout"
+   }
+  },
+  "SteampunkIdleGameApiauthlogoutPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTauthlogoutDFA371A4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "LogoutFunctionC3F6EAEB",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/auth/logout"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..auth.logout"
+   }
+  },
+  "SteampunkIdleGameApiauthlogoutPOST7237311F": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "LogoutFunctionC3F6EAEB",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthlogout2B5B1A48"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApiauthlogoutOPTIONS772887CD": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiauthlogout2B5B1A48"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/auth/logout/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacter753EF41C": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "SteampunkIdleGameApi740B0A2C",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "character",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacterGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETcharacter89B86F80": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/GET/character"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..character"
+   }
+  },
+  "SteampunkIdleGameApicharacterGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETcharacterBFC391F4": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/GET/character"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..character"
+   }
+  },
+  "SteampunkIdleGameApicharacterGET0A60EB83": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CharacterFunction69BA9C2D",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharacter753EF41C"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/GET/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacterPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharacter701DD6F7": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/character"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character"
+   }
+  },
+  "SteampunkIdleGameApicharacterPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharacter724370B6": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/character"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character"
+   }
+  },
+  "SteampunkIdleGameApicharacterPOST53E79CE8": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CharacterFunction69BA9C2D",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharacter753EF41C"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacterOPTIONS6D6A68E2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharacter753EF41C"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharactervalidatenameC58921B5": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApicharacter753EF41C"
+    },
+    "PathPart": "validate-name",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharactervalidatenamePOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharactervalidatename3FD11904": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/character/validate-name"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character.validate-name"
+   }
+  },
+  "SteampunkIdleGameApicharactervalidatenamePOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTcharactervalidatename011CD071": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/character/validate-name"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..character.validate-name"
+   }
+  },
+  "SteampunkIdleGameApicharactervalidatenamePOSTB33533E2": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CharacterFunction69BA9C2D",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharactervalidatenameC58921B5"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharactervalidatenameOPTIONS9AEBA184": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharactervalidatenameC58921B5"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/validate-name/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacteruserIdDC91F570": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApicharacter753EF41C"
+    },
+    "PathPart": "{userId}",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacteruserIdPUTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPUTcharacteruserIdFB48CE43": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/PUT/character/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.PUT..character.{userId}"
+   }
+  },
+  "SteampunkIdleGameApicharacteruserIdPUTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPUTcharacteruserId5EF8BD75": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "CharacterFunction69BA9C2D",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/PUT/character/*"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.PUT..character.{userId}"
+   }
+  },
+  "SteampunkIdleGameApicharacteruserIdPUTDDE32CBB": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "PUT",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "CharacterFunction69BA9C2D",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharacteruserIdDC91F570"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/PUT/Resource"
+   }
+  },
+  "SteampunkIdleGameApicharacteruserIdOPTIONS151BF5CB": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApicharacteruserIdDC91F570"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/character/{userId}/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivity0CC7D1A6": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Fn::GetAtt": [
+      "SteampunkIdleGameApi740B0A2C",
+      "RootResourceId"
+     ]
+    },
+    "PathPart": "activity",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityOPTIONS25D2C3A8": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiactivity0CC7D1A6"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityswitchB4616454": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApiactivity0CC7D1A6"
+    },
+    "PathPart": "switch",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityswitchPOSTApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTactivityswitchBFCA1219": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SwitchActivityFunction7C3C4114",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/POST/activity/switch"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..activity.switch"
+   }
+  },
+  "SteampunkIdleGameApiactivityswitchPOSTApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FPOSTactivityswitchAFA4A08E": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "SwitchActivityFunction7C3C4114",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/POST/activity/switch"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.POST..activity.switch"
+   }
+  },
+  "SteampunkIdleGameApiactivityswitchPOST2CB00C99": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "POST",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "SwitchActivityFunction7C3C4114",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiactivityswitchB4616454"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/POST/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityswitchOPTIONSE3242BFC": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiactivityswitchB4616454"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/switch/OPTIONS/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityprogress16EA14B4": {
+   "Type": "AWS::ApiGateway::Resource",
+   "Properties": {
+    "ParentId": {
+     "Ref": "SteampunkIdleGameApiactivity0CC7D1A6"
+    },
+    "PathPart": "progress",
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityprogressGETApiPermissionSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETactivityprogress2C8C8056": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetActivityProgressFunction8140C292",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/",
+       {
+        "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+       },
+       "/GET/activity/progress"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/ApiPermission.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..activity.progress"
+   }
+  },
+  "SteampunkIdleGameApiactivityprogressGETApiPermissionTestSteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291FGETactivityprogress32E52100": {
+   "Type": "AWS::Lambda::Permission",
+   "Properties": {
+    "Action": "lambda:InvokeFunction",
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "GetActivityProgressFunction8140C292",
+      "Arn"
+     ]
+    },
+    "Principal": "apigateway.amazonaws.com",
+    "SourceArn": {
+     "Fn::Join": [
+      "",
+      [
+       "arn:aws:execute-api:us-west-2:735515353866:",
+       {
+        "Ref": "SteampunkIdleGameApi740B0A2C"
+       },
+       "/test-invoke-stage/GET/activity/progress"
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/ApiPermission.Test.SteampunkIdleGameMinimalBackendSteampunkIdleGameApi6A57291F.GET..activity.progress"
+   }
+  },
+  "SteampunkIdleGameApiactivityprogressGETC77C6561": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "GET",
+    "Integration": {
+     "IntegrationHttpMethod": "POST",
+     "Type": "AWS_PROXY",
+     "Uri": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:aws:apigateway:us-west-2:lambda:path/2015-03-31/functions/",
+        {
+         "Fn::GetAtt": [
+          "GetActivityProgressFunction8140C292",
+          "Arn"
+         ]
+        },
+        "/invocations"
+       ]
+      ]
+     }
+    },
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiactivityprogress16EA14B4"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/GET/Resource"
+   }
+  },
+  "SteampunkIdleGameApiactivityprogressOPTIONS2DB8AF47": {
+   "Type": "AWS::ApiGateway::Method",
+   "Properties": {
+    "AuthorizationType": "NONE",
+    "HttpMethod": "OPTIONS",
+    "Integration": {
+     "IntegrationResponses": [
+      {
+       "ResponseParameters": {
+        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+        "method.response.header.Access-Control-Allow-Methods": "'GET,POST,PUT,DELETE,OPTIONS'",
+        "method.response.header.Access-Control-Allow-Origin": "'*'"
+       },
+       "StatusCode": "200"
+      }
+     ],
+     "RequestTemplates": {
+      "application/json": "{\"statusCode\": 200}"
+     },
+     "Type": "MOCK"
+    },
+    "MethodResponses": [
+     {
+      "ResponseParameters": {
+       "method.response.header.Access-Control-Allow-Headers": true,
+       "method.response.header.Access-Control-Allow-Methods": true,
+       "method.response.header.Access-Control-Allow-Origin": true
+      },
+      "StatusCode": "200"
+     }
+    ],
+    "ResourceId": {
+     "Ref": "SteampunkIdleGameApiactivityprogress16EA14B4"
+    },
+    "RestApiId": {
+     "Ref": "SteampunkIdleGameApi740B0A2C"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/SteampunkIdleGameApi/Default/activity/progress/OPTIONS/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/02OQU/DMAyFf8vuqSmdEOcNxA0xddwnNzUla5NUdUJVRfnvKMkQO73vPVvPbqCpn6De4cqV7MdqUh2Es0M5Clz5EvrNoLZ9B+ETu4nEy5fJEIVCDaG1Jct6spOSW7KFophQdz1CePNGOmVNmt3ziRatmJU1UfD+gszkGA5JBO/h6OVI7ohMAmc1oKMVNwgtsTvMKt+94SvNk900GZfSO3d2OOQPC7TE1i+ScuefuRUVfif3bfsUFYrxfy8/loqUGdLGh3ezd1EY2xNc+eGnaeDxGerdlZWqFm+c0gRt0V/r32K4agEAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameMinimalBackend/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "SteampunkIdleGameApiEndpoint8EB3C979": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "SteampunkIdleGameApi740B0A2C"
+      },
+      ".execute-api.us-west-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "ApiUrl": {
+   "Description": "API Gateway URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "https://",
+      {
+       "Ref": "SteampunkIdleGameApi740B0A2C"
+      },
+      ".execute-api.us-west-2.",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "SteampunkIdleGameApiDeploymentStageprodE13F4AA1"
+      },
+      "/"
+     ]
+    ]
+   }
+  },
+  "UsersTableName": {
+   "Description": "Users DynamoDB Table Name",
+   "Value": {
+    "Ref": "UsersTable9725E9C8"
+   }
+  },
+  "CharactersTableName": {
+   "Description": "Characters DynamoDB Table Name",
+   "Value": {
+    "Ref": "CharactersTable0F2A9F65"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

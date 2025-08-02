@@ -42,6 +42,8 @@ export class AuthService {
   private static instance: AuthService;
   private currentUser: User | null = null;
   private authTokens: AuthTokens | null = null;
+  private readonly SESSION_STORAGE_KEY = 'steampunk_idle_session';
+  private readonly USER_STORAGE_KEY = 'steampunk_idle_user';
 
   constructor() {
     // Singleton pattern
@@ -49,6 +51,87 @@ export class AuthService {
       return AuthService.instance;
     }
     AuthService.instance = this;
+    // Initialize auth state and restore session if available
+    this.restoreSession();
+  }
+
+  /**
+   * Restore session from localStorage
+   */
+  private restoreSession(): void {
+    try {
+      // First check for our persistent session
+      const storedSession = localStorage.getItem(this.SESSION_STORAGE_KEY);
+      const storedUser = localStorage.getItem(this.USER_STORAGE_KEY);
+      
+      if (storedSession && storedUser) {
+        const sessionData = JSON.parse(storedSession);
+        const userData = JSON.parse(storedUser);
+        
+        // Check if session is still valid
+        if (sessionData.expiresAt && new Date(sessionData.expiresAt) > new Date()) {
+          this.authTokens = sessionData.tokens;
+          this.currentUser = userData;
+          console.log('Session restored from persistent localStorage');
+          return;
+        } else {
+          // Session expired, clear storage
+          this.clearStoredSession();
+        }
+      }
+
+      // Check for mock auth session (dev mode)
+      const mockSession = localStorage.getItem('mockAuthSession');
+      if (mockSession) {
+        const mockData = JSON.parse(mockSession);
+        if (mockData.user && mockData.tokens) {
+          this.currentUser = mockData.user;
+          this.authTokens = mockData.tokens;
+          // Store it in our persistent format for future use
+          this.storeSession(mockData.user, mockData.tokens);
+          console.log('Session restored from mock auth (dev mode)');
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Failed to restore session:', error);
+      this.clearStoredSession();
+      // Also clear mock session if it's corrupted
+      try {
+        localStorage.removeItem('mockAuthSession');
+      } catch (e) {
+        console.error('Failed to clear mock session:', e);
+      }
+    }
+  }
+
+  /**
+   * Store session in localStorage
+   */
+  private storeSession(user: User, tokens: AuthTokens): void {
+    try {
+      const sessionData = {
+        tokens,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() // 7 days
+      };
+      localStorage.setItem(this.SESSION_STORAGE_KEY, JSON.stringify(sessionData));
+      localStorage.setItem(this.USER_STORAGE_KEY, JSON.stringify(user));
+    } catch (error) {
+      console.error('Failed to store session:', error);
+    }
+  }
+
+  /**
+   * Clear stored session
+   */
+  private clearStoredSession(): void {
+    try {
+      localStorage.removeItem(this.SESSION_STORAGE_KEY);
+      localStorage.removeItem(this.USER_STORAGE_KEY);
+      localStorage.removeItem('mockAuthSession'); // Also clear mock session
+    } catch (error) {
+      console.error('Failed to clear stored session:', error);
+    }
   }
 
   /**
@@ -56,36 +139,48 @@ export class AuthService {
    */
   async initializeAuth(): Promise<{ user: User; tokens: AuthTokens } | null> {
     try {
-      console.log('AuthService: Initializing AWS Cognito authentication');
+      console.log('AuthService: Initializing authentication');
       
-      const currentUser = await getCurrentUser();
-      const session = await fetchAuthSession();
-
-      if (currentUser && session.tokens) {
-        const user: User = {
-          userId: currentUser.userId,
-          email: currentUser.signInDetails?.loginId || '',
-          name: currentUser.username,
-          socialProviders: [],
-          lastLogin: new Date().toISOString(),
-        };
-
-        const tokens: AuthTokens = {
-          accessToken: session.tokens.accessToken?.toString() || '',
-          idToken: session.tokens.idToken?.toString() || '',
-          refreshToken: 'refresh-token-placeholder', // AWS Amplify handles refresh automatically
-          expiresIn: 3600, // Default to 1 hour
-          tokenType: 'Bearer',
-        };
-
-        this.currentUser = user;
-        this.authTokens = tokens;
-
-        console.log('AuthService: Successfully restored AWS Cognito session');
-        return { user, tokens };
+      // First try to restore from localStorage
+      if (this.currentUser && this.authTokens) {
+        console.log('AuthService: Session restored from localStorage');
+        return { user: this.currentUser, tokens: this.authTokens };
       }
 
-      console.log('AuthService: No existing AWS Cognito session found');
+      // Try AWS Cognito session
+      try {
+        const currentUser = await getCurrentUser();
+        const session = await fetchAuthSession();
+
+        if (currentUser && session.tokens) {
+          const user: User = {
+            userId: currentUser.userId,
+            email: currentUser.signInDetails?.loginId || '',
+            name: currentUser.username,
+            socialProviders: [],
+            lastLogin: new Date().toISOString(),
+          };
+
+          const tokens: AuthTokens = {
+            accessToken: session.tokens.accessToken?.toString() || '',
+            idToken: session.tokens.idToken?.toString() || '',
+            refreshToken: 'refresh-token-placeholder', // AWS Amplify handles refresh automatically
+            expiresIn: 3600, // Default to 1 hour
+            tokenType: 'Bearer',
+          };
+
+          this.currentUser = user;
+          this.authTokens = tokens;
+          this.storeSession(user, tokens);
+
+          console.log('AuthService: Successfully restored AWS Cognito session');
+          return { user, tokens };
+        }
+      } catch (cognitoError) {
+        console.log('AuthService: No AWS Cognito session found');
+      }
+
+      console.log('AuthService: No existing session found');
       return null;
     } catch (error: any) {
       console.log('AuthService: No existing session or session expired');
@@ -131,6 +226,7 @@ export class AuthService {
 
         this.currentUser = user;
         this.authTokens = tokens;
+        this.storeSession(user, tokens);
 
         console.log('AuthService: AWS Cognito login successful');
         return { user, tokens };
@@ -229,6 +325,10 @@ export class AuthService {
    * Get current user
    */
   getCurrentUser(): User | null {
+    // Ensure we have the latest session state
+    if (!this.currentUser) {
+      this.restoreSession();
+    }
     return this.currentUser;
   }
 
@@ -243,6 +343,10 @@ export class AuthService {
    * Check if user is authenticated
    */
   isAuthenticated(): boolean {
+    // If not currently authenticated, try to restore from storage
+    if (!this.currentUser || !this.authTokens) {
+      this.restoreSession();
+    }
     return this.currentUser !== null && this.authTokens !== null;
   }
 
@@ -257,6 +361,7 @@ export class AuthService {
       
       this.currentUser = null;
       this.authTokens = null;
+      this.clearStoredSession();
 
       console.log('AuthService: AWS Cognito logout successful');
     } catch (error: any) {
@@ -264,6 +369,7 @@ export class AuthService {
       // Clear local state even if logout fails
       this.currentUser = null;
       this.authTokens = null;
+      this.clearStoredSession();
       throw this.handleAuthError(error);
     }
   }
@@ -327,6 +433,9 @@ export class AuthService {
       };
 
       this.authTokens = tokens;
+      if (this.currentUser) {
+        this.storeSession(this.currentUser, tokens);
+      }
       console.log('AuthService: AWS Cognito token refresh successful');
       return tokens;
     } catch (error: any) {
@@ -391,6 +500,52 @@ export class AuthService {
     authError.name = error.name || 'AuthError';
     authError.code = error.code;
     return authError;
+  }
+
+  /**
+   * Validate current session
+   */
+  async validateSession(): Promise<boolean> {
+    try {
+      if (!this.authTokens) {
+        return false;
+      }
+      
+      // Check stored session expiry
+      const storedSession = localStorage.getItem(this.SESSION_STORAGE_KEY);
+      if (storedSession) {
+        const sessionData = JSON.parse(storedSession);
+        if (sessionData.expiresAt && new Date(sessionData.expiresAt) <= new Date()) {
+          // Session expired
+          this.clearStoredSession();
+          this.currentUser = null;
+          this.authTokens = null;
+          return false;
+        }
+      }
+      return true;
+    } catch (error) {
+      console.error('Session validation failed:', error);
+      this.clearStoredSession();
+      this.currentUser = null;
+      this.authTokens = null;
+      return false;
+    }
+  }
+
+  /**
+   * Send session heartbeat to keep session alive
+   */
+  async sendHeartbeat(): Promise<void> {
+    try {
+      if (!this.authTokens) {
+        return;
+      }
+      // Simple heartbeat - just validate the session is still good
+      await this.validateSession();
+    } catch (error) {
+      console.error('Heartbeat failed:', error);
+    }
   }
 
   /**

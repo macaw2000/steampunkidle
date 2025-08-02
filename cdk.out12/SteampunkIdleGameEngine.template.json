@@ -1,0 +1,2652 @@
+{
+ "Description": "Steampunk Idle Game - Fargate Game Engine",
+ "Resources": {
+  "GameEngineVpcE8904ED8": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16",
+    "EnableDnsHostnames": true,
+    "EnableDnsSupport": true,
+    "InstanceTenancy": "default",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/Resource"
+   }
+  },
+  "GameEngineVpcPublicSubnet1Subnet447CBF05": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-west-2a",
+    "CidrBlock": "10.0.0.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/Subnet"
+   }
+  },
+  "GameEngineVpcPublicSubnet1RouteTable9D4E49A0": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/RouteTable"
+   }
+  },
+  "GameEngineVpcPublicSubnet1RouteTableAssociation65ED5D81": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPublicSubnet1RouteTable9D4E49A0"
+    },
+    "SubnetId": {
+     "Ref": "GameEngineVpcPublicSubnet1Subnet447CBF05"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/RouteTableAssociation"
+   }
+  },
+  "GameEngineVpcPublicSubnet1DefaultRouteB3781880": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "GameEngineVpcIGW6742DE39"
+    },
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPublicSubnet1RouteTable9D4E49A0"
+    }
+   },
+   "DependsOn": [
+    "GameEngineVpcVPCGWFF5C340F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/DefaultRoute"
+   }
+  },
+  "GameEngineVpcPublicSubnet1EIP9ED80151": {
+   "Type": "AWS::EC2::EIP",
+   "Properties": {
+    "Domain": "vpc",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/EIP"
+   }
+  },
+  "GameEngineVpcPublicSubnet1NATGatewayC86CA6B4": {
+   "Type": "AWS::EC2::NatGateway",
+   "Properties": {
+    "AllocationId": {
+     "Fn::GetAtt": [
+      "GameEngineVpcPublicSubnet1EIP9ED80151",
+      "AllocationId"
+     ]
+    },
+    "SubnetId": {
+     "Ref": "GameEngineVpcPublicSubnet1Subnet447CBF05"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "DependsOn": [
+    "GameEngineVpcPublicSubnet1DefaultRouteB3781880",
+    "GameEngineVpcPublicSubnet1RouteTableAssociation65ED5D81"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet1/NATGateway"
+   }
+  },
+  "GameEngineVpcPublicSubnet2Subnet30AFA94A": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-west-2b",
+    "CidrBlock": "10.0.1.0/24",
+    "MapPublicIpOnLaunch": true,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Public"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Public"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2/Subnet"
+   }
+  },
+  "GameEngineVpcPublicSubnet2RouteTable5343BD1E": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2/RouteTable"
+   }
+  },
+  "GameEngineVpcPublicSubnet2RouteTableAssociationBEDAD4A7": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPublicSubnet2RouteTable5343BD1E"
+    },
+    "SubnetId": {
+     "Ref": "GameEngineVpcPublicSubnet2Subnet30AFA94A"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2/RouteTableAssociation"
+   }
+  },
+  "GameEngineVpcPublicSubnet2DefaultRoute918E397A": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "GatewayId": {
+     "Ref": "GameEngineVpcIGW6742DE39"
+    },
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPublicSubnet2RouteTable5343BD1E"
+    }
+   },
+   "DependsOn": [
+    "GameEngineVpcVPCGWFF5C340F"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PublicSubnet2/DefaultRoute"
+   }
+  },
+  "GameEngineVpcPrivateSubnet1Subnet2EB2B79B": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-west-2a",
+    "CidrBlock": "10.0.2.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1/Subnet"
+   }
+  },
+  "GameEngineVpcPrivateSubnet1RouteTable91B16350": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1/RouteTable"
+   }
+  },
+  "GameEngineVpcPrivateSubnet1RouteTableAssociation4BFA8580": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPrivateSubnet1RouteTable91B16350"
+    },
+    "SubnetId": {
+     "Ref": "GameEngineVpcPrivateSubnet1Subnet2EB2B79B"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1/RouteTableAssociation"
+   }
+  },
+  "GameEngineVpcPrivateSubnet1DefaultRoute83473167": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "GameEngineVpcPublicSubnet1NATGatewayC86CA6B4"
+    },
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPrivateSubnet1RouteTable91B16350"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet1/DefaultRoute"
+   }
+  },
+  "GameEngineVpcPrivateSubnet2SubnetE58A0756": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "us-west-2b",
+    "CidrBlock": "10.0.3.0/24",
+    "MapPublicIpOnLaunch": false,
+    "Tags": [
+     {
+      "Key": "aws-cdk:subnet-name",
+      "Value": "Private"
+     },
+     {
+      "Key": "aws-cdk:subnet-type",
+      "Value": "Private"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2/Subnet"
+   }
+  },
+  "GameEngineVpcPrivateSubnet2RouteTable24D2FA66": {
+   "Type": "AWS::EC2::RouteTable",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2/RouteTable"
+   }
+  },
+  "GameEngineVpcPrivateSubnet2RouteTableAssociationEB9C659A": {
+   "Type": "AWS::EC2::SubnetRouteTableAssociation",
+   "Properties": {
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPrivateSubnet2RouteTable24D2FA66"
+    },
+    "SubnetId": {
+     "Ref": "GameEngineVpcPrivateSubnet2SubnetE58A0756"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2/RouteTableAssociation"
+   }
+  },
+  "GameEngineVpcPrivateSubnet2DefaultRouteC5768B1D": {
+   "Type": "AWS::EC2::Route",
+   "Properties": {
+    "DestinationCidrBlock": "0.0.0.0/0",
+    "NatGatewayId": {
+     "Ref": "GameEngineVpcPublicSubnet1NATGatewayC86CA6B4"
+    },
+    "RouteTableId": {
+     "Ref": "GameEngineVpcPrivateSubnet2RouteTable24D2FA66"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/PrivateSubnet2/DefaultRoute"
+   }
+  },
+  "GameEngineVpcIGW6742DE39": {
+   "Type": "AWS::EC2::InternetGateway",
+   "Properties": {
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Name",
+      "Value": "SteampunkIdleGameEngine/GameEngineVpc"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/IGW"
+   }
+  },
+  "GameEngineVpcVPCGWFF5C340F": {
+   "Type": "AWS::EC2::VPCGatewayAttachment",
+   "Properties": {
+    "InternetGatewayId": {
+     "Ref": "GameEngineVpcIGW6742DE39"
+    },
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/VPCGW"
+   }
+  },
+  "GameEngineVpcRestrictDefaultSecurityGroupCustomResource4B931A75": {
+   "Type": "Custom::VpcRestrictDefaultSG",
+   "Properties": {
+    "ServiceToken": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E",
+      "Arn"
+     ]
+    },
+    "DefaultSecurityGroupId": {
+     "Fn::GetAtt": [
+      "GameEngineVpcE8904ED8",
+      "DefaultSecurityGroup"
+     ]
+    },
+    "Account": "735515353866"
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngineVpc/RestrictDefaultSecurityGroupCustomResource/Default"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ]
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Sub": "arn:${AWS::Partition}:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+     }
+    ],
+    "Policies": [
+     {
+      "PolicyName": "Inline",
+      "PolicyDocument": {
+       "Version": "2012-10-17",
+       "Statement": [
+        {
+         "Effect": "Allow",
+         "Action": [
+          "ec2:AuthorizeSecurityGroupIngress",
+          "ec2:AuthorizeSecurityGroupEgress",
+          "ec2:RevokeSecurityGroupIngress",
+          "ec2:RevokeSecurityGroupEgress"
+         ],
+         "Resource": [
+          {
+           "Fn::Join": [
+            "",
+            [
+             "arn:aws:ec2:us-west-2:735515353866:security-group/",
+             {
+              "Fn::GetAtt": [
+               "GameEngineVpcE8904ED8",
+               "DefaultSecurityGroup"
+              ]
+             }
+            ]
+           ]
+          }
+         ]
+        }
+       ]
+      }
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/Custom::VpcRestrictDefaultSGCustomResourceProvider/Role"
+   }
+  },
+  "CustomVpcRestrictDefaultSGCustomResourceProviderHandlerDC833E5E": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": "cdk-hnb659fds-assets-735515353866-us-west-2",
+     "S3Key": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip"
+    },
+    "Timeout": 900,
+    "MemorySize": 128,
+    "Handler": "__entrypoint__.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs22.x",
+    "Description": "Lambda function for removing all inbound/outbound rules from the VPC default security group"
+   },
+   "DependsOn": [
+    "CustomVpcRestrictDefaultSGCustomResourceProviderRole26592FE0"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/Custom::VpcRestrictDefaultSGCustomResourceProvider/Handler",
+    "aws:asset:path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+    "aws:asset:property": "Code"
+   }
+  },
+  "TaskQueuePersistenceTaskQueuesTable77206819": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "playerId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "isRunning",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "lastProcessed",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "isPaused",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "lastUpdated",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "queueSize",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "version",
+      "AttributeType": "N"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "DeletionProtectionEnabled": false,
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "running-status-lastprocessed-index",
+      "KeySchema": [
+       {
+        "AttributeName": "isRunning",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "lastProcessed",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "NonKeyAttributes": [
+        "playerId",
+        "currentTaskId",
+        "queueSize",
+        "isPaused",
+        "lastUpdated",
+        "version"
+       ],
+       "ProjectionType": "INCLUDE"
+      }
+     },
+     {
+      "IndexName": "paused-status-index",
+      "KeySchema": [
+       {
+        "AttributeName": "isPaused",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "lastUpdated",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "NonKeyAttributes": [
+        "playerId",
+        "pauseReason",
+        "canResume",
+        "queueSize"
+       ],
+       "ProjectionType": "INCLUDE"
+      }
+     },
+     {
+      "IndexName": "queuesize-lastprocessed-index",
+      "KeySchema": [
+       {
+        "AttributeName": "queueSize",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "lastProcessed",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "KEYS_ONLY"
+      }
+     },
+     {
+      "IndexName": "version-lastupdated-index",
+      "KeySchema": [
+       {
+        "AttributeName": "version",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "lastUpdated",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "KEYS_ONLY"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "playerId",
+      "KeyType": "HASH"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "StreamSpecification": {
+     "StreamViewType": "NEW_AND_OLD_IMAGES"
+    },
+    "TableName": "steampunk-idle-game-task-queues-enhanced",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "TaskQueuePersistence"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     },
+     {
+      "Key": "Purpose",
+      "Value": "MainStorage"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/TaskQueuePersistence/TaskQueuesTable/Resource"
+   }
+  },
+  "TaskQueuePersistenceTaskQueueSnapshotsTable8C689013": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "snapshotId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "playerId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "reason",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "playerId-timestamp-index",
+      "KeySchema": [
+       {
+        "AttributeName": "playerId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "timestamp-reason-index",
+      "KeySchema": [
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "reason",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "KEYS_ONLY"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "snapshotId",
+      "KeyType": "HASH"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "steampunk-idle-game-task-queue-snapshots",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "TaskQueuePersistence"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     },
+     {
+      "Key": "Purpose",
+      "Value": "Backup"
+     }
+    ],
+    "TimeToLiveSpecification": {
+     "AttributeName": "ttl",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/TaskQueuePersistence/TaskQueueSnapshotsTable/Resource"
+   }
+  },
+  "TaskQueuePersistenceTaskQueueMigrationsTable86BB0742": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "migrationId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "status",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "fromVersion",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "toVersion",
+      "AttributeType": "N"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "status-timestamp-index",
+      "KeySchema": [
+       {
+        "AttributeName": "status",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "fromversion-toversion-index",
+      "KeySchema": [
+       {
+        "AttributeName": "fromVersion",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "toVersion",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "migrationId",
+      "KeyType": "HASH"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "steampunk-idle-game-task-queue-migrations",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "TaskQueuePersistence"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     },
+     {
+      "Key": "Purpose",
+      "Value": "SchemaManagement"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/TaskQueuePersistence/TaskQueueMigrationsTable/Resource"
+   }
+  },
+  "TaskQueuePersistenceTaskQueueMetricsTable1C36DACC": {
+   "Type": "AWS::DynamoDB::Table",
+   "Properties": {
+    "AttributeDefinitions": [
+     {
+      "AttributeName": "metricId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "timestamp",
+      "AttributeType": "N"
+     },
+     {
+      "AttributeName": "playerId",
+      "AttributeType": "S"
+     },
+     {
+      "AttributeName": "metricType",
+      "AttributeType": "S"
+     }
+    ],
+    "BillingMode": "PAY_PER_REQUEST",
+    "GlobalSecondaryIndexes": [
+     {
+      "IndexName": "playerId-timestamp-index",
+      "KeySchema": [
+       {
+        "AttributeName": "playerId",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     },
+     {
+      "IndexName": "metrictype-timestamp-index",
+      "KeySchema": [
+       {
+        "AttributeName": "metricType",
+        "KeyType": "HASH"
+       },
+       {
+        "AttributeName": "timestamp",
+        "KeyType": "RANGE"
+       }
+      ],
+      "Projection": {
+       "ProjectionType": "ALL"
+      }
+     }
+    ],
+    "KeySchema": [
+     {
+      "AttributeName": "metricId",
+      "KeyType": "HASH"
+     },
+     {
+      "AttributeName": "timestamp",
+      "KeyType": "RANGE"
+     }
+    ],
+    "PointInTimeRecoverySpecification": {
+     "PointInTimeRecoveryEnabled": true
+    },
+    "TableName": "steampunk-idle-game-task-queue-metrics",
+    "Tags": [
+     {
+      "Key": "Component",
+      "Value": "TaskQueuePersistence"
+     },
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     },
+     {
+      "Key": "Purpose",
+      "Value": "Monitoring"
+     }
+    ],
+    "TimeToLiveSpecification": {
+     "AttributeName": "ttl",
+     "Enabled": true
+    }
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/TaskQueuePersistence/TaskQueueMetricsTable/Resource"
+   }
+  },
+  "GameEngineGameEngineAlarmTopic4F4AFAA4": {
+   "Type": "AWS::SNS::Topic",
+   "Properties": {
+    "DisplayName": "Steampunk Game Engine Alerts",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "TopicName": "steampunk-game-engine-alerts-staging"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineAlarmTopic/Resource"
+   }
+  },
+  "GameEngineGameEngineCluster165E0999": {
+   "Type": "AWS::ECS::Cluster",
+   "Properties": {
+    "ClusterName": "steampunk-idle-game-cluster-staging",
+    "ClusterSettings": [
+     {
+      "Name": "containerInsights",
+      "Value": "enabled"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineCluster/Resource"
+   }
+  },
+  "GameEngineGameEngineCluster36576135": {
+   "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+   "Properties": {
+    "CapacityProviders": [
+     "FARGATE",
+     "FARGATE_SPOT"
+    ],
+    "Cluster": {
+     "Ref": "GameEngineGameEngineCluster165E0999"
+    },
+    "DefaultCapacityProviderStrategy": []
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineCluster/GameEngineCluster"
+   }
+  },
+  "GameEngineGameEngineLogGroup7329340B": {
+   "Type": "AWS::Logs::LogGroup",
+   "Properties": {
+    "LogGroupName": "/ecs/steampunk-idle-game-engine-staging",
+    "RetentionInDays": 14,
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "UpdateReplacePolicy": "Delete",
+   "DeletionPolicy": "Delete",
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineLogGroup/Resource"
+   }
+  },
+  "GameEngineGameEngineTaskDefTaskRoleB3A57DE6": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTaskDef/TaskRole/Resource"
+   }
+  },
+  "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem"
+       ],
+       "Effect": "Allow",
+       "Resource": [
+        "arn:aws:dynamodb:us-west-2:735515353866:table/steampunk-idle-game-characters",
+        "arn:aws:dynamodb:us-west-2:735515353866:table/steampunk-idle-game-characters/index/*",
+        "arn:aws:dynamodb:us-west-2:735515353866:table/steampunk-idle-game-users",
+        "arn:aws:dynamodb:us-west-2:735515353866:table/steampunk-idle-game-users/index/*",
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:dynamodb:us-west-2:735515353866:table/",
+           {
+            "Ref": "TaskQueuePersistenceTaskQueuesTable77206819"
+           },
+           "/index/*"
+          ]
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           "arn:aws:dynamodb:us-west-2:735515353866:table/",
+           {
+            "Ref": "TaskQueuePersistenceTaskQueuesTable77206819"
+           }
+          ]
+         ]
+        }
+       ]
+      },
+      {
+       "Action": [
+        "cloudwatch:PutMetricData",
+        "logs:CreateLogGroup",
+        "logs:CreateLogStream",
+        "logs:DescribeLogGroups",
+        "logs:DescribeLogStreams",
+        "logs:PutLogEvents",
+        "ssmmessages:CreateControlChannel",
+        "ssmmessages:CreateDataChannel",
+        "ssmmessages:OpenControlChannel",
+        "ssmmessages:OpenDataChannel"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "Roles": [
+     {
+      "Ref": "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTaskDef/TaskRole/DefaultPolicy/Resource"
+   }
+  },
+  "GameEngineGameEngineTaskDefDC80E3FD": {
+   "Type": "AWS::ECS::TaskDefinition",
+   "Properties": {
+    "ContainerDefinitions": [
+     {
+      "Environment": [
+       {
+        "Name": "NODE_ENV",
+        "Value": "staging"
+       },
+       {
+        "Name": "PORT",
+        "Value": "3001"
+       },
+       {
+        "Name": "AWS_REGION",
+        "Value": "us-west-2"
+       },
+       {
+        "Name": "TASK_QUEUES_TABLE",
+        "Value": {
+         "Ref": "TaskQueuePersistenceTaskQueuesTable77206819"
+        }
+       },
+       {
+        "Name": "CHARACTERS_TABLE",
+        "Value": "steampunk-idle-game-characters"
+       },
+       {
+        "Name": "USERS_TABLE",
+        "Value": "steampunk-idle-game-users"
+       },
+       {
+        "Name": "LOG_LEVEL",
+        "Value": "info"
+       },
+       {
+        "Name": "METRICS_NAMESPACE",
+        "Value": "SteampunkIdleGame/GameEngine"
+       },
+       {
+        "Name": "ENVIRONMENT",
+        "Value": "staging"
+       }
+      ],
+      "Essential": true,
+      "HealthCheck": {
+       "Command": [
+        "CMD-SHELL",
+        "node -e \"require('http').get('http://localhost:3001/api/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })\""
+       ],
+       "Interval": 30,
+       "Retries": 3,
+       "StartPeriod": 60,
+       "Timeout": 5
+      },
+      "Image": {
+       "Fn::Sub": "735515353866.dkr.ecr.us-west-2.${AWS::URLSuffix}/cdk-hnb659fds-container-assets-735515353866-us-west-2:d86c9ef0113bc1f2b802a64d9ee6a369f42b4d1bec3839ec39e1009b697deafa"
+      },
+      "LogConfiguration": {
+       "LogDriver": "awslogs",
+       "Options": {
+        "awslogs-group": {
+         "Ref": "GameEngineGameEngineLogGroup7329340B"
+        },
+        "awslogs-stream-prefix": "game-engine",
+        "awslogs-region": "us-west-2",
+        "awslogs-datetime-format": "%Y-%m-%d %H:%M:%S"
+       }
+      },
+      "MemoryReservation": 512,
+      "Name": "GameEngineContainer",
+      "PortMappings": [
+       {
+        "ContainerPort": 3001,
+        "Protocol": "tcp"
+       }
+      ]
+     }
+    ],
+    "Cpu": "512",
+    "ExecutionRoleArn": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineTaskDefExecutionRole39909B1E",
+      "Arn"
+     ]
+    },
+    "Family": "steampunk-idle-game-engine-staging",
+    "Memory": "1024",
+    "NetworkMode": "awsvpc",
+    "RequiresCompatibilities": [
+     "FARGATE"
+    ],
+    "RuntimePlatform": {
+     "CpuArchitecture": "X86_64",
+     "OperatingSystemFamily": "LINUX"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "TaskRoleArn": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineTaskDefTaskRoleB3A57DE6",
+      "Arn"
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTaskDef/Resource"
+   }
+  },
+  "GameEngineGameEngineTaskDefExecutionRole39909B1E": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTaskDef/ExecutionRole/Resource"
+   }
+  },
+  "GameEngineGameEngineTaskDefExecutionRoleDefaultPolicyF3D09868": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ecr:BatchCheckLayerAvailability",
+        "ecr:BatchGetImage",
+        "ecr:GetDownloadUrlForLayer"
+       ],
+       "Effect": "Allow",
+       "Resource": "arn:aws:ecr:us-west-2:735515353866:repository/cdk-hnb659fds-container-assets-735515353866-us-west-2"
+      },
+      {
+       "Action": "ecr:GetAuthorizationToken",
+       "Effect": "Allow",
+       "Resource": "*"
+      },
+      {
+       "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents"
+       ],
+       "Effect": "Allow",
+       "Resource": {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineLogGroup7329340B",
+         "Arn"
+        ]
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "GameEngineGameEngineTaskDefExecutionRoleDefaultPolicyF3D09868",
+    "Roles": [
+     {
+      "Ref": "GameEngineGameEngineTaskDefExecutionRole39909B1E"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTaskDef/ExecutionRole/DefaultPolicy/Resource"
+   }
+  },
+  "GameEngineGameEngineALB97773DE9": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "Properties": {
+    "LoadBalancerAttributes": [
+     {
+      "Key": "deletion_protection.enabled",
+      "Value": "false"
+     },
+     {
+      "Key": "idle_timeout.timeout_seconds",
+      "Value": "60"
+     }
+    ],
+    "Name": "steampunk-alb-staging",
+    "Scheme": "internet-facing",
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "GameEngineGameEngineALBSecurityGroup6903B966",
+       "GroupId"
+      ]
+     }
+    ],
+    "Subnets": [
+     {
+      "Ref": "GameEngineVpcPublicSubnet1Subnet447CBF05"
+     },
+     {
+      "Ref": "GameEngineVpcPublicSubnet2Subnet30AFA94A"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Type": "application"
+   },
+   "DependsOn": [
+    "GameEngineVpcPublicSubnet1DefaultRouteB3781880",
+    "GameEngineVpcPublicSubnet1RouteTableAssociation65ED5D81",
+    "GameEngineVpcPublicSubnet2DefaultRoute918E397A",
+    "GameEngineVpcPublicSubnet2RouteTableAssociationBEDAD4A7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineALB/Resource"
+   }
+  },
+  "GameEngineGameEngineALBSecurityGroup6903B966": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "Automatically created Security Group for ELB SteampunkIdleGameEngineGameEngineALB3DA58C26",
+    "SecurityGroupIngress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow from anyone on port 80",
+      "FromPort": 80,
+      "IpProtocol": "tcp",
+      "ToPort": 80
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineALB/SecurityGroup/Resource"
+   }
+  },
+  "GameEngineGameEngineALBSecurityGrouptoSteampunkIdleGameEngineGameEngineServiceSecurityGroupDD23BE71300106999272": {
+   "Type": "AWS::EC2::SecurityGroupEgress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "DestinationSecurityGroupId": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineServiceSecurityGroup243CADC0",
+      "GroupId"
+     ]
+    },
+    "FromPort": 3001,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineALBSecurityGroup6903B966",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "ToPort": 3001
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineALB/SecurityGroup/to SteampunkIdleGameEngineGameEngineServiceSecurityGroupDD23BE71:3001"
+   }
+  },
+  "GameEngineGameEngineALBGameEngineListenerE693BFCA": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "TargetGroupArn": {
+       "Ref": "GameEngineGameEngineTargetGroup2A06F1AD"
+      },
+      "Type": "forward"
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "GameEngineGameEngineALB97773DE9"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineALB/GameEngineListener/Resource"
+   }
+  },
+  "GameEngineGameEngineTargetGroup2A06F1AD": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "Properties": {
+    "HealthCheckEnabled": true,
+    "HealthCheckIntervalSeconds": 30,
+    "HealthCheckPath": "/health",
+    "HealthCheckPort": "3001",
+    "HealthCheckProtocol": "HTTP",
+    "HealthCheckTimeoutSeconds": 5,
+    "HealthyThresholdCount": 2,
+    "Matcher": {
+     "HttpCode": "200"
+    },
+    "Name": "steampunk-tg-staging",
+    "Port": 3001,
+    "Protocol": "HTTP",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "TargetGroupAttributes": [
+     {
+      "Key": "deregistration_delay.timeout_seconds",
+      "Value": "30"
+     },
+     {
+      "Key": "stickiness.enabled",
+      "Value": "true"
+     },
+     {
+      "Key": "stickiness.type",
+      "Value": "lb_cookie"
+     },
+     {
+      "Key": "stickiness.lb_cookie.duration_seconds",
+      "Value": "3600"
+     }
+    ],
+    "TargetType": "ip",
+    "UnhealthyThresholdCount": 3,
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineTargetGroup/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceE542BE26": {
+   "Type": "AWS::ECS::Service",
+   "Properties": {
+    "CapacityProviderStrategy": [
+     {
+      "CapacityProvider": "FARGATE",
+      "Weight": 1
+     },
+     {
+      "CapacityProvider": "FARGATE_SPOT",
+      "Weight": 0
+     }
+    ],
+    "Cluster": {
+     "Ref": "GameEngineGameEngineCluster165E0999"
+    },
+    "DeploymentConfiguration": {
+     "Alarms": {
+      "AlarmNames": [],
+      "Enable": false,
+      "Rollback": false
+     },
+     "MaximumPercent": 200,
+     "MinimumHealthyPercent": 50
+    },
+    "DesiredCount": 1,
+    "EnableECSManagedTags": false,
+    "EnableExecuteCommand": true,
+    "HealthCheckGracePeriodSeconds": 120,
+    "LoadBalancers": [
+     {
+      "ContainerName": "GameEngineContainer",
+      "ContainerPort": 3001,
+      "TargetGroupArn": {
+       "Ref": "GameEngineGameEngineTargetGroup2A06F1AD"
+      }
+     }
+    ],
+    "NetworkConfiguration": {
+     "AwsvpcConfiguration": {
+      "AssignPublicIp": "ENABLED",
+      "SecurityGroups": [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceSecurityGroup243CADC0",
+         "GroupId"
+        ]
+       }
+      ],
+      "Subnets": [
+       {
+        "Ref": "GameEngineVpcPublicSubnet1Subnet447CBF05"
+       },
+       {
+        "Ref": "GameEngineVpcPublicSubnet2Subnet30AFA94A"
+       }
+      ]
+     }
+    },
+    "ServiceName": "steampunk-idle-game-engine-staging",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "TaskDefinition": {
+     "Ref": "GameEngineGameEngineTaskDefDC80E3FD"
+    }
+   },
+   "DependsOn": [
+    "GameEngineGameEngineALBGameEngineListenerE693BFCA",
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/Service"
+   }
+  },
+  "GameEngineGameEngineServiceSecurityGroup243CADC0": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "SteampunkIdleGameEngine/GameEngine/GameEngineService/SecurityGroup",
+    "SecurityGroupEgress": [
+     {
+      "CidrIp": "0.0.0.0/0",
+      "Description": "Allow all outbound traffic by default",
+      "IpProtocol": "-1"
+     }
+    ],
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "VpcId": {
+     "Ref": "GameEngineVpcE8904ED8"
+    }
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/SecurityGroup/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceSecurityGroupfromSteampunkIdleGameEngineGameEngineALBSecurityGroup04BE3A7D3001910AF22B": {
+   "Type": "AWS::EC2::SecurityGroupIngress",
+   "Properties": {
+    "Description": "Load balancer to target",
+    "FromPort": 3001,
+    "GroupId": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineServiceSecurityGroup243CADC0",
+      "GroupId"
+     ]
+    },
+    "IpProtocol": "tcp",
+    "SourceSecurityGroupId": {
+     "Fn::GetAtt": [
+      "GameEngineGameEngineALBSecurityGroup6903B966",
+      "GroupId"
+     ]
+    },
+    "ToPort": 3001
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/SecurityGroup/from SteampunkIdleGameEngineGameEngineALBSecurityGroup04BE3A7D:3001"
+   }
+  },
+  "GameEngineGameEngineServiceTaskCountTarget3EEDC6BF": {
+   "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+   "Properties": {
+    "MaxCapacity": 3,
+    "MinCapacity": 1,
+    "ResourceId": {
+     "Fn::Join": [
+      "",
+      [
+       "service/",
+       {
+        "Ref": "GameEngineGameEngineCluster165E0999"
+       },
+       "/",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       }
+      ]
+     ]
+    },
+    "RoleARN": "arn:aws:iam::735515353866:role/aws-service-role/ecs.application-autoscaling.amazonaws.com/AWSServiceRoleForApplicationAutoScaling_ECSService",
+    "ScalableDimension": "ecs:service:DesiredCount",
+    "ServiceNamespace": "ecs"
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/TaskCount/Target/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceTaskCountTargetCpuScaling62FC6DFD": {
+   "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+   "Properties": {
+    "PolicyName": "SteampunkIdleGameEngineGameEngineServiceTaskCountTargetCpuScalingAE0349F2",
+    "PolicyType": "TargetTrackingScaling",
+    "ScalingTargetId": {
+     "Ref": "GameEngineGameEngineServiceTaskCountTarget3EEDC6BF"
+    },
+    "TargetTrackingScalingPolicyConfiguration": {
+     "DisableScaleIn": false,
+     "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ECSServiceAverageCPUUtilization"
+     },
+     "ScaleInCooldown": 300,
+     "ScaleOutCooldown": 120,
+     "TargetValue": 70
+    }
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/TaskCount/Target/CpuScaling/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceTaskCountTargetMemoryScalingA128BCC2": {
+   "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+   "Properties": {
+    "PolicyName": "SteampunkIdleGameEngineGameEngineServiceTaskCountTargetMemoryScalingD504ED7C",
+    "PolicyType": "TargetTrackingScaling",
+    "ScalingTargetId": {
+     "Ref": "GameEngineGameEngineServiceTaskCountTarget3EEDC6BF"
+    },
+    "TargetTrackingScalingPolicyConfiguration": {
+     "DisableScaleIn": false,
+     "PredefinedMetricSpecification": {
+      "PredefinedMetricType": "ECSServiceAverageMemoryUtilization"
+     },
+     "ScaleInCooldown": 300,
+     "ScaleOutCooldown": 120,
+     "TargetValue": 80
+    }
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/TaskCount/Target/MemoryScaling/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceTaskCountTargetActiveTaskQueuesScalingUpperPolicyFC2387A5": {
+   "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+   "Properties": {
+    "PolicyName": "SteampunkIdleGameEngineGameEngineServiceTaskCountTargetActiveTaskQueuesScalingUpperPolicy34A748EB",
+    "PolicyType": "StepScaling",
+    "ScalingTargetId": {
+     "Ref": "GameEngineGameEngineServiceTaskCountTarget3EEDC6BF"
+    },
+    "StepScalingPolicyConfiguration": {
+     "AdjustmentType": "ChangeInCapacity",
+     "Cooldown": 180,
+     "MetricAggregationType": "Average",
+     "StepAdjustments": [
+      {
+       "MetricIntervalLowerBound": 0,
+       "MetricIntervalUpperBound": 40,
+       "ScalingAdjustment": 1
+      },
+      {
+       "MetricIntervalLowerBound": 40,
+       "MetricIntervalUpperBound": 90,
+       "ScalingAdjustment": 2
+      },
+      {
+       "MetricIntervalLowerBound": 90,
+       "ScalingAdjustment": 3
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/TaskCount/Target/ActiveTaskQueuesScaling/UpperPolicy/Resource"
+   }
+  },
+  "GameEngineGameEngineServiceTaskCountTargetActiveTaskQueuesScalingUpperAlarm8A4763AB": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineServiceTaskCountTargetActiveTaskQueuesScalingUpperPolicyFC2387A5"
+     }
+    ],
+    "AlarmDescription": "Upper threshold scaling alarm",
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 1,
+    "MetricName": "ActiveTaskQueues",
+    "Namespace": "SteampunkIdleGame/GameEngine",
+    "Period": 60,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 10
+   },
+   "DependsOn": [
+    "GameEngineGameEngineTaskDefTaskRoleDefaultPolicyBF2FC2FD",
+    "GameEngineGameEngineTaskDefTaskRoleB3A57DE6"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineService/TaskCount/Target/ActiveTaskQueuesScaling/UpperAlarm/Resource"
+   }
+  },
+  "GameEngineServiceHighCpuAlarmFE340857": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine service CPU utilization is high",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-high-cpu"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Ref": "GameEngineGameEngineCluster165E0999"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineServiceE542BE26",
+        "Name"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "CPUUtilization",
+    "Namespace": "AWS/ECS",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 80,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/ServiceHighCpuAlarm/Resource"
+   }
+  },
+  "GameEngineServiceHighMemoryAlarmE575E7C6": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine service memory utilization is high",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-high-memory"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Ref": "GameEngineGameEngineCluster165E0999"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineServiceE542BE26",
+        "Name"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "MemoryUtilization",
+    "Namespace": "AWS/ECS",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 85,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/ServiceHighMemoryAlarm/Resource"
+   }
+  },
+  "GameEngineServiceTaskCountAlarmDA76B47A": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine service has no running tasks",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-no-running-tasks"
+      ]
+     ]
+    },
+    "ComparisonOperator": "LessThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "ClusterName",
+      "Value": {
+       "Ref": "GameEngineGameEngineCluster165E0999"
+      }
+     },
+     {
+      "Name": "ServiceName",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineServiceE542BE26",
+        "Name"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 3,
+    "MetricName": "RunningTaskCount",
+    "Namespace": "AWS/ECS",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 1,
+    "TreatMissingData": "breaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/ServiceTaskCountAlarm/Resource"
+   }
+  },
+  "GameEngineTargetGroupUnhealthyAlarmBA8F4E0A": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine has unhealthy targets",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-unhealthy-targets"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineALB97773DE9",
+        "LoadBalancerFullName"
+       ]
+      }
+     },
+     {
+      "Name": "TargetGroup",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineTargetGroup2A06F1AD",
+        "TargetGroupFullName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "UnHealthyHostCount",
+    "Namespace": "AWS/ApplicationELB",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 60,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 0,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/TargetGroupUnhealthyAlarm/Resource"
+   }
+  },
+  "GameEngineHighResponseTimeAlarmEFF455EF": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine response time is high",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-high-response-time"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineALB97773DE9",
+        "LoadBalancerFullName"
+       ]
+      }
+     },
+     {
+      "Name": "TargetGroup",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineTargetGroup2A06F1AD",
+        "TargetGroupFullName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "TargetResponseTime",
+    "Namespace": "AWS/ApplicationELB",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 5,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/HighResponseTimeAlarm/Resource"
+   }
+  },
+  "GameEngineHighErrorRateAlarm27F4C55E": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Game Engine error rate is high",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-high-error-rate"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "Dimensions": [
+     {
+      "Name": "LoadBalancer",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineALB97773DE9",
+        "LoadBalancerFullName"
+       ]
+      }
+     },
+     {
+      "Name": "TargetGroup",
+      "Value": {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineTargetGroup2A06F1AD",
+        "TargetGroupFullName"
+       ]
+      }
+     }
+    ],
+    "EvaluationPeriods": 2,
+    "MetricName": "HTTPCode_Target_5XX_Count",
+    "Namespace": "AWS/ApplicationELB",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Sum",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 10,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/HighErrorRateAlarm/Resource"
+   }
+  },
+  "GameEngineTaskProcessingErrorsAlarm54056088": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "High number of task processing errors",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-task-processing-errors"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 2,
+    "MetricName": "TaskProcessingErrors",
+    "Namespace": "SteampunkIdleGame/GameEngine",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Sum",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 50,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/TaskProcessingErrorsAlarm/Resource"
+   }
+  },
+  "GameEngineQueueBacklogAlarmD518B529": {
+   "Type": "AWS::CloudWatch::Alarm",
+   "Properties": {
+    "AlarmActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "AlarmDescription": "Task queue backlog is growing",
+    "AlarmName": {
+     "Fn::Join": [
+      "",
+      [
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "-queue-backlog"
+      ]
+     ]
+    },
+    "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+    "EvaluationPeriods": 3,
+    "MetricName": "QueueBacklog",
+    "Namespace": "SteampunkIdleGame/GameEngine",
+    "OKActions": [
+     {
+      "Ref": "GameEngineGameEngineAlarmTopic4F4AFAA4"
+     }
+    ],
+    "Period": 300,
+    "Statistic": "Average",
+    "Tags": [
+     {
+      "Key": "Environment",
+      "Value": "production"
+     },
+     {
+      "Key": "Project",
+      "Value": "SteampunkIdleGame"
+     }
+    ],
+    "Threshold": 1000,
+    "TreatMissingData": "notBreaching"
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/QueueBacklogAlarm/Resource"
+   }
+  },
+  "GameEngineGameEngineDashboardA193D074": {
+   "Type": "AWS::CloudWatch::Dashboard",
+   "Properties": {
+    "DashboardBody": {
+     "Fn::Join": [
+      "",
+      [
+       "{\"widgets\":[{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":0,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Service Metrics\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ECS\",\"CPUUtilization\",\"ClusterName\",\"",
+       {
+        "Ref": "GameEngineGameEngineCluster165E0999"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "\"],[\"AWS/ECS\",\"MemoryUtilization\",\"ClusterName\",\"",
+       {
+        "Ref": "GameEngineGameEngineCluster165E0999"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "\"],[\"AWS/ECS\",\"RunningTaskCount\",\"ClusterName\",\"",
+       {
+        "Ref": "GameEngineGameEngineCluster165E0999"
+       },
+       "\",\"ServiceName\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       },
+       "\",{\"yAxis\":\"right\"}]],\"yAxis\":{},\"period\":300}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":6,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Load Balancer Metrics\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"AWS/ApplicationELB\",\"RequestCount\",\"LoadBalancer\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineALB97773DE9",
+         "LoadBalancerFullName"
+        ]
+       },
+       "\",{\"stat\":\"Sum\"}],[\"AWS/ApplicationELB\",\"TargetResponseTime\",\"LoadBalancer\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineALB97773DE9",
+         "LoadBalancerFullName"
+        ]
+       },
+       "\"],[\"AWS/ApplicationELB\",\"HTTPCode_Target_2XX_Count\",\"LoadBalancer\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineALB97773DE9",
+         "LoadBalancerFullName"
+        ]
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"AWS/ApplicationELB\",\"HTTPCode_Target_5XX_Count\",\"LoadBalancer\",\"",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineALB97773DE9",
+         "LoadBalancerFullName"
+        ]
+       },
+       "\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}]],\"yAxis\":{}}},{\"type\":\"metric\",\"width\":12,\"height\":6,\"x\":0,\"y\":12,\"properties\":{\"view\":\"timeSeries\",\"title\":\"Custom Application Metrics\",\"region\":\"",
+       {
+        "Ref": "AWS::Region"
+       },
+       "\",\"metrics\":[[\"SteampunkIdleGame/GameEngine\",\"ActiveTaskQueues\"],[\"SteampunkIdleGame/GameEngine\",\"TasksProcessedPerSecond\"],[\"SteampunkIdleGame/GameEngine\",\"TaskProcessingErrors\",{\"stat\":\"Sum\",\"yAxis\":\"right\"}],[\"SteampunkIdleGame/GameEngine\",\"QueueBacklog\",{\"yAxis\":\"right\"}]],\"yAxis\":{}}}]}"
+      ]
+     ]
+    },
+    "DashboardName": {
+     "Fn::Join": [
+      "",
+      [
+       "SteampunkGameEngine-",
+       {
+        "Fn::GetAtt": [
+         "GameEngineGameEngineServiceE542BE26",
+         "Name"
+        ]
+       }
+      ]
+     ]
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/GameEngine/GameEngineDashboard/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/32SwW7bMAyGn6V3VcsCDDunSVcEKDYjDnotaJlx2MiSIVIJAsPvPshO7GRFd+LPj5Qs/vRcz2c/9OwBTvxoysOjpUK3uYA5KDjxe4tmrtu3xqjlzr1lS5XFwpLJY+FQEpvUxkfBLRQWJz6xBbM3BELejc1JPK+zFH6DvIDgCc4qC3QEwenitRMMDseG4SWXbCECZl+jE5WjiYHk/BJ8bPo3/Bc8VwGZP+G163mnyrOD2peFbsehetEpdqzbrW+od6UXnULDul3ayIIh4c9yCQ0YknMW/JFKDDeWsPoFoYLkFR9WuCNHV6f+Jd4JkMNwwy5ncwxHMoP7F5kbsOnN6ZKlj046ZX3Fun311ejKVXeKoNbtxg/D9jHzlkxv+aDSnOEdmFFYr7w5YFjXUKX1oqSa3mDjmcSH8xMwKrTAQsZ6KAuw4Ay56jjX7aJpLJl++FcP5VNfG+y6y2/7iAXdpeeqb+pbCBXKONZN2imY2iCKZwOWXKXbyaDU3Ft3T4awDWAO5Kp8ODe5cg9yweZLsjDp650y1sfyBGL2ul1YCHW6ZxAr4H3hIZQJjUnXqQ2yjyHtNrL4ekp37ovS9Sfrl9BvJxeoyFXpzJ8oTZROOV+i/uBvx/lcf/+pZw8fTPQYohOqUW+G+Bc+flRvIgQAAA=="
+   },
+   "Metadata": {
+    "aws:cdk:path": "SteampunkIdleGameEngine/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "GameEngineGameEngineURLAA748ED3": {
+   "Description": "Game Engine API URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineALB97773DE9",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   },
+   "Export": {
+    "Name": "SteampunkGameEngineURL-staging"
+   }
+  },
+  "GameEngineGameEngineServiceArn229435D6": {
+   "Description": "Game Engine Service ARN",
+   "Value": {
+    "Ref": "GameEngineGameEngineServiceE542BE26"
+   },
+   "Export": {
+    "Name": "SteampunkGameEngineServiceArn-staging"
+   }
+  },
+  "GameEngineGameEngineClusterName956AD64D": {
+   "Description": "Game Engine Cluster Name",
+   "Value": {
+    "Ref": "GameEngineGameEngineCluster165E0999"
+   },
+   "Export": {
+    "Name": "SteampunkGameEngineClusterName-staging"
+   }
+  },
+  "GameEngineGameEngineLogGroupName8E7F1CC2": {
+   "Description": "Game Engine Log Group Name",
+   "Value": {
+    "Ref": "GameEngineGameEngineLogGroup7329340B"
+   },
+   "Export": {
+    "Name": "SteampunkGameEngineLogGroupName-staging"
+   }
+  },
+  "GameEngineUrl": {
+   "Description": "Game Engine Load Balancer URL",
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      "http://",
+      {
+       "Fn::GetAtt": [
+        "GameEngineGameEngineALB97773DE9",
+        "DNSName"
+       ]
+      }
+     ]
+    ]
+   }
+  },
+  "TaskQueuesTableName": {
+   "Description": "Task Queues DynamoDB Table Name",
+   "Value": {
+    "Ref": "TaskQueuePersistenceTaskQueuesTable77206819"
+   }
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

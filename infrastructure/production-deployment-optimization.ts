@@ -47,7 +47,7 @@ export class ProductionDeploymentOptimizationStack extends cdk.Stack {
 
   private createOptimizationFunction(): lambda.Function {
     return new lambda.Function(this, 'ProductionOptimizationFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'optimization.handler',
       code: lambda.Code.fromInline(`
         const { CloudWatchClient, PutMetricDataCommand } = require('@aws-sdk/client-cloudwatch');
@@ -140,7 +140,7 @@ export class ProductionDeploymentOptimizationStack extends cdk.Stack {
   }  
 private createHealthCheckFunction(props: ProductionDeploymentOptimizationProps): lambda.Function {
     return new lambda.Function(this, 'ProductionHealthCheckFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'healthCheck.handler',
       code: lambda.Code.fromInline(`
         const https = require('https');
@@ -271,7 +271,7 @@ private createHealthCheckFunction(props: ProductionDeploymentOptimizationProps):
 
   private createDeploymentReadinessFunction(props: ProductionDeploymentOptimizationProps): lambda.Function {
     return new lambda.Function(this, 'DeploymentReadinessFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'deploymentReadiness.handler',
       code: lambda.Code.fromInline(`
         const { CloudWatchClient, PutMetricDataCommand, GetMetricStatisticsCommand } = require('@aws-sdk/client-cloudwatch');

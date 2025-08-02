@@ -46,7 +46,7 @@ export class LoadTestingStack extends cdk.Stack {
 
     // Load test execution function
     this.loadTestFunction = new lambda.Function(this, 'LoadTestFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'loadTest.handler',
       code: lambda.Code.fromInline(`
         const https = require('https');
@@ -384,7 +384,7 @@ export class LoadTestingStack extends cdk.Stack {
 
     // Metrics analysis function
     this.metricsFunction = new lambda.Function(this, 'LoadTestMetricsFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'metrics.handler',
       code: lambda.Code.fromInline(`
         const { S3Client, GetObjectCommand } = require('@aws-sdk/client-s3');

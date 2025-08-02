@@ -14,7 +14,7 @@ import MarketplaceHub from './marketplace/MarketplaceHub';
 import LeaderboardHub from './leaderboard/LeaderboardHub';
 import CharacterPanel from './character/CharacterPanel';
 import HarvestingRewards from './harvesting/HarvestingRewards';
-import HarvestingHub from './harvesting/HarvestingHub';
+import SimpleHarvestingHub from './harvesting/SimpleHarvestingHub';
 import TaskQueueContainer from './taskQueue/TaskQueueContainer';
 import FargateTaskQueueManager from './taskQueue/FargateTaskQueueManager';
 
@@ -87,19 +87,8 @@ const GameDashboard: React.FC = () => {
         );
       case 'Resource Harvesting':
         return character ? (
-          <HarvestingHub
-            playerId={character.characterId}
-            playerLevel={character.level}
-            playerStats={{
-              intelligence: character.stats?.intelligence || 10,
-              dexterity: character.stats?.dexterity || 10,
-              strength: character.stats?.strength || 10,
-              perception: character.stats?.vitality || 10
-            }}
-            onRewardsReceived={(rewards) => {
-              setHarvestingRewards(rewards);
-              setShowRewards(true);
-            }}
+          <SimpleHarvestingHub
+            userId={character.userId}
             onClose={closeFeature}
           />
         ) : (
@@ -209,29 +198,9 @@ const GameDashboard: React.FC = () => {
     // Set online status when component mounts
     dispatch(setOnlineStatus(true));
 
-    // Load and restore task queue state when character is available
+    // Note: Advanced task queue system disabled - using simple activity system
     if (character) {
-      // Progress tracking is now handled by UnifiedProgressBar
-      // No need to track progress in GameDashboard anymore
-
-      // Set up task completion listener FIRST before syncing with server
-      serverTaskQueueService.onTaskComplete(character.characterId, (result) => {
-        // Update queue status after task completion
-        const status = serverTaskQueueService.getQueueStatus(character.characterId);
-        setQueueStatus(status);
-
-        // Exotic items are now displayed in the unified progress bar - no popups needed
-      });
-
-      // Sync with server-side task queue to restore idle game state
-      console.log('GameDashboard: Syncing with server task queue for character:', character.characterId);
-      serverTaskQueueService.syncWithServer(character.characterId).then(() => {
-        // Update initial queue status after syncing
-        const status = serverTaskQueueService.getQueueStatus(character.characterId);
-        setQueueStatus(status);
-      }).catch(error => {
-        console.error('Failed to sync with server task queue:', error);
-      });
+      console.log('GameDashboard: Character loaded, using simple activity system');
     }
 
     // Fetch initial online player count
@@ -244,10 +213,7 @@ const GameDashboard: React.FC = () => {
     return () => {
       dispatch(setOnlineStatus(false));
       clearInterval(playerCountInterval);
-      if (character) {
-        // Clean up server sync before component unmount
-        serverTaskQueueService.removeCallbacks(character.characterId);
-      }
+      // Note: No task queue cleanup needed in simple mode
     };
   }, [dispatch, character]);
 
@@ -256,16 +222,10 @@ const GameDashboard: React.FC = () => {
     fetchOnlinePlayerCount();
   }, [isAuthenticated, character]);
 
-  // Update queue status periodically
+  // Note: Queue status updates disabled - using simple activity system
   useEffect(() => {
     if (!character) return;
-
-    const interval = setInterval(() => {
-      const status = serverTaskQueueService.getQueueStatus(character.characterId);
-      setQueueStatus(status);
-    }, 1000); // Update every second
-
-    return () => clearInterval(interval);
+    // Simple activity system doesn't need periodic queue updates
   }, [character]);
 
   // Show login screen if not authenticated

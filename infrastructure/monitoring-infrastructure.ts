@@ -45,7 +45,7 @@ export class MonitoringInfrastructure extends Construct {
 
     // Lambda function for monitoring operations
     this.monitoringFunction = new lambda.Function(this, 'MonitoringFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'taskQueueMonitoringHandler.handler',
       code: lambda.Code.fromAsset('src/lambda/activity'),
       timeout: cdk.Duration.seconds(30),
@@ -60,7 +60,7 @@ export class MonitoringInfrastructure extends Construct {
 
     // Health check function
     this.healthCheckFunction = new lambda.Function(this, 'HealthCheckFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'taskQueueMonitoringHandler.healthCheck',
       code: lambda.Code.fromAsset('src/lambda/activity'),
       timeout: cdk.Duration.seconds(10),

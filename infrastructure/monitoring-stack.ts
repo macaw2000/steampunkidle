@@ -312,7 +312,7 @@ export class MonitoringStack extends cdk.Stack {
 
     // Create a Lambda function to analyze X-Ray traces
     const xrayAnalysisFunction = new lambda.Function(this, 'XRayAnalysisFunction', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       handler: 'index.handler',
       code: lambda.Code.fromInline(`
         const { XRayClient, GetTraceSummariesCommand, GetServiceGraphCommand } = require('@aws-sdk/client-xray');

@@ -1,0 +1,52 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200": {
+      "displayName": "SteampunkIdleGameEngine/Custom::VpcRestrictDefaultSGCustomResourceProvider Code",
+      "source": {
+        "path": "asset.7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-830eaa9c": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "7fa1e366ee8a9ded01fc355f704cff92bfd179574e6f9cfee800a3541df1b200.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "0cc1f744899f659d60bf9cac99ca4ed7bd85ceceeeaa7f4e4bc701fe67e03707": {
+      "displayName": "SteampunkIdleGameEngine Template",
+      "source": {
+        "path": "SteampunkIdleGameEngine.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "735515353866-us-west-2-aef24d1b": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "0cc1f744899f659d60bf9cac99ca4ed7bd85ceceeeaa7f4e4bc701fe67e03707.json",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {
+    "d86c9ef0113bc1f2b802a64d9ee6a369f42b4d1bec3839ec39e1009b697deafa": {
+      "displayName": "GameEngine/GameEngineTaskDef/GameEngineContainer/AssetImage",
+      "source": {
+        "directory": "asset.d86c9ef0113bc1f2b802a64d9ee6a369f42b4d1bec3839ec39e1009b697deafa",
+        "dockerFile": "Dockerfile"
+      },
+      "destinations": {
+        "735515353866-us-west-2-de537f8c": {
+          "repositoryName": "cdk-hnb659fds-container-assets-735515353866-us-west-2",
+          "imageTag": "d86c9ef0113bc1f2b802a64d9ee6a369f42b4d1bec3839ec39e1009b697deafa",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-image-publishing-role-735515353866-us-west-2"
+        }
+      }
+    }
+  }
+}

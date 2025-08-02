@@ -1,0 +1,81 @@
+{
+  "version": "45.0.0",
+  "files": {
+    "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6": {
+      "displayName": "SteampunkIdleGameSimpleWeb/Custom::S3AutoDeleteObjectsCustomResourceProvider Code",
+      "source": {
+        "path": "asset.faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-cd71a7a8": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "faa95a81ae7d7373f3e1f242268f904eb748d8d0fdd306e8a6fe515a1905a7d6.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535": {
+      "displayName": "DeployWebsite/AwsCliLayer/Code",
+      "source": {
+        "path": "asset.c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535.zip",
+        "packaging": "file"
+      },
+      "destinations": {
+        "735515353866-us-west-2-6406ecc4": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "c49d356cac773d491c5f7ac148995a1181498a8e289429f8612a7f7e3814f535.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d": {
+      "displayName": "Custom::CDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C/Code",
+      "source": {
+        "path": "asset.9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-44deadaa": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "9a1fcb4a7ecba81ad70e9d3fb241f6794497da945dae5f25924e4dd002b65f2d.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "62b0a1054471656372f32173dd6c8c1a2817df155ba52d8a4fee89282fe45cef": {
+      "displayName": "DeployWebsite/Asset1",
+      "source": {
+        "path": "asset.62b0a1054471656372f32173dd6c8c1a2817df155ba52d8a4fee89282fe45cef",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "735515353866-us-west-2-afbdb59e": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "62b0a1054471656372f32173dd6c8c1a2817df155ba52d8a4fee89282fe45cef.zip",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    },
+    "6e722d973fd4b7d1f49122cbb041ba41629bc904abc23f66408a767e475c317c": {
+      "displayName": "SteampunkIdleGameSimpleWeb Template",
+      "source": {
+        "path": "SteampunkIdleGameSimpleWeb.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "735515353866-us-west-2-628a2c65": {
+          "bucketName": "cdk-hnb659fds-assets-735515353866-us-west-2",
+          "objectKey": "6e722d973fd4b7d1f49122cbb041ba41629bc904abc23f66408a767e475c317c.json",
+          "region": "us-west-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::735515353866:role/cdk-hnb659fds-file-publishing-role-735515353866-us-west-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
